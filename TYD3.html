@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<link rel="manifest" href="./manifest.json" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>Rúbricas Tecnología y Digitalización 3º ESO</title>
     <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -222,7 +220,6 @@
             <main class="flex-1 p-3 md:p-4 lg:p-6 xl:p-8 overflow-y-auto mt-14 md:mt-0">
                 <!-- Botón de Exportar (Nuevo) -->
                 <div id="export-container-competencias" class="mb-4 md:mb-6" style="display: none;">
-                    <!-- Selector de formato de puntuación añadido -->
                     <div class="mb-3">
                         <label for="export-format-competencias" class="block text-sm font-medium text-gray-700 mb-1">Formato de Puntuación:</label>
                         <select id="export-format-competencias" name="export-format-competencias" class="w-full md:w-auto block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
@@ -317,7 +314,6 @@
             <main class="flex-1 p-3 md:p-4 lg:p-6 xl:p-8 overflow-y-auto mt-14 md:mt-0">
                 <!-- Botón de Exportar (Nuevo) -->
                 <div id="export-container" class="mb-4 md:mb-6" style="display: none;">
-                    <!-- Selector de formato de puntuación añadido -->
                     <div class="mb-3">
                         <label for="export-format-multiple" class="block text-sm font-medium text-gray-700 mb-1">Formato de Puntuación:</label>
                         <select id="export-format-multiple" name="export-format-multiple" class="w-full md:w-auto block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
@@ -535,7 +531,7 @@
                 descripcion: "Organizar la información de manera estructurada, aplicando técnicas de almacenamiento seguro.",
                 competencia: 6,
                 niveles: [
-                    { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No organiza la información o lo hace de forma caótica y sin criterio.</li><li class='pl-2'>Guarda todos los archivos en el escritorio sin orden ni concierto; no respalda los archivos; no protege los archivos con contraseñas o antivirus.</li></ul>" },
+                    { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No organiza la información o lo hace de forma caótica и sin criterio.</li><li class='pl-2'>Guarda todos los archivos en el escritorio sin orden ni concierto; no respalda los archivos; no protege los archivos con contraseñas o antivirus.</li></ul>" },
                     { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Organiza la información de forma parcial o incompleta, sin seguir una estructura clara o coherente.</li><li class='pl-2'>Aplica técnicas de almacenamiento seguro de forma parcial o incompleta, sin tener en cuenta aspectos como el formato, el nombre, la ubicación o la protección de los archivos.</li><li class='pl-2'>Guarda los archivos en carpetas pero sin un criterio lógico o uniforme.</li></ul>" },
                     { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Organiza la información de forma adecuada, siguiendo una estructura básica y coherente.</li><li class='pl-2'>Aplica técnicas de almacenamiento seguro de forma adecuada, teniendo en cuenta aspectos como el formato, el nombre, la ubicación o la protección de los archivos.</li><li class='pl-2'>Guarda los archivos en carpetas según el tipo o el tema y les asigna nombres descriptivos; protege los archivos con contraseñas seguras o antivirus actualizados.</li></ul>" },
                     { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Organiza la información de forma óptima, siguiendo una estructura clara, coherente y adaptada al propósito.</li><li class='pl-2'>Aplica técnicas de almacenamiento seguro de forma óptima, teniendo en cuenta aspectos como el formato, el nombre, la ubicación o la protección de los archivos y utilizando herramientas adecuadas para ello.</li><li class='pl-2'>Guarda los archivos en carpetas según el tipo o el tema y les asigna nombres descriptivos que incluyen datos relevantes como la fecha o el autor; protege los archivos con contraseñas seguras.</li></ul>" },
@@ -564,7 +560,7 @@
                     { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica las aportaciones de las tecnologías emergentes al bienestar, a la igualdad social y a la disminución del impacto ambiental, ni hace un uso responsable y ético de las mismas, en el entorno más cercano.</li><li class='pl-2'>No presenta evidencias de trabajo en clase relacionadas con este criterio.</li></ul>" },
                     { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica de forma superficial algunas aportaciones de las tecnologías emergentes al bienestar, a la igualdad social y a la disminución del impacto ambiental, pero no hace un uso responsable y ético de las mismas, en el entorno más cercano.</li><li class='pl-2'>Presenta evidencias de trabajo en clase incompletas o poco elaboradas, como un listado de tecnologías emergentes sin explicar su relación con el desarrollo sostenible.</li></ul>" },
                     { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica de forma adecuada las principales aportaciones de las tecnologías emergentes al bienestar, a la igualdad social y a la disminución del impacto ambiental, y hace un uso responsable y ético de las mismas, en el entorno más cercano.</li><li class='pl-2'>Presenta evidencias de trabajo en clase suficientes y correctas, como un mapa conceptual o una ficha que resume las características y beneficios de una tecnología emergente para el desarrollo sostenible.</li></ul>" },
-                    { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica de forma amplia y detallada las aportaciones más relevantes de las tecnologías emergentes al bienestar, a la igualdad social y a la disminución del impacto ambiental, y hace un uso responsable y ético de las mismas, en el entorno más cercano.</li><li class='pl-2'>Presenta evidencias de work en clase completas y bien estructuradas, como un informe o una presentación multimedia que compara varias tecnologías emergentes y su contribución al desarrollo sostenible.</li></ul>" },
+                    { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica de forma amplia y detallada las aportaciones más relevantes de las tecnologías emergentes al bienestar, a la igualdad social y a la disminución del impacto ambiental, y hace un uso responsable y ético de las mismas, en el entorno más cercano.</li><li class='pl-2'>Presenta evidencias de trabajo en clase completas y bien estructuradas, como un informe o una presentación multimedia que compara varias tecnologías emergentes y su contribución al desarrollo sostenible.</li></ul>" },
                     { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica de forma crítica y reflexiva las aportaciones más significativas de las tecnologías emergentes al bienestar, a la igualdad social y a la disminución del impacto ambiental, y hace un uso responsable y ético de las mismas, en el entorno más cercano.</li><li class='pl-2'>Presenta evidencias de trabajo en clase excelentes y creativas, como un proyecto o una exposición oral que propone una solución innovadora y sostenible basada en una tecnología emergente para un problema real del entorno más cercano.</li></ul>" }
                 ]
             }
@@ -704,9 +700,7 @@
             populateCompetenciasSidebar();
             populateCriteriosSidebar();
 
-            // ===== INICIO: CÓDIGO MODIFICADO =====
-            // Se actualizan los listeners para que lean el formato del selector
-            
+            // Actualizar los listeners para que lean el formato del selector
             exportButtonEl.addEventListener('click', () => {
                 const format = document.getElementById('export-format-multiple').value;
                 const criteriaToExport = rubricasData.filter(c => selectedCriterios.includes(c.id));
@@ -718,7 +712,6 @@
                 const criteriaToExport = rubricasData.filter(c => c.competencia == selectedCompetencia);
                 generateAndDownloadCSV(criteriaToExport, format);
             });
-            // ===== FIN: CÓDIGO MODIFICADO =====
         });
 
         /**
@@ -1021,10 +1014,6 @@
             return fullHTML;
         }
 
-        // ===== INICIO: BLOQUE DE CÓDIGO MODIFICADO/AÑADIDO =====
-        // Se eliminan las funciones exportToClassroomCSV y exportToClassroomCSVCompetencias
-        // y se reemplazan por estas tres funciones nuevas:
-
         // --- FUNCIONES DE EXPORTACIÓN ---
 
         /**
@@ -1138,8 +1127,6 @@
             }, 500);
         }
 
-        // ===== FIN: BLOQUE DE CÓDIGO MODIFICADO/AÑADIDO =====
-
         /**
          * Convierte el título completo en un formato abreviado para la exportación.
          * Ejemplo: "TYD.3.1.1. Definir problemas o necesidades planteadas" -> "TYD.3.1.1. Definir problemas"
@@ -1168,4 +1155,22 @@
                 'Automatizar procesos, máquinas y objetos': 'Automatización y robótica',
                 'Hacer un uso eficiente y seguro': 'Uso seguro de dispositivos',
                 'Crear contenidos y elaborar materiales': 'Creación de contenidos',
-                'Organ
+                'Organizar la información': 'Organización de información',
+                'Reconocer la influencia de la actividad tecnológica': 'Impacto tecnológico',
+                'Identificar las aportaciones básicas': 'Tecnologías emergentes'
+            };
+            
+            // Aplicar abreviación si existe
+            for (const [completo, abreviado] of Object.entries(abreviaciones)) {
+                if (descripcionAbreviada.includes(completo)) {
+                    descripcionAbreviada = abreviado;
+                    break;
+                }
+            }
+            
+            return `${codigo} ${descripcionAbreviada}`;
+        }
+
+    </script>
+</body>
+</html>
