@@ -8,6 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
+    /* Todos los estilos anteriores permanecen igual */
     :root {
       --primary: #2c3e50;
       --secondary: #3498db;
@@ -151,7 +152,9 @@
     
     input[type="number"], 
     input[type="text"],
-    select {
+    input[type="password"],
+    select,
+    textarea {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ddd;
@@ -160,7 +163,7 @@
       transition: all 0.3s;
     }
     
-    input:focus, select:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: var(--secondary);
       box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
       outline: none;
@@ -231,7 +234,6 @@
       }
     }
     
-    /* Botones apilados verticalmente en la sección Acciones */
     .controls-vertical {
       display: flex;
       flex-direction: column;
@@ -293,7 +295,7 @@
       cursor: pointer;
       color: var(--primary);
       font-size: 1.1rem;
-      margin-right: 50px; /* Espacio adicional entre título y puntuación */
+      margin-right: 50px;
     }
     
     .valor-input {
@@ -364,7 +366,6 @@
       position: relative;
     }
     
-    /* Estilos mejorados para tooltips */
     [data-tooltip] {
       position: relative;
       cursor: pointer;
@@ -412,7 +413,6 @@
       transform: translateX(-50%) translateY(0);
     }
     
-    /* Ajuste para tooltips a la izquierda */
     .tooltip-left::after {
       left: 0;
       transform: translateX(0);
@@ -431,7 +431,6 @@
       transform: translateX(0) translateY(0);
     }
     
-    /* Ajuste para tooltips a la derecha */
     .tooltip-right::after {
       left: auto;
       right: 0;
@@ -762,7 +761,6 @@
       100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
     }
     
-    /* Estilos para el botón de ayuda */
     .help-button {
       position: fixed;
       bottom: 20px;
@@ -787,7 +785,6 @@
       box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
     }
     
-    /* Estilos para el modal de ayuda */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -902,7 +899,6 @@
       margin: 0;
     }
     
-    /* Estilos para secciones colapsables */
     .section-content {
       transition: all 0.3s ease;
       overflow: hidden;
@@ -916,11 +912,10 @@
     }
     
     .section-content.expanded {
-      max-height: 5000px; /* Valor suficientemente alto */
+      max-height: 5000px;
       opacity: 1;
     }
     
-    /* Estilos responsivos adicionales */
     @media (max-width: 480px) {
       body {
         padding: 10px;
@@ -962,15 +957,74 @@
         right: 15px;
       }
     }
+
+    .github-panel {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .github-config {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    @media (max-width: 768px) {
+      .github-config {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .github-info {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid var(--secondary);
+    }
+    
+    .github-info p {
+      margin-bottom: 10px;
+    }
+    
+    .github-info ul {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .github-info li {
+      margin-bottom: 5px;
+    }
+    
+    .github-status {
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: 500;
+    }
+    
+    .github-status.connected {
+      background-color: #d4edda;
+      color: #155724;
+      border-left: 4px solid var(--success);
+    }
+    
+    .github-status.disconnected {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid var(--danger);
+    }
   </style>
 </head>
 <body>
-  <!-- Botón de ayuda flotante -->
   <div class="help-button" id="help-button">
     <i class="fas fa-question"></i>
   </div>
 
-  <!-- Modal de ayuda -->
   <div class="modal-overlay" id="help-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1014,6 +1068,10 @@
               <h4><i class="fas fa-file-export"></i> Exportación/Importación</h4>
               <p>Guarda y carga listas de alumnos por clase para reutilizarlas.</p>
             </div>
+            <div class="feature-item">
+              <h4><i class="fab fa-github"></i> Guardar en GitHub Gists</h4>
+              <p>Guarda y carga tus evaluaciones desde GitHub Gists para acceso desde cualquier lugar.</p>
+            </div>
           </div>
         </div>
         
@@ -1026,6 +1084,7 @@
             <li><strong>Evaluación:</strong> Asigna puntuaciones a cada estudiante en cada tarea.</li>
             <li><strong>Resultados:</strong> Calcula los resultados para ver los promedios por criterio.</li>
             <li><strong>Exportación:</strong> Genera informes PDF o exporta rúbricas para Classroom.</li>
+            <li><strong>Guardar en GitHub:</strong> Configura tu token de GitHub para guardar tus evaluaciones en la nube.</li>
           </ol>
         </div>
         
@@ -1038,7 +1097,22 @@
             <li>Los resultados se calculan automáticamente por criterio y se promedian para obtener la nota final.</li>
             <li>Las rúbricas exportadas son compatibles con Google Classroom para una fácil importación.</li>
             <li>Puedes guardar y cargar listas de alumnos para diferentes clases usando las opciones de exportación/importación.</li>
+            <li>Para usar GitHub Gists, necesitas crear un token de acceso personal en GitHub con permisos para gists.</li>
           </ul>
+        </div>
+        
+        <div class="help-section">
+          <h3><i class="fab fa-github"></i> Configurar GitHub Gists</h3>
+          <ol>
+            <li>Ve a <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings > Developer settings > Personal access tokens</a></li>
+            <li>Haz clic en "Generate new token"</li>
+            <li>Asigna un nombre descriptivo al token</li>
+            <li>Selecciona la opción "gist" en los permisos</li>
+            <li>Haz clic en "Generate token"</li>
+            <li>Copia el token generado y pégalo en el campo "Token de GitHub" de esta aplicación</li>
+            <li>Haz clic en "Guardar Token"</li>
+          </ol>
+          <p><strong>Nota de seguridad:</strong> Tu token se almacena localmente en tu navegador y nunca se envía a ningún servidor excepto a GitHub para autenticar las operaciones con Gists.</p>
         </div>
       </div>
     </div>
@@ -1082,7 +1156,6 @@
       <div class="config-panel">
         <h2 class="panel-title"><i class="fas fa-tasks"></i> Acciones</h2>
         
-        <!-- Botones apilados verticalmente -->
         <div class="controls controls-vertical">
           <button class="btn btn-success" id="generar-evaluacion">
             <i class="fas fa-play"></i> Generar Evaluación
@@ -1093,10 +1166,66 @@
           <button class="btn" id="deseleccionar-todas">
             <i class="fas fa-square"></i> Deseleccionar Todas las Tareas
           </button>
+          <button class="btn" id="mostrar-github">
+            <i class="fab fa-github"></i> Configurar GitHub Gists
+          </button>
         </div>
         
         <div class="message info">
           <i class="fas fa-info-circle"></i> Seleccione las tareas para la evaluación
+        </div>
+      </div>
+    </section>
+    
+    <section class="github-panel fade-in" id="github-panel">
+      <h2 class="panel-title collapsible" id="github-title">
+        <i class="fab fa-github"></i> Configuración de GitHub Gists
+        <i class="fas fa-chevron-down toggle-icon"></i>
+      </h2>
+      <div class="section-content expanded" id="github-content">
+        <div class="github-config">
+          <div class="form-group">
+            <label for="github-token"><i class="fas fa-key"></i> Token de GitHub</label>
+            <input type="password" id="github-token" placeholder="Introduce tu token de GitHub">
+            <small>El token se almacena localmente en tu navegador</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="gist-description"><i class="fas fa-file-alt"></i> Descripción del Gist</label>
+            <input type="text" id="gist-description" placeholder="Evaluación de Tecnología 4º ESO">
+          </div>
+        </div>
+        
+        <div class="github-status" id="github-status">
+          <i class="fas fa-info-circle"></i> No configurado. Introduce tu token de GitHub.
+        </div>
+        
+        <div class="controls">
+          <button class="btn btn-success" id="guardar-token">
+            <i class="fas fa-save"></i> Guardar Token
+          </button>
+          <button class="btn" id="guardar-gist">
+            <i class="fab fa-github"></i> Guardar Evaluación en Gist
+          </button>
+          <button class="btn" id="cargar-gist">
+            <i class="fas fa-download"></i> Cargar Evaluación desde Gist
+          </button>
+          <button class="btn btn-danger" id="eliminar-token">
+            <i class="fas fa-trash"></i> Eliminar Token
+          </button>
+        </div>
+        
+        <div class="github-info">
+          <h4><i class="fas fa-info-circle"></i> Información sobre GitHub Gists</h4>
+          <p>Para usar esta funcionalidad, necesitas un token de acceso personal de GitHub con permisos para gists.</p>
+          <ol>
+            <li>Ve a <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings > Developer settings > Personal access tokens</a></li>
+            <li>Haz clic en "Generate new token"</li>
+            <li>Selecciona la opción "gist" en los permisos</li>
+            <li>Haz clic en "Generate token"</li>
+            <li>Copia el token generado y pégalo arriba</li>
+          </ol>
+          <p><strong>Nota de seguridad:</strong> Tu token se almacena localmente en tu navegador y nunca se envía a ningún servidor excepto a GitHub.</p>
         </div>
       </div>
     </section>
@@ -1195,6 +1324,10 @@
   </div>
 
   <script>
+    // =========================================================================
+    // === CONFIGURACIÓN Y DATOS ===
+    // =========================================================================
+    
     const criterios = [
       "TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1",
       "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2", "TEC4.6.3"
@@ -1247,476 +1380,365 @@
       "WIKI": ["TEC4.1.1", "TEC4.3.1", "TEC4.3.2", "TEC4.5.1"]
     };
 
+    // Variables globales
     let alumnos = [];
     let tareasSeleccionadas = [];
     let valoresTareas = {};
     let resultados = {};
     let criteriosPorTarea = {};
+    let githubToken = localStorage.getItem('githubToken') || '';
+    let gistId = localStorage.getItem('gistId') || '';
 
     // =========================================================================
-    // === DATOS DE RÚBRICAS (desde RubricasTEC4Varios01.html) ===
-    // =========================================================================
-
-    const rubricasData = [
-      {
-        id: "c1",
-        titulo: "TEC.4.1.1. Idear y planificar",
-        descripcion: "Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
-        competencia: 1,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, no realiza ninguna observación documentada ni análisis de las necesidades del entorno.</li><li class='pl-2'>No presenta ninguna propuesta de solución tecnológica.</li><li class='pl-2'>No incluye un plan de acción ni lista de recursos necesarios.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis del entorno, pero no están enfocadas en necesidades o requisitos relevantes.</li><li class='pl-2'>Sus propuestas de solución son poco viables.</li><li class='pl-2'>Sus propuestas de solución son básicas y necesitan más desarrollo.</li><li class='pl-2'>Su plan de acción es limitado, falta detalle y no identifica recursos necesarios.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis adecuados del entorno.</li><li class='pl-2'>Propone soluciones tecnológicas viables, aunque pueden necesitar más refinamiento.</li><li class='pl-2'>Presenta un plan de acción básico, pero puede mejorar en detalle y organización.</li><li class='pl-2'>Identifica algunos recursos necesarios.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos del entorno.</li><li class='pl-2'>Sus propuestas de solución son creativas y bien desarrolladas.</li><li class='pl-2'>Su plan de acción es detallado y organizado, considerando la mayoría de los factores importantes.</li><li class='pl-2'>Identifica la mayoría de los recursos necesarios.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos, precisos y relevantes del entorno.</li><li class='pl-2'>Sus propuestas de solución son innovadoras, originales y muy bien desarrolladas.</li><li class='pl-2'>Su plan de acción es muy detallado, bien organizado, y considera todos los factores importantes y posibles contratiempos.</li><li class='pl-2'>Identifica todos los recursos necesarios.</li></ul>" }
-        ]
-      },
-      {
-        id: "c2",
-        titulo: "TEC.4.1.2. Estrategias colaborativas",
-        descripcion: "Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
-        competencia: 1,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No participa activamente en el proyecto ni aporta ideas o soluciones.</li><li class='pl-2'>No se comunica ni coopera con el resto del equipo.</li><li class='pl-2'>No respeta las normas ni los plazos establecidos.</li><li class='pl-2'>No tiene en cuenta las aportaciones de otras disciplinas ni las necesidades del cliente o usuario.</li><li class='pl-2'>No revisa ni mejora su trabajo ni el del equipo.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa poco en el proyecto y aporta ideas o soluciones poco originales o adecuadas.</li><li class='pl-2'>Se comunica y coopera poco con el resto del equipo.</li><li class='pl-2'>Respeta poco las normas y los plazos establecidos.</li><li class='pl-2'>Tiene poco en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora poco su trabajo y el del equipo.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa en el proyecto y aporta ideas o soluciones originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera con el resto del equipo.</li><li class='pl-2'>Respeta las normas y los plazos establecidos.</li><li class='pl-2'>Tiene en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora su trabajo y el del equipo.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa mucho en el proyecto y aporta ideas o soluciones muy originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera mucho con el resto del equipo.</li><li class='pl-2'>Respeta mucho las normas y los plazos establecidos.</li><li class='pl-2'>Tiene muy en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora mucho su trabajo y el del equipo.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa excelentemente en el proyecto y aporta ideas o soluciones excelentes y adecuadas.</li><li class='pl-2'>Se comunica y coopera excelentemente con el resto del equipo.</li><li class='pl-2'>Respeta excelentemente las normas y los plazos establecidos.</li><li class='pl-2'>Tiene excelentemente en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora excelentemente su trabajo y el del equipo.</li></ul>" }
-        ]
-      },
-      {
-        id: "c3",
-        titulo: "TEC.4.1.3. Gestión creativa de proyectos",
-        descripcion: "Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
-        competencia: 1,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra creatividad en la concepción o el diseño de su proyecto.</li><li class='pl-2'>Raramente participa en actividades grupales y no aporta al trabajo en equipo.</li><li class='pl-2'>No se observan esfuerzos de investigación para la mejora o la eficiencia del proyecto.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Algunas ideas del proyecto muestran cierta creatividad, pero falta originalidad.</li><li class='pl-2'>Participa en actividades grupales, pero sus contribuciones son mínimas y no siempre aportan al equipo.</li><li class='pl-2'>Se observa una investigación superficial o poco detallada para su proyecto.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto muestra un pensamiento creativo básico y presenta algunas soluciones innovadoras.</li><li class='pl-2'>Colabora regularmente en actividades de grupo y contribuye de manera básica al trabajo en equipo.</li><li class='pl-2'>Realiza una investigación básica que ha permitido leves mejoras en su proyecto.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es notablemente creativo e incluye varias soluciones innovadoras.</li><li class='pl-2'>A menudo toma la iniciativa en actividades de grupo y su contribución mejora significativamente el rendimiento del equipo.</li><li class='pl-2'>Realiza investigaciones detalladas que conducen a soluciones más eficientes y accesibles en su proyecto.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es excepcionalmente creativo, presenta soluciones muy innovadoras que destacan de las demás.</li><li class='pl-2'>Constantemente impulsa y mejora el rendimiento del equipo con su fuerte liderazgo y habilidades colaborativas.</li><li class='pl-2'>Realiza investigaciones exhaustivas y profundas que han llevado a soluciones extremadamente eficientes, accesibles e innovadoras para su proyecto.</li></ul>" }
-        ]
-      },
-      {
-        id: "c4",
-        titulo: "TEC.4.2.1. Analizar diseño y ciclo de vida",
-        descripcion: "Analizar el diseño de un producto que dé respuesta a una necesidad planteada, evaluando su demanda, evolución y previsión de fin de ciclo de vida con un criterio ético, responsable e inclusivo.",
-        competencia: 2,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No analiza el diseño del producto ni identifica la necesidad que resuelve.</li><li class='pl-2'>No evalúa su demanda, evolución ni previsión de fin de ciclo de vida.</li><li class='pl-2'>No aplica un criterio ético, responsable e inclusivo</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza superficialmente el diseño del producto y reconoce parcialmente la necesidad que resuelve.</li><li class='pl-2'>Evalúa de forma incompleta o inexacta su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma deficiente o inconsistente</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza correctamente el diseño del producto y identifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa adecuadamente su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma coherente y razonada.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza detalladamente el diseño del producto y explica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con precisión su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma rigurosa y argumentada.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza exhaustivamente el diseño del producto y justifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con profundidad su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma excelente y crítica.</li></ul>" }
-        ]
-      },
-      {
-        id: "c5",
-        titulo: "TEC.4.2.2. Fabricar productos",
-        descripcion: "Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos adecuados.",
-        competencia: 2,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No logra producir un producto o solución tecnológica, o el resultado es inadecuado o inapropiado.</li><li class='pl-2'>No utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>No utiliza adecuadamente técnicas manuales, mecánicas o digitales, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son inadecuados.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica, pero presenta fallos o es inadecuado para la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido, pero de manera muy limitada or ineficaz.</li><li class='pl-2'>Utiliza algunas técnicas manuales, mecánicas o digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales utilizados son insuficientes y se podrían mejorar</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que cumple con la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son apropiados, pero admiten mejora.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que no solo cumple con la necesidad prevista, sino que muestra elementos de innovación o creatividad.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera muy efectiva, y su uso mejora la calidad del producto final.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales con gran habilidad, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son óptimos y aumentan la calidad del producto final.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que es excepcional en términos de diseño, funcionalidad e innovación.</li><li class='pl-2'>Demuestra un uso maestro de las herramientas de diseño asistido, lo que mejora significativamente la calidad del producto final.</li><li class='pl-2'>Demuestra una gran maestría en el uso de técnicas manuales, mecánicas y digitales, y la selección y uso de materiales y recursos mecánicos, eléctricos, electrónicos y digitales son excepcionales, aportando a la funcionalidad y la innovación del producto final.</li></ul>" }
-        ]
-      },
-      {
-        id: "c6",
-        titulo: "TEC.4.3.1. Intercambiar información",
-        descripcion: "Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas junto con el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
-        competencia: 3,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No intercambia información ni fomenta el trabajo en equipo.</li><li class='pl-2'>No emplea las herramientas digitales adecuadas ni el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma escasa o inadecuada.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma deficiente o incompleta.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma adecuada y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma correcta y completa.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma eficaz y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma óptima y precisa.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma excelente y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma excelente y creativa.</li></ul>" }
-        ]
-      },
-      {
-        id: "c7",
-        titulo: "TEC.4.3.2. Presentar y difundir",
-        descripcion: "Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
-        competencia: 3,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es confusa, desorganizada y no se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son monótonas y no transmiten interés ni seguridad.</li><li class='pl-2'>El discurso es incoherente, irrelevante o incompleto.</li><li class='pl-2'>El lenguaje es excluyente y sexista.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es poco clara, poco estructurada y se desvía del tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son poco variadas y transmiten poco interés o seguridad.</li><li class='pl-2'>El discurso es poco coherente, poco relevante o poco completo.</li><li class='pl-2'>El lenguaje es poco inclusivo y poco respetuoso con la diversidad.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es clara, estructurada y se ajusta aproximadamente al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son adecuadas y transmiten interés y seguridad.</li><li class='pl-2'>El discurso es coherente, relevante y completo.</li><li class='pl-2'>El lenguaje es inclusivo y respeta la diversidad.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es muy clara, muy estructurada y se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son variadas y transmiten mucho interés y seguridad.</li><li class='pl-2'>El discurso es muy coherente, muy relevante y muy completo.</li><li class='pl-2'>El lenguaje es muy inclusivo y muy respetuoso con la diversidad.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es excelente, creativa y se ajusta al tiempo establecido con precisión.</li><li class='pl-2'>La entonación y la expresión son dinámicas y transmiten entusiasmo y confianza.</li><li class='pl-2'>El discurso es excelente, original y exhaustivo.</li><li class='pl-2'>El lenguaje es excelente, inclusivo y respetuoso con la diversidad en todo momento.</li></ul>" }
-        ]
-      },
-      {
-        id: "c8",
-        titulo: "TEC.4.4.1. Diseñar sistemas automáticos",
-        descripcion: "Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática and componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
-        competencia: 4,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No realiza ni entrega los proyectos y/o prácticas de sistemas automáticos programables y robots o los hace con errores graves.</li><li class='pl-2'>No sabe qué son ni cómo funciona la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>No relaciona los contenidos de tecnología con otras materias.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots con retraso o con errores significativos.</li><li class='pl-2'>Sabe qué son algunos elementos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control, pero no cómo funcionan.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma superficial o incompleta.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan los elementos básicos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma adecuada y coherente.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y sin errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan varios elementos avanzados de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma amplia y profunda.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Sabe qué son y cómo funcionan diversos elementos innovadores o creativos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias crítica y reflexivamente.</li></ul>" }
-        ]
-      },
-      {
-        id: "c9",
-        titulo: "TEC.4.4.2. Integrar tecnologías emergentes",
-        descripcion: "Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
-        competencia: 4,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni utiliza las aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>No realiza ningún intento por incorporar una aplicación de IoT, Big Data o IA en un proyecto y/o práctica, ni muestra interés por entender su uso ético y seguro.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos, pero no las utiliza adecuadamente.</li><li class='pl-2'>Intenta incorporar una aplicación de IoT en un proyecto y/o práctica, pero no logra conectarla ni operar correctamente.</li><li class='pl-2'>Muestra una comprensión limitada del uso ético y seguro de estos dispositivos.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de modo muy básico una aplicación de IoT en un proyecto y/o práctica, demostrando un uso ético y seguro muy básico de la tecnología.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con autonomía varias aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra una aplicación de IoT y utiliza Big Data or IA en un proyecto o práctica más complejo/a, demostrando un uso ético y seguro avanzado de estas tecnologías.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con creatividad diversas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de manera innovadora y avanzada aplicaciones de IoT, Big Data e IA en un proyecto y/o práctica complejo/a y original, demostrando un alto nivel de uso ético y seguro de estas tecnologías.</li></ul>" }
-        ]
-      },
-      {
-        id: "c10",
-        titulo: "TEC.4.5.1. Resolver tareas con herramientas digitales",
-        descripcion: "Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
-        competencia: 5,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No entrega las tareas o las hace con errores graves.</li><li class='pl-2'>No realiza ningún intento de uso de herramientas digitales para completar las tareas asignadas en clase.</li><li class='pl-2'>No se observa evidencia de trabajo o esfuerzo en las actividades asignadas.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas con retraso o con errores significativos.</li><li class='pl-2'>Intenta usar una herramienta digital para completar una tarea en clase pero necesita ayuda constante y su resultado final es incompleto.</li><li class='pl-2'>Se puede ver un intento en las actividades, aunque su aplicación de conocimientos es muy limitada</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe usar y configurar las aplicaciones y herramientas digitales que se le indican, siguiendo instrucciones o ejemplos dados pero de modo básico.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma básica.</li><li class='pl-2'>Trabaja por su cuenta cuando es necesario, pero no siempre.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y sin errores.</li><li class='pl-2'>Demuestra un uso eficiente y autónomo de diferentes herramientas digitales para completar tareas en clase y su aplicación interdisciplinaria de conocimientos es clara.</li><li class='pl-2'>Trabaja por su cuenta con iniciativa y responsabilidad.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Utiliza de manera experta y creativa diversas herramientas digitales para resolver tareas de clase, aplicando conocimientos interdisciplinares de manera innovadora.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma crítica y reflexiva.</li><li class='pl-2'>Trabaja por su cuenta con proactividad e independencia.</li></ul>" }
-        ]
-      },
-      {
-        id: "c11",
-        titulo: "TEC.4.6.1. Uso responsable de la tecnología",
-        descripcion: "Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
-        competencia: 6,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No reconoce el concepto de sostenibilidad y accesibilidad y no puede identificar estos criterios en el uso de materiales o desarrollo de procesos tecnológicos.</li><li class='pl-2'>No respeta las normas de seguridad e higiene en el taller.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e identifica algunos materiales y procesos tecnológicos sostenibles y accesibles pero tiene dificultades para aplicar estos conceptos en su trabajo.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller solo cuando se le recuerda.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona materiales sostenibles y accesibles para un proyecto o práctica simple.</li><li class='pl-2'>Además, muestra un entendimiento básico de cómo su proceso de trabajo pode minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller siempre que se le indica.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e implementa materiales sostenibles y accesibles en un proyecto o práctica de mediana complejidad.</li><li class='pl-2'>Además, muestra un entendimiento avanzado de cómo su proceso de trabalho pode minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con iniciativa y responsabilidad.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona, implementa y justifica el uso de materiales sostenibles y accesibles en un proyecto de alta complejidad o en una práctica avanzada.</li><li class='pl-2'>Demuestra constantemente cómo su proceso de trabajo minimiza el impacto negativo en la sociedad y el planeta, y hace propuestas para mejorar la sostenibilidad y accesibilidad en futuros proyectos.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con proactividad e independencia.</li></ul>" }
-        ]
-      },
-      {
-        id: "c12",
-        titulo: "TEC.4.6.2. Analizar arquitectura bioclimática",
-        descripcion: "Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
-        competencia: 6,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra comprensión alguna de los conceptos de arquitectura bioclimática y ecotransporte, y no es capaz de identificar su relación con el cuidado del entorno y el desarrollo sostenible.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una mínima comprensión de los conceptos de arquitectura bioclimática y ecotransporte, y sus beneficios para el cuidado del entorno, pero tiene dificultades para conectar estos conceptos con el desarrollo sostenible.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una aceptable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir los beneficios de la arquitectura bioclimática y el ecotransporte para el cuidado del entorno.</li><li class='pl-2'>Muestra una comprensión básica de cómo estas tecnologías pueden contribuir al desarrollo sostenible.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una notable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir cómo influyen en el medio ambiente, dando ejemplos concretos o reales.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos concretos o reales.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una sobresaliente comprensión de los conceptos de arquitectura bioclimática y ecotransporte y cómo influyen en el medio ambiente, dando ejemplos originales o creativos.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos originales o creativos.</li></ul>" }
-        ]
-      },
-      {
-        id: "c13",
-        titulo: "TEC.4.6.3. Valorar proyectos sociales",
-        descripcion: "Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
-        competencia: 6,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni valora la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, no sabe qué son ni para qué sirven estos tipos de proyectos.</li><li class='pl-2'>No muestra interés ni participación en ellos.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora parcialmente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son algunos de estos tipos de proyectos, pero no para qué sirven.</li><li class='pl-2'>Muestra poco interés y participación en ellos.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora correctamente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos.</li><li class='pl-2'>Muestra interés y participación en ellos cuando se le indica.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora muy bien la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, actions de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos concretos o reales.</li><li class='pl-2'>Muestra interés y participación en ellos con iniciativa y responsabilidad.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora excelentemente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos originales o creativos.</li><li class='pl-2'>Muestra interés y participación en ellos con proactividad e independencia.</li></ul>" }
-        ]
-      }
-    ];
-
-    // =========================================================================
-    // === FUNCIONES DE EXPORTACIÓN DE RÚBRICAS ===
+    // === FUNCIÓN PARA NORMALIZAR IDs ===
     // =========================================================================
 
     /**
-     * Limpia un string HTML y lo formatea para CSV, encerrándolo entre comillas.
+     * Normaliza un texto para crear un ID válido para CSS
+     * Elimina acentos, reemplaza espacios y caracteres especiales
      */
-    function cleanDescriptor(htmlString) {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlString;
-      const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
-      // Limpiar saltos de línea y espacios múltiples, y escapar comillas
-      const textoLimpio = textoPlano.replace(/\s+/g, ' ').trim();
-      return `"${textoLimpio.replace(/"/g, '""')}"`;
+    function normalizarId(texto) {
+      return texto
+        .normalize('NFD') // Normaliza caracteres con acentos
+        .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos
+        .replace(/[^a-zA-Z0-9]/g, '_') // Reemplaza caracteres no alfanuméricos con _
+        .replace(/_+/g, '_') // Reemplaza múltiples _ con uno solo
+        .replace(/^_|_$/g, ''); // Elimina _ al principio o final
     }
 
+    // =========================================================================
+    // === FUNCIONES DE GITHUB GISTS ===
+    // =========================================================================
+
     /**
-     * Genera las líneas de puntos y descriptores según el formato seleccionado.
+     * Verifica si el token de GitHub está configurado y es válido
      */
-    function getExportData(format, nivelesInvertidos) {
-      let puntosLinea = "\t";
-      let descriptoresLinea = "\t";
-
-      // Extraer descriptores limpios (Alto a Bajo)
-      const desc_10 = cleanDescriptor(nivelesInvertidos[0].descriptor); // (9-10)
-      const desc_8_9 = cleanDescriptor(nivelesInvertidos[1].descriptor); // (7-8.9)
-      const desc_5_6 = cleanDescriptor(nivelesInvertidos[2].descriptor); // (5-6.9)
-      const desc_3_4 = cleanDescriptor(nivelesInvertidos[3].descriptor); // (3-4.9)
-      const desc_1_2 = cleanDescriptor(nivelesInvertidos[4].descriptor); // (1-2.9)
-      const desc_0 = `"No entregado"`;
-
-      switch(String(format)) {
-        case '1': // 1) 10, 8, 6, 4, 2 (5 niveles)
-          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
-          break;
-        case '2': // 2) 10, 8, 6, 4, 2, 0 (6 niveles)
-          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0\t0.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}\t${desc_0}`;
-          break;
-        case '3': // 3) 10, 8.5, 7.5, 6.5, 5.5, 4.5, 3.5, 2.5, 1.5 (9 niveles)
-          puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}`;
-          break;
-        case '4': // 4) 10, 8.5, 7.5 ... 1.5, 0 (10 niveles)
-          puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5\t0.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}\t${desc_0}`;
-          break;
-        default: // Fallback a la opción 1
-          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+    function verificarTokenGitHub() {
+      const githubStatus = document.getElementById('github-status');
+      
+      if (!githubToken) {
+        githubStatus.innerHTML = '<i class="fas fa-info-circle"></i> No configurado. Introduce tu token de GitHub.';
+        githubStatus.className = 'github-status disconnected';
+        return false;
       }
       
-      return { puntosLinea, descriptoresLinea };
-    }
-
-    /**
-     * Convierte el título completo en un formato abreviado para la exportación.
-     * Corregido: Ahora mantiene los puntos en los códigos (TEC.4.1.1. en lugar de TEC4 1 1)
-     * y elimina los paréntesis, poniendo la primera letra en mayúsculas
-     */
-    function getTituloAbreviado(tituloCompleto) {
-      // Extraer el código (TEC.4.1.1.)
-      const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
-      if (!codigoMatch) return tituloCompleto;
-      
-      // Mantener el código con puntos (TEC.4.1.1.)
-      const codigo = codigoMatch[1] + ".";
-      
-      // Extraer la parte descriptiva y crear un título abreviado
-      let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
-      
-      // Crear abreviaciones comunes
-      const abreviaciones = {
-        'Intercambiar información': 'Intercambio información',
-        'Presentar y difundir': 'Presentación en público',
-        'Idear y planificar': 'Ideación y planificación',
-        'Estrategias colaborativas': 'Trabajo colaborativo',
-        'Gestión creativa de proyectos': 'Gestión de proyectos',
-        'Analizar diseño y ciclo de vida': 'Análisis de diseño',
-        'Fabricar productos': 'Fabricación de productos',
-        'Diseñar sistemas automáticos': 'Sistemas automáticos',
-        'Integrar tecnologías emergentes': 'Tecnologías emergentes',
-        'Resolver tareas': 'Resolución de tareas',
-        'Uso responsable': 'Sostenibilidad',
-        'Analizar arquitectura bioclimática': 'Arquitectura bioclimática',
-        'Valorar proyectos sociales': 'Proyectos sociales'
-      };
-      
-      // Aplicar abreviación si existe
-      for (const [completo, abreviado] of Object.entries(abreviaciones)) {
-        if (descripcionAbreviada.includes(completo)) {
-          descripcionAbreviada = abreviado;
-          break;
+      // Verificar el token haciendo una petición simple a la API de GitHub
+      fetch('https://api.github.com/user', {
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json'
         }
-      }
+      })
+      .then(response => {
+        if (response.ok) {
+          githubStatus.innerHTML = '<i class="fas fa-check-circle"></i> Conectado a GitHub. Token válido.';
+          githubStatus.className = 'github-status connected';
+          return true;
+        } else {
+          githubStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Token inválido. Verifica tu token de GitHub.';
+          githubStatus.className = 'github-status disconnected';
+          return false;
+        }
+      })
+      .catch(error => {
+        githubStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión. Verifica tu conexión a Internet.';
+        githubStatus.className = 'github-status disconnected';
+        return false;
+      });
       
-      // Asegurar que la primera letra es mayúscula
-      descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
-      
-      return `${codigo} ${descripcionAbreviada}`;
+      return true;
     }
 
     /**
-     * Exporta las rúbricas de los criterios utilizados en la evaluación actual a CSV.
+     * Guarda el token de GitHub en localStorage
      */
-    function exportarRubricasCSV() {
-      // Recopilar criterios únicos utilizados en la evaluación
-      const criteriosUtilizados = new Set();
-      tareasSeleccionadas.forEach(tarea => {
-        criteriosPorTarea[tarea].forEach(criterio => {
-          criteriosUtilizados.add(criterio);
-        });
-      });
-
-      // Buscar las rúbricas correspondientes
-      const rubricasParaExportar = rubricasData.filter(rubrica => {
-        // Extraer el código del criterio del título de la rúbrica
-        // Convertir TEC.4.1.1. a TEC4.1.1 para comparar
-        const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
-        return criteriosUtilizados.has(codigoRubrica);
-      });
-
-      if (rubricasParaExportar.length === 0) {
-        alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
-        return;
-      }
-
-      // Usar formato por defecto (opción 1)
-      const format = '1';
+    function guardarTokenGitHub() {
+      const tokenInput = document.getElementById('github-token');
+      githubToken = tokenInput.value.trim();
       
-      // Generar CSV
-      let csvRows = [
-        "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
-        "v1.0-s"
-      ];
-
-      rubricasParaExportar.forEach(criterio => {
-        const tituloAbreviado = getTituloAbreviado(criterio.titulo);
-        csvRows.push(tituloAbreviado);
-        csvRows.push(criterio.descripcion);
-        
-        const nivelesInvertidos = [...criterio.niveles].reverse();
-        const { puntosLinea, descriptoresLinea } = getExportData(format, nivelesInvertidos);
-        
-        csvRows.push(puntosLinea);
-        csvRows.push(descriptoresLinea);
-        csvRows.push("");
-      });
-
-      // Crear y descargar archivo
-      const csvString = csvRows.join('\n');
-      const BOM = '\uFEFF'; // Byte Order Mark para UTF-8
-      const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      
-      const actividad = document.getElementById('actividad').value || "Evaluacion";
-      link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      setTimeout(() => {
-        alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
-      }, 500);
-    }
-
-    // =========================================================================
-    // === FUNCIONES DE EXPORTACIÓN/IMPORTACIÓN DE ALUMNADO ===
-    // =========================================================================
-
-    /**
-     * Exporta el alumnado actual a un archivo JSON
-     */
-    function exportarAlumnado() {
-      const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
-      const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
-      
-      // Verificar que hay alumnos guardados
-      if (alumnos.length === 0) {
-        alert("No hay alumnos guardados para exportar.");
+      if (!githubToken) {
+        alert('Por favor, introduce un token de GitHub válido.');
         return;
       }
       
-      const datos = {
-        clase: nombreClase,
-        actividad: actividad,
-        fechaExportacion: new Date().toISOString(),
-        alumnos: alumnos
-      };
+      localStorage.setItem('githubToken', githubToken);
+      tokenInput.value = ''; // Limpiar el campo por seguridad
       
-      const datosStr = JSON.stringify(datos, null, 2);
-      const blob = new Blob([datosStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Actividades_${nombreClase}_Alumnado.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Verificar el token
+      verificarTokenGitHub();
       
-      alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
+      alert('Token guardado correctamente.');
     }
 
     /**
-     * Importa alumnado desde un archivo JSON
+     * Elimina el token de GitHub de localStorage
      */
-    function importarAlumnado(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const datos = JSON.parse(e.target.result);
-          
-          // Validar la estructura del archivo
-          if (!datos.clase || !Array.isArray(datos.alumnos)) {
-            throw new Error('El archivo no tiene el formato correcto.');
-          }
-          
-          // Actualizar el nombre de la clase
-          document.getElementById('nombre-clase').value = datos.clase;
-          
-          // Actualizar el nombre de la actividad si está presente
-          if (datos.actividad) {
-            document.getElementById('actividad').value = datos.actividad;
-          }
-          
-          // Actualizar el número de alumnos
-          document.getElementById('num-alumnos').value = datos.alumnos.length;
-          
-          // Actualizar la lista de alumnos
-          alumnos = datos.alumnos;
-          
-          // Actualizar la interfaz
-          actualizarInterfazAlumnos();
-          
-          alert(`Alumnado de la clase ${datos.clase} importado correctamente. Se han cargado ${datos.alumnos.length} alumnos.`);
-          
-          // Limpiar el input de archivo
-          event.target.value = '';
-          
-        } catch (error) {
-          alert('Error al importar el archivo: ' + error.message);
-        }
-      };
-      reader.readAsText(file);
+    function eliminarTokenGitHub() {
+      if (confirm('¿Estás seguro de que quieres eliminar el token de GitHub?')) {
+        githubToken = '';
+        gistId = '';
+        localStorage.removeItem('githubToken');
+        localStorage.removeItem('gistId');
+        document.getElementById('github-status').innerHTML = '<i class="fas fa-info-circle"></i> Token eliminado.';
+        document.getElementById('github-status').className = 'github-status disconnected';
+        alert('Token eliminado correctamente.');
+      }
     }
 
     /**
-     * Actualiza la interfaz con los alumnos importados
+     * Prepara los datos de la evaluación para guardar en Gist
      */
-    function actualizarInterfazAlumnos() {
-      const alumnosContainer = document.getElementById('alumnos-container');
-      alumnosContainer.innerHTML = '';
+    function prepararDatosParaGist() {
+      // Recopilar todas las puntuaciones de los alumnos
+      const puntuaciones = {};
       
       alumnos.forEach((alumno, index) => {
-        const alumnoItem = document.createElement('div');
-        alumnoItem.className = 'alumno-item';
-        alumnoItem.innerHTML = `
-          <div class="alumno-header">
-            <label>Alumno ${index + 1}</label>
-          </div>
-          <input type="text" class="alumno-input" value="${alumno}" placeholder="Nombre completo">
-        `;
-        alumnosContainer.appendChild(alumnoItem);
+        puntuaciones[alumno] = {};
+        
+        tareasSeleccionadas.forEach(tarea => {
+          const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
+          const input = inputs[index];
+          const maxValor = valoresTareas[tarea];
+          const value = validarNumeroPositivo(input, 0, maxValor);
+          
+          puntuaciones[alumno][tarea] = value;
+        });
       });
       
-      // Mostrar la sección de nombres de alumnos
-      document.getElementById('nombres-alumnos-section').style.display = 'block';
+      // Crear objeto con todos los datos
+      const datosEvaluacion = {
+        clase: document.getElementById('nombre-clase').value,
+        actividad: document.getElementById('actividad').value,
+        fecha: new Date().toISOString(),
+        alumnos: alumnos,
+        tareasSeleccionadas: tareasSeleccionadas,
+        criteriosPorTarea: criteriosPorTarea,
+        valoresTareas: valoresTareas,
+        puntuaciones: puntuaciones,
+        resultados: resultados
+      };
+      
+      return datosEvaluacion;
     }
 
-    // =========================================================================
-    // === FUNCIONES DE AYUDA - MODAL ===
-    // =========================================================================
-
-    function mostrarAyuda() {
-      document.getElementById('help-modal').style.display = 'flex';
+    /**
+     * Guarda la evaluación actual en un Gist de GitHub
+     */
+    async function guardarEnGist() {
+      if (!githubToken) {
+        alert('Primero debes configurar tu token de GitHub.');
+        return;
+      }
+      
+      // Verificar que hay datos para guardar
+      if (alumnos.length === 0 || tareasSeleccionadas.length === 0) {
+        alert('No hay datos de evaluación para guardar. Configura los alumnos y selecciona tareas primero.');
+        return;
+      }
+      
+      const datosEvaluacion = prepararDatosParaGist();
+      const descripcion = document.getElementById('gist-description').value || 
+                         `Evaluación: ${datosEvaluacion.actividad} - ${datosEvaluacion.clase}`;
+      
+      const nombreArchivo = `evaluacion_${datosEvaluacion.clase}_${datosEvaluacion.actividad}_${new Date().toISOString().slice(0, 10)}.json`;
+      
+      const gistData = {
+        description: descripcion,
+        public: false,
+        files: {
+          [nombreArchivo]: {
+            content: JSON.stringify(datosEvaluacion, null, 2)
+          }
+        }
+      };
+      
+      // Si ya tenemos un Gist ID, actualizamos ese Gist, sino creamos uno nuevo
+      const url = gistId ? 
+        `https://api.github.com/gists/${gistId}` : 
+        'https://api.github.com/gists';
+      
+      const method = gistId ? 'PATCH' : 'POST';
+      
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(gistData)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Guardar el ID del Gist si es nuevo
+        if (!gistId) {
+          gistId = data.id;
+          localStorage.setItem('gistId', gistId);
+        }
+        
+        alert(`Evaluación guardada correctamente en GitHub Gists.\n\nID del Gist: ${data.id}\nURL: ${data.html_url}`);
+        
+      } catch (error) {
+        console.error('Error al guardar en Gist:', error);
+        alert(`Error al guardar en GitHub Gists: ${error.message}`);
+      }
     }
 
-    function ocultarAyuda() {
-      document.getElementById('help-modal').style.display = 'none';
+    /**
+     * Carga una evaluación desde un Gist de GitHub
+     */
+    async function cargarDesdeGist() {
+      if (!githubToken) {
+        alert('Primero debes configurar tu token de GitHub.');
+        return;
+      }
+      
+      // Si tenemos un Gist ID guardado, lo usamos
+      if (gistId) {
+        await cargarGistPorId(gistId);
+        return;
+      }
+      
+      // Si no tenemos Gist ID, solicitamos uno
+      const gistIdInput = prompt('Introduce el ID del Gist que quieres cargar:');
+      if (!gistIdInput) return;
+      
+      await cargarGistPorId(gistIdInput);
+    }
+
+    /**
+     * Carga un Gist específico por su ID
+     */
+    async function cargarGistPorId(id) {
+      try {
+        const response = await fetch(`https://api.github.com/gists/${id}`, {
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const gist = await response.json();
+        
+        // Buscar archivos de evaluación (que empiecen por "evaluacion_")
+        const archivosEvaluacion = Object.keys(gist.files).filter(
+          nombre => nombre.startsWith('evaluacion_')
+        );
+        
+        if (archivosEvaluacion.length === 0) {
+          alert('No se encontraron archivos de evaluación en este Gist.');
+          return;
+        }
+        
+        // Si hay múltiples archivos, dejar que el usuario elija
+        let archivoSeleccionado;
+        if (archivosEvaluacion.length > 1) {
+          const opciones = archivosEvaluacion.map(nombre => {
+            const fecha = nombre.match(/\d{4}-\d{2}-\d{2}/);
+            return `${nombre}${fecha ? ` (${fecha[0]})` : ''}`;
+          }).join('\n');
+          
+          const seleccion = prompt(`Selecciona un archivo (introduce el número):\n${archivosEvaluacion.map((nombre, i) => `${i+1}. ${nombre}`).join('\n')}`);
+          const indice = parseInt(seleccion) - 1;
+          
+          if (isNaN(indice) || indice < 0 || indice >= archivosEvaluacion.length) {
+            alert('Selección inválida.');
+            return;
+          }
+          
+          archivoSeleccionado = archivosEvaluacion[indice];
+        } else {
+          archivoSeleccionado = archivosEvaluacion[0];
+        }
+        
+        // Cargar los datos del archivo seleccionado
+        const contenido = gist.files[archivoSeleccionado].content;
+        const datosEvaluacion = JSON.parse(contenido);
+        
+        // Restaurar los datos en la aplicación
+        restaurarDatosDesdeGist(datosEvaluacion);
+        
+        alert(`Evaluación cargada correctamente:\n\nClase: ${datosEvaluacion.clase}\nActividad: ${datosEvaluacion.actividad}\nFecha: ${new Date(datosEvaluacion.fecha).toLocaleDateString()}`);
+        
+      } catch (error) {
+        console.error('Error al cargar desde Gist:', error);
+        alert(`Error al cargar desde GitHub Gists: ${error.message}`);
+      }
+    }
+
+    /**
+     * Restaura los datos de la evaluación desde un objeto cargado desde Gist
+     */
+    function restaurarDatosDesdeGist(datosEvaluacion) {
+      // Restaurar configuración básica
+      document.getElementById('nombre-clase').value = datosEvaluacion.clase;
+      document.getElementById('actividad').value = datosEvaluacion.actividad;
+      
+      // Restaurar alumnos
+      alumnos = datosEvaluacion.alumnos;
+      actualizarInterfazAlumnos();
+      
+      // Restaurar tareas y criterios
+      tareasSeleccionadas = datosEvaluacion.tareasSeleccionadas;
+      criteriosPorTarea = datosEvaluacion.criteriosPorTarea;
+      valoresTareas = datosEvaluacion.valoresTareas;
+      
+      // Marcar las tareas seleccionadas en la interfaz
+      document.querySelectorAll('.tarea-checkbox').forEach(cb => {
+        cb.checked = tareasSeleccionadas.includes(cb.value);
+      });
+      
+      // Actualizar los valores de las tareas
+      Object.keys(valoresTareas).forEach(tarea => {
+        const valorInput = document.querySelector(`.valor-input[data-tarea="${tarea}"]`);
+        if (valorInput) {
+          valorInput.value = valoresTareas[tarea];
+        }
+      });
+      
+      // Actualizar los criterios seleccionados para cada tarea
+      Object.keys(criteriosPorTarea).forEach(tarea => {
+        criteriosPorTarea[tarea].forEach(criterio => {
+          // Usar IDs normalizados para los selectores
+          const idNormalizado = `criterio-${normalizarId(tarea)}-${normalizarId(criterio)}`;
+          const checkbox = document.getElementById(idNormalizado);
+          if (checkbox) {
+            checkbox.checked = true;
+          }
+        });
+      });
+      
+      // Generar la interfaz de evaluación
+      generarEvaluacion();
+      
+      // Restaurar las puntuaciones si existen
+      if (datosEvaluacion.puntuaciones) {
+        alumnos.forEach((alumno, alumnoIndex) => {
+          tareasSeleccionadas.forEach(tarea => {
+            const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
+            const input = inputs[alumnoIndex];
+            if (input && datosEvaluacion.puntuaciones[alumno] && datosEvaluacion.puntuaciones[alumno][tarea]) {
+              input.value = datosEvaluacion.puntuaciones[alumno][tarea];
+            }
+          });
+        });
+      }
+      
+      // Si hay resultados calculados, restaurarlos
+      if (datosEvaluacion.resultados && Object.keys(datosEvaluacion.resultados).length > 0) {
+        resultados = datosEvaluacion.resultados;
+        mostrarResultados();
+      }
     }
 
     // =========================================================================
@@ -1785,7 +1807,6 @@
         const item = document.createElement("div");
         item.className = "tarea-item";
         
-        // Quitamos el data-tooltip del label
         item.innerHTML = `
           <div class="tarea-header">
             <label>
@@ -1800,7 +1821,7 @@
               Criterios de evaluación 
               <i class="fas fa-chevron-down"></i>
             </h4>
-            <div class="criterios-list" id="criterios-${tarea}"></div>
+            <div class="criterios-list" id="criterios-${normalizarId(tarea)}"></div>
           </div>
         `;
         selectorDiv.appendChild(item);
@@ -1810,16 +1831,20 @@
           validarNumeroPositivo(this, 1);
         });
         
-        const criteriosContainer = document.getElementById(`criterios-${tarea}`);
+        const criteriosContainer = document.getElementById(`criterios-${normalizarId(tarea)}`);
         criterios.forEach(criterio => {
           const isChecked = criteriosPorTarea[tarea].includes(criterio);
           const criterioItem = document.createElement("div");
           criterioItem.className = "criterio-item";
+          
+          // Usar IDs normalizados
+          const idNormalizado = `criterio-${normalizarId(tarea)}-${normalizarId(criterio)}`;
+          
           criterioItem.innerHTML = `
-            <input type="checkbox" id="criterio-${tarea}-${criterio}" 
+            <input type="checkbox" id="${idNormalizado}" 
                    value="${criterio}" ${isChecked ? 'checked' : ''}
                    data-tarea="${tarea}">
-            <label for="criterio-${tarea}-${criterio}" 
+            <label for="${idNormalizado}" 
                    data-tooltip="${tooltipTextos[criterio] || 'Descripción no disponible'}">${criterio}</label>
           `;
           criteriosContainer.appendChild(criterioItem);
@@ -1835,7 +1860,6 @@
             criteriosList.style.display = 'none';
             toggleIcon.classList.remove('rotated');
           }
-          // Reajustar tooltips después de mostrar/ocultar
           setTimeout(ajustarTooltips, 50);
         });
       });
@@ -1855,7 +1879,6 @@
         });
       });
       
-      // Ajustar tooltips después de cargar
       setTimeout(ajustarTooltips, 100);
     }
 
@@ -1863,7 +1886,6 @@
       const numAlumnosInput = document.getElementById('num-alumnos');
       let numAlumnos = parseInt(numAlumnosInput.value);
       
-      // Validar y corregir el número de alumnos
       if (isNaN(numAlumnos)) {
         numAlumnos = 5;
         numAlumnosInput.value = 5;
@@ -1878,12 +1900,10 @@
       const alumnosContainer = document.getElementById('alumnos-container');
       alumnosContainer.innerHTML = '';
       
-      // Si ya tenemos alumnos guardados, los usamos, sino creamos nuevos
       for (let i = 0; i < numAlumnos; i++) {
         const alumnoItem = document.createElement('div');
         alumnoItem.className = 'alumno-item';
         
-        // Usar el nombre guardado si existe, sino campo vacío
         const nombreGuardado = alumnos[i] || '';
         
         alumnoItem.innerHTML = `
@@ -1901,7 +1921,7 @@
 
     function guardarAlumnos() {
       const inputsAlumnos = document.querySelectorAll('.alumno-input');
-      alumnos = []; // Reiniciamos el array
+      alumnos = [];
       let todosLlenos = true;
       let nombresVacios = [];
       
@@ -1924,8 +1944,6 @@
       }
       
       alert(`Nombres de ${alumnos.length} alumnos guardados correctamente`);
-      // No ocultamos la sección para permitir la exportación
-      // document.getElementById('nombres-alumnos-section').style.display = 'none';
     }
 
     function generarEvaluacion() {
@@ -1966,7 +1984,6 @@
         const fila = document.createElement('tr');
         const maxValor = valoresTareas[tarea];
         
-        // Obtener descripciones de criterios para el tooltip
         const criteriosDesc = criteriosPorTarea[tarea].map(c => {
           return `${c}: ${tooltipTextos[c] || 'Sin descripción'}`;
         }).join('\n');
@@ -1998,7 +2015,6 @@
         });
       });
       
-      // Ajustar tooltips después de generar la tabla
       setTimeout(ajustarTooltips, 100);
       document.getElementById('evaluacion-section').scrollIntoView({ behavior: 'smooth' });
     }
@@ -2110,7 +2126,6 @@
         resumenDiv.appendChild(card);
       });
       
-      // Ajustar tooltips en los resultados
       setTimeout(ajustarTooltips, 100);
       document.getElementById('resultados-section').style.display = 'block';
       document.getElementById('resultados-section').scrollIntoView({ behavior: 'smooth' });
@@ -2138,7 +2153,6 @@
       let firstStudent = true;
       let yPos = 20;
       
-      // Encabezado solo para la primera página
       doc.setFontSize(20);
       doc.text(`Resultados de Evaluación: ${actividad}`, 15, yPos);
       yPos += 10;
@@ -2149,15 +2163,13 @@
       yPos += 20;
       
       alumnos.forEach((alumno, index) => {
-        // Nueva página para cada alumno (excepto el primero)
         if (!firstStudent) {
           doc.addPage();
-          yPos = 20; // Reiniciar posición en nueva página
+          yPos = 20;
         } else {
           firstStudent = false;
         }
         
-        // Datos del alumno
         doc.setFontSize(16);
         doc.setTextColor(0);
         doc.text(`Alumno: ${alumno}`, 15, yPos);
@@ -2166,7 +2178,6 @@
         doc.text(`Promedio: ${resultados[alumno].promedio.toFixed(2)}`, 15, yPos + 10);
         yPos += 25;
         
-        // Cabecera de criterios
         doc.setFontSize(12);
         doc.setTextColor(100);
         doc.text("Criterio", 15, yPos);
@@ -2178,7 +2189,6 @@
         doc.setFontSize(11);
         doc.setTextColor(0);
         
-        // Agrupación de criterios por familia
         const series = {};
         Object.keys(resultados[alumno].criterios).forEach(criterio => {
           const serie = criterio.substring(0, 6);
@@ -2190,7 +2200,6 @@
         
         familiasOrden.forEach(familia => {
           if (series[familia]) {
-            // Verificar espacio antes de agregar nueva familia
             if (yPos > 280) {
               doc.addPage();
               yPos = 20;
@@ -2203,7 +2212,6 @@
             yPos += 8;
             
             series[familia].sort().forEach(criterio => {
-              // Verificar espacio antes de agregar criterio
               if (yPos > 280) {
                 doc.addPage();
                 yPos = 20;
@@ -2214,19 +2222,15 @@
               yPos += 10;
             });
             
-            yPos += 5; // Espacio entre familias
+            yPos += 5;
           }
         });
         
-        yPos += 10; // Espacio final para el próximo alumno
+        yPos += 10;
       });
       
       doc.save(`evaluacion-${actividad.replace(/ /g, '_')}.pdf`);
     }
-
-    // =========================================================================
-    // === FUNCIONALIDAD DE SECCIONES COLAPSABLES ===
-    // =========================================================================
 
     function inicializarSeccionesColapsables() {
       const secciones = [
@@ -2241,7 +2245,6 @@
         const content = document.getElementById(`${seccion.id}-content`);
         
         if (title && content) {
-          // Establecer estado inicial
           if (seccion.defaultState === 'collapsed') {
             title.classList.add('collapsed');
             content.classList.remove('expanded');
@@ -2252,7 +2255,6 @@
             content.classList.add('expanded');
           }
           
-          // Añadir event listener
           title.addEventListener('click', () => {
             title.classList.toggle('collapsed');
             content.classList.toggle('collapsed');
@@ -2262,14 +2264,24 @@
       });
     }
 
+    function mostrarAyuda() {
+      document.getElementById('help-modal').style.display = 'flex';
+    }
+
+    function ocultarAyuda() {
+      document.getElementById('help-modal').style.display = 'none';
+    }
+
+    // =========================================================================
+    // === INICIALIZACIÓN ===
+    // =========================================================================
+
     document.addEventListener('DOMContentLoaded', () => {
       inicializarTareas();
       inicializarSeccionesColapsables();
       
-      // Ajustar tooltips cuando cambia el tamaño de la ventana
       window.addEventListener('resize', ajustarTooltips);
       
-      // Configurar eventos de ayuda
       document.getElementById('help-button').addEventListener('click', mostrarAyuda);
       document.getElementById('close-modal').addEventListener('click', ocultarAyuda);
       document.getElementById('help-modal').addEventListener('click', function(e) {
@@ -2278,7 +2290,6 @@
         }
       });
       
-      // Configurar eventos principales
       document.getElementById('seleccionar-todas').addEventListener('click', () => {
         document.querySelectorAll('.tarea-checkbox').forEach(cb => cb.checked = true);
       });
@@ -2292,7 +2303,6 @@
       document.getElementById('generar-evaluacion').addEventListener('click', generarEvaluacion);
       document.getElementById('calcular-resultados').addEventListener('click', calcularResultados);
       
-      // Configurar eventos de exportación/importación de alumnado
       document.getElementById('exportar-alumnos').addEventListener('click', exportarAlumnado);
       document.getElementById('importar-alumnos').addEventListener('click', () => {
         document.getElementById('importar-alumnos-file').click();
@@ -2313,20 +2323,280 @@
       
       document.getElementById('exportar-pdf').addEventListener('click', exportarPDF);
       
-      // Añadir event listener para los botones de exportar rúbricas
       document.getElementById('exportar-rubricas-csv').addEventListener('click', exportarRubricasCSV);
       document.getElementById('exportar-rubricas-csv-tareas').addEventListener('click', exportarRubricasCSV);
       
-      // Validación para valor total de actividad
       document.getElementById('valor-total').addEventListener('input', function() {
         validarNumeroPositivo(this, 1);
       });
       
-      // Validación para número de alumnos
       document.getElementById('num-alumnos').addEventListener('input', function() {
         validarNumeroPositivo(this, 1, 50);
       });
+      
+      // Configuración de GitHub Gists
+      document.getElementById('mostrar-github').addEventListener('click', () => {
+        const githubPanel = document.getElementById('github-panel');
+        githubPanel.style.display = githubPanel.style.display === 'none' ? 'block' : 'none';
+        
+        if (githubPanel.style.display === 'block') {
+          verificarTokenGitHub();
+        }
+      });
+      
+      document.getElementById('guardar-token').addEventListener('click', guardarTokenGitHub);
+      document.getElementById('guardar-gist').addEventListener('click', guardarEnGist);
+      document.getElementById('cargar-gist').addEventListener('click', cargarDesdeGist);
+      document.getElementById('eliminar-token').addEventListener('click', eliminarTokenGitHub);
+      
+      if (githubToken) {
+        document.getElementById('github-token').value = '••••••••••••••••';
+        verificarTokenGitHub();
+      }
     });
+
+    // =========================================================================
+    // === FUNCIONES DE EXPORTACIÓN DE RÚBRICAS ===
+    // =========================================================================
+
+    const rubricasData = [
+      {
+        id: "c1",
+        titulo: "TEC.4.1.1. Idear y planificar",
+        descripcion: "Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
+        competencia: 1,
+        niveles: [
+          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, no realiza ninguna observación documentada ni análisis de las necesidades del entorno.</li><li class='pl-2'>No presenta ninguna propuesta de solución tecnológica.</li><li class='pl-2'>No incluye un plan de acción ni lista de recursos necesarios.</li></ul>" },
+          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis del entorno, pero no están enfocadas en necesidades o requisitos relevantes.</li><li class='pl-2'>Sus propuestas de solución son poco viables.</li><li class='pl-2'>Sus propuestas de solución son básicas y necesitan más desarrollo.</li><li class='pl-2'>Su plan de acción es limitado, falta detalle y no identifica recursos necesarios.</li></ul>" },
+          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis adecuados del entorno.</li><li class='pl-2'>Propone soluciones tecnológicas viables, aunque pueden necesitar más refinamiento.</li><li class='pl-2'>Presenta un plan de acción básico, pero puede mejorar en detalle y organización.</li><li class='pl-2'>Identifica algunos recursos necesarios.</li></ul>" },
+          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos del entorno.</li><li class='pl-2'>Sus propuestas de solución son creativas y bien desarrolladas.</li><li class='pl-2'>Su plan de acción es detallado y organizado, considerando la mayoría de los factores importantes.</li><li class='pl-2'>Identifica la mayoría de los recursos necesarios.</li></ul>" },
+          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos, precisos y relevantes del entorno.</li><li class='pl-2'>Sus propuestas de solución son innovadoras, originales y muy bien desarrolladas.</li><li class='pl-2'>Su plan de acción es muy detallado, bien organizado, y considera todos los factores importantes y posibles contratiempos.</li><li class='pl-2'>Identifica todos los recursos necesarios.</li></ul>" }
+        ]
+      }
+    ];
+
+    function cleanDescriptor(htmlString) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlString;
+      const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
+      const textoLimpio = textoPlano.replace(/\s+/g, ' ').trim();
+      return `"${textoLimpio.replace(/"/g, '""')}"`;
+    }
+
+    function getExportData(format, nivelesInvertidos) {
+      let puntosLinea = "\t";
+      let descriptoresLinea = "\t";
+
+      const desc_10 = cleanDescriptor(nivelesInvertidos[0].descriptor);
+      const desc_8_9 = cleanDescriptor(nivelesInvertidos[1].descriptor);
+      const desc_5_6 = cleanDescriptor(nivelesInvertidos[2].descriptor);
+      const desc_3_4 = cleanDescriptor(nivelesInvertidos[3].descriptor);
+      const desc_1_2 = cleanDescriptor(nivelesInvertidos[4].descriptor);
+      const desc_0 = `"No entregado"`;
+
+      switch(String(format)) {
+        case '1':
+          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
+          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+          break;
+        case '2':
+          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0\t0.0";
+          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}\t${desc_0}`;
+          break;
+        case '3':
+          puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5";
+          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}`;
+          break;
+        case '4':
+          puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5\t0.0";
+          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}\t${desc_0}`;
+          break;
+        default:
+          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
+          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+      }
+      
+      return { puntosLinea, descriptoresLinea };
+    }
+
+    function getTituloAbreviado(tituloCompleto) {
+      const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
+      if (!codigoMatch) return tituloCompleto;
+      
+      const codigo = codigoMatch[1] + ".";
+      
+      let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
+      
+      const abreviaciones = {
+        'Intercambiar información': 'Intercambio información',
+        'Presentar y difundir': 'Presentación en público',
+        'Idear y planificar': 'Ideación y planificación',
+        'Estrategias colaborativas': 'Trabajo colaborativo',
+        'Gestión creativa de proyectos': 'Gestión de proyectos',
+        'Analizar diseño y ciclo de vida': 'Análisis de diseño',
+        'Fabricar productos': 'Fabricación de productos',
+        'Diseñar sistemas automáticos': 'Sistemas automáticos',
+        'Integrar tecnologías emergentes': 'Tecnologías emergentes',
+        'Resolver tareas': 'Resolución de tareas',
+        'Uso responsable': 'Sostenibilidad',
+        'Analizar arquitectura bioclimática': 'Arquitectura bioclimática',
+        'Valorar proyectos sociales': 'Proyectos sociales'
+      };
+      
+      for (const [completo, abreviado] of Object.entries(abreviaciones)) {
+        if (descripcionAbreviada.includes(completo)) {
+          descripcionAbreviada = abreviado;
+          break;
+        }
+      }
+      
+      descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
+      
+      return `${codigo} ${descripcionAbreviada}`;
+    }
+
+    function exportarRubricasCSV() {
+      const criteriosUtilizados = new Set();
+      tareasSeleccionadas.forEach(tarea => {
+        criteriosPorTarea[tarea].forEach(criterio => {
+          criteriosUtilizados.add(criterio);
+        });
+      });
+
+      const rubricasParaExportar = rubricasData.filter(rubrica => {
+        const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
+        return criteriosUtilizados.has(codigoRubrica);
+      });
+
+      if (rubricasParaExportar.length === 0) {
+        alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
+        return;
+      }
+
+      const format = '1';
+      
+      let csvRows = [
+        "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
+        "v1.0-s"
+      ];
+
+      rubricasParaExportar.forEach(criterio => {
+        const tituloAbreviado = getTituloAbreviado(criterio.titulo);
+        csvRows.push(tituloAbreviado);
+        csvRows.push(criterio.descripcion);
+        
+        const nivelesInvertidos = [...criterio.niveles].reverse();
+        const { puntosLinea, descriptoresLinea } = getExportData(format, nivelesInvertidos);
+        
+        csvRows.push(puntosLinea);
+        csvRows.push(descriptoresLinea);
+        csvRows.push("");
+      });
+
+      const csvString = csvRows.join('\n');
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      
+      const actividad = document.getElementById('actividad').value || "Evaluacion";
+      link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setTimeout(() => {
+        alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
+      }, 500);
+    }
+
+    function exportarAlumnado() {
+      const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
+      const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
+      
+      if (alumnos.length === 0) {
+        alert("No hay alumnos guardados para exportar.");
+        return;
+      }
+      
+      const datos = {
+        clase: nombreClase,
+        actividad: actividad,
+        fechaExportacion: new Date().toISOString(),
+        alumnos: alumnos
+      };
+      
+      const datosStr = JSON.stringify(datos, null, 2);
+      const blob = new Blob([datosStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Actividades_${nombreClase}_Alumnado.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
+    }
+
+    function importarAlumnado(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const datos = JSON.parse(e.target.result);
+          
+          if (!datos.clase || !Array.isArray(datos.alumnos)) {
+            throw new Error('El archivo no tiene el formato correcto.');
+          }
+          
+          document.getElementById('nombre-clase').value = datos.clase;
+          
+          if (datos.actividad) {
+            document.getElementById('actividad').value = datos.actividad;
+          }
+          
+          document.getElementById('num-alumnos').value = datos.alumnos.length;
+          
+          alumnos = datos.alumnos;
+          
+          actualizarInterfazAlumnos();
+          
+          alert(`Alumnado de la clase ${datos.clase} importado correctamente. Se han cargado ${datos.alumnos.length} alumnos.`);
+          
+          event.target.value = '';
+          
+        } catch (error) {
+          alert('Error al importar el archivo: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function actualizarInterfazAlumnos() {
+      const alumnosContainer = document.getElementById('alumnos-container');
+      alumnosContainer.innerHTML = '';
+      
+      alumnos.forEach((alumno, index) => {
+        const alumnoItem = document.createElement('div');
+        alumnoItem.className = 'alumno-item';
+        alumnoItem.innerHTML = `
+          <div class="alumno-header">
+            <label>Alumno ${index + 1}</label>
+          </div>
+          <input type="text" class="alumno-input" value="${alumno}" placeholder="Nombre completo">
+        `;
+        alumnosContainer.appendChild(alumnoItem);
+      });
+      
+      document.getElementById('nombres-alumnos-section').style.display = 'block';
+    }
   </script>
 </body>
 </html>
