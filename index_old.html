@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<link rel="manifest" href="./manifest.json" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>Generación de Rúbrícas de Evaluación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header {
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            font-size: 1.8rem;
+            font-weight: 500;
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .row-top {
+            justify-content: center;
+        }
+        
+        .row-middle, .row-bottom {
+            justify-content: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 20px 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 250px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 7px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #2980b9, #1c2833);
+            text-decoration: none;
+        }
+        
+        .btn:active {
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .button-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>GENERACIÓN DE RÚBRICAS DE EVALUACIÓN</h1>
+            <h2>Departamento de Tecnología - IES Virgen de Villadiego</h2>
+        </header>
+        
+        <div class="buttons-container">
+            <div class="button-row row-top">
+                <a href="CYR1.html" target="_blank" class="btn">Computación y Robótica <br> 1º ESO</a>
+                <a href="CYR2.html" target="_blank" class="btn">Computación y Robótica <br> 2º ESO</a>
+                <a href="CYR3.html" target="_blank" class="btn">Computación y Robótica <br> 3º ESO</a>
+            </div>
+            
+            <div class="button-row row-middle">
+                <a href="TYD2.html" target="_blank" class="btn">Tecnología y Digitalización <br> 2º ESO</a>
+                <a href="TYD3.html" target="_blank" class="btn">Tecnología y Digitalización <br> 3º ESO</a>
+            </div>
+            
+            <div class="button-row row-bottom">
+                <a href="TEC4.html" target="_blank" class="btn">Tecnología <br> 4º ESO</a>
+                <a href="DIG4.html" target="_blank" class="btn">Digitalización <br> 4ºESO</a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Ángel Millán León - 2025</p>
+        </footer>
+    </div>
+    <script src="./regist_serviceWorker.js"></script>
+
+</body>
+</html>
