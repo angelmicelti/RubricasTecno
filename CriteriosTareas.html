@@ -1018,6 +1018,68 @@
       color: #721c24;
       border-left: 4px solid var(--danger);
     }
+    
+    /* Estilos para el modal de selección de evaluaciones */
+    .gist-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin: 15px 0;
+      border: 1px solid #e0e6ed;
+      border-radius: 8px;
+    }
+    
+    .gist-item {
+      padding: 15px;
+      border-bottom: 1px solid #e0e6ed;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .gist-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .gist-item:last-child {
+      border-bottom: none;
+    }
+    
+    .gist-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .gist-title {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .gist-date {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    .gist-description {
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    
+    .gist-filename {
+      color: var(--secondary);
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
+    
+    .gist-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .gist-actions .btn {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -1025,6 +1087,7 @@
     <i class="fas fa-question"></i>
   </div>
 
+  <!-- Modal de Ayuda -->
   <div class="modal-overlay" id="help-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1113,6 +1176,33 @@
             <li>Haz clic en "Guardar Token"</li>
           </ol>
           <p><strong>Nota de seguridad:</strong> Tu token se almacena localmente en tu navegador y nunca se envía a ningún servidor excepto a GitHub para autenticar las operaciones con Gists.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para seleccionar evaluaciones guardadas -->
+  <div class="modal-overlay" id="gists-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fab fa-github"></i> Evaluaciones Guardadas en GitHub</h2>
+        <button class="close-modal" id="close-gists-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="gists-loading" class="message info">
+          <i class="fas fa-spinner fa-spin"></i> Cargando evaluaciones guardadas...
+        </div>
+        <div id="gists-list" class="gist-list" style="display: none;"></div>
+        <div id="gists-empty" class="message info" style="display: none;">
+          <i class="fas fa-info-circle"></i> No se encontraron evaluaciones guardadas.
+        </div>
+        <div class="gist-actions">
+          <button class="btn" id="refresh-gists">
+            <i class="fas fa-sync-alt"></i> Actualizar Lista
+          </button>
+          <button class="btn btn-danger" id="close-gists">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
         </div>
       </div>
     </div>
@@ -1207,8 +1297,8 @@
           <button class="btn" id="guardar-gist">
             <i class="fab fa-github"></i> Guardar Evaluación en Gist
           </button>
-          <button class="btn" id="cargar-gist">
-            <i class="fas fa-download"></i> Cargar Evaluación desde Gist
+          <button class="btn" id="listar-gists">
+            <i class="fas fa-list"></i> Ver Evaluaciones Guardadas
           </button>
           <button class="btn btn-danger" id="eliminar-token">
             <i class="fas fa-trash"></i> Eliminar Token
@@ -1387,7 +1477,6 @@
     let resultados = {};
     let criteriosPorTarea = {};
     let githubToken = localStorage.getItem('githubToken') || '';
-    let gistId = localStorage.getItem('gistId') || '';
 
     // =========================================================================
     // === FUNCIÓN PARA NORMALIZAR IDs ===
@@ -1476,9 +1565,7 @@
     function eliminarTokenGitHub() {
       if (confirm('¿Estás seguro de que quieres eliminar el token de GitHub?')) {
         githubToken = '';
-        gistId = '';
         localStorage.removeItem('githubToken');
-        localStorage.removeItem('gistId');
         document.getElementById('github-status').innerHTML = '<i class="fas fa-info-circle"></i> Token eliminado.';
         document.getElementById('github-status').className = 'github-status disconnected';
         alert('Token eliminado correctamente.');
@@ -1522,7 +1609,7 @@
     }
 
     /**
-     * Guarda la evaluación actual en un Gist de GitHub
+     * Guarda la evaluación actual en un nuevo Gist de GitHub (no sobrescribe)
      */
     async function guardarEnGist() {
       if (!githubToken) {
@@ -1552,16 +1639,9 @@
         }
       };
       
-      // Si ya tenemos un Gist ID, actualizamos ese Gist, sino creamos uno nuevo
-      const url = gistId ? 
-        `https://api.github.com/gists/${gistId}` : 
-        'https://api.github.com/gists';
-      
-      const method = gistId ? 'PATCH' : 'POST';
-      
       try {
-        const response = await fetch(url, {
-          method: method,
+        const response = await fetch('https://api.github.com/gists', {
+          method: 'POST',
           headers: {
             'Authorization': `token ${githubToken}`,
             'Content-Type': 'application/json',
@@ -1576,12 +1656,6 @@
         
         const data = await response.json();
         
-        // Guardar el ID del Gist si es nuevo
-        if (!gistId) {
-          gistId = data.id;
-          localStorage.setItem('gistId', gistId);
-        }
-        
         alert(`Evaluación guardada correctamente en GitHub Gists.\n\nID del Gist: ${data.id}\nURL: ${data.html_url}`);
         
       } catch (error) {
@@ -1591,33 +1665,109 @@
     }
 
     /**
-     * Carga una evaluación desde un Gist de GitHub
+     * Muestra un modal con todas las evaluaciones guardadas en GitHub Gists
      */
-    async function cargarDesdeGist() {
+    async function mostrarEvaluacionesGuardadas() {
       if (!githubToken) {
         alert('Primero debes configurar tu token de GitHub.');
         return;
       }
       
-      // Si tenemos un Gist ID guardado, lo usamos
-      if (gistId) {
-        await cargarGistPorId(gistId);
-        return;
+      const modal = document.getElementById('gists-modal');
+      const loading = document.getElementById('gists-loading');
+      const list = document.getElementById('gists-list');
+      const empty = document.getElementById('gists-empty');
+      
+      // Mostrar modal y estado de carga
+      modal.style.display = 'flex';
+      loading.style.display = 'block';
+      list.style.display = 'none';
+      empty.style.display = 'none';
+      
+      try {
+        // Obtener todos los gists del usuario
+        const response = await fetch('https://api.github.com/gists', {
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const gists = await response.json();
+        
+        // Filtrar solo los gists que contienen evaluaciones
+        const evaluaciones = gists.filter(gist => {
+          return Object.keys(gist.files).some(filename => 
+            filename.startsWith('evaluacion_') && filename.endsWith('.json')
+          );
+        });
+        
+        // Ocultar carga y mostrar resultados
+        loading.style.display = 'none';
+        
+        if (evaluaciones.length === 0) {
+          empty.style.display = 'block';
+          return;
+        }
+        
+        list.style.display = 'block';
+        list.innerHTML = '';
+        
+        // Ordenar por fecha de creación (más recientes primero)
+        evaluaciones.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        // Crear elementos para cada evaluación
+        evaluaciones.forEach(gist => {
+          const evaluacionFile = Object.keys(gist.files).find(filename => 
+            filename.startsWith('evaluacion_') && filename.endsWith('.json')
+          );
+          
+          if (!evaluacionFile) return;
+          
+          const item = document.createElement('div');
+          item.className = 'gist-item';
+          item.dataset.gistId = gist.id;
+          
+          const fecha = new Date(gist.created_at).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          item.innerHTML = `
+            <div class="gist-header">
+              <div class="gist-title">${gist.description || 'Evaluación sin descripción'}</div>
+              <div class="gist-date">${fecha}</div>
+            </div>
+            <div class="gist-description">${evaluacionFile}</div>
+          `;
+          
+          item.addEventListener('click', () => {
+            cargarEvaluacionDesdeGist(gist.id);
+          });
+          
+          list.appendChild(item);
+        });
+        
+      } catch (error) {
+        console.error('Error al cargar evaluaciones:', error);
+        loading.style.display = 'none';
+        alert(`Error al cargar las evaluaciones guardadas: ${error.message}`);
       }
-      
-      // Si no tenemos Gist ID, solicitamos uno
-      const gistIdInput = prompt('Introduce el ID del Gist que quieres cargar:');
-      if (!gistIdInput) return;
-      
-      await cargarGistPorId(gistIdInput);
     }
 
     /**
-     * Carga un Gist específico por su ID
+     * Carga una evaluación específica desde un Gist
      */
-    async function cargarGistPorId(id) {
+    async function cargarEvaluacionDesdeGist(gistId) {
       try {
-        const response = await fetch(`https://api.github.com/gists/${id}`, {
+        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
           headers: {
             'Authorization': `token ${githubToken}`,
             'Accept': 'application/vnd.github.v3+json'
@@ -1630,49 +1780,30 @@
         
         const gist = await response.json();
         
-        // Buscar archivos de evaluación (que empiecen por "evaluacion_")
-        const archivosEvaluacion = Object.keys(gist.files).filter(
-          nombre => nombre.startsWith('evaluacion_')
+        // Buscar archivo de evaluación
+        const evaluacionFile = Object.keys(gist.files).find(filename => 
+          filename.startsWith('evaluacion_') && filename.endsWith('.json')
         );
         
-        if (archivosEvaluacion.length === 0) {
-          alert('No se encontraron archivos de evaluación en este Gist.');
-          return;
+        if (!evaluacionFile) {
+          throw new Error('No se encontró un archivo de evaluación en este Gist.');
         }
         
-        // Si hay múltiples archivos, dejar que el usuario elija
-        let archivoSeleccionado;
-        if (archivosEvaluacion.length > 1) {
-          const opciones = archivosEvaluacion.map(nombre => {
-            const fecha = nombre.match(/\d{4}-\d{2}-\d{2}/);
-            return `${nombre}${fecha ? ` (${fecha[0]})` : ''}`;
-          }).join('\n');
-          
-          const seleccion = prompt(`Selecciona un archivo (introduce el número):\n${archivosEvaluacion.map((nombre, i) => `${i+1}. ${nombre}`).join('\n')}`);
-          const indice = parseInt(seleccion) - 1;
-          
-          if (isNaN(indice) || indice < 0 || indice >= archivosEvaluacion.length) {
-            alert('Selección inválida.');
-            return;
-          }
-          
-          archivoSeleccionado = archivosEvaluacion[indice];
-        } else {
-          archivoSeleccionado = archivosEvaluacion[0];
-        }
-        
-        // Cargar los datos del archivo seleccionado
-        const contenido = gist.files[archivoSeleccionado].content;
+        // Cargar los datos del archivo
+        const contenido = gist.files[evaluacionFile].content;
         const datosEvaluacion = JSON.parse(contenido);
         
         // Restaurar los datos en la aplicación
         restaurarDatosDesdeGist(datosEvaluacion);
         
+        // Cerrar el modal
+        document.getElementById('gists-modal').style.display = 'none';
+        
         alert(`Evaluación cargada correctamente:\n\nClase: ${datosEvaluacion.clase}\nActividad: ${datosEvaluacion.actividad}\nFecha: ${new Date(datosEvaluacion.fecha).toLocaleDateString()}`);
         
       } catch (error) {
         console.error('Error al cargar desde Gist:', error);
-        alert(`Error al cargar desde GitHub Gists: ${error.message}`);
+        alert(`Error al cargar la evaluación: ${error.message}`);
       }
     }
 
@@ -2346,8 +2477,25 @@
       
       document.getElementById('guardar-token').addEventListener('click', guardarTokenGitHub);
       document.getElementById('guardar-gist').addEventListener('click', guardarEnGist);
-      document.getElementById('cargar-gist').addEventListener('click', cargarDesdeGist);
+      document.getElementById('listar-gists').addEventListener('click', mostrarEvaluacionesGuardadas);
       document.getElementById('eliminar-token').addEventListener('click', eliminarTokenGitHub);
+      
+      // Configuración del modal de evaluaciones guardadas
+      document.getElementById('close-gists-modal').addEventListener('click', () => {
+        document.getElementById('gists-modal').style.display = 'none';
+      });
+      
+      document.getElementById('close-gists').addEventListener('click', () => {
+        document.getElementById('gists-modal').style.display = 'none';
+      });
+      
+      document.getElementById('refresh-gists').addEventListener('click', mostrarEvaluacionesGuardadas);
+      
+      document.getElementById('gists-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.style.display = 'none';
+        }
+      });
       
       if (githubToken) {
         document.getElementById('github-token').value = '••••••••••••••••';
