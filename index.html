@@ -98,6 +98,34 @@
             transform: translateY(-2px);
         }
         
+        .btn-green {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 20px 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 250px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-green:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 7px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #229954, #1e8449);
+            text-decoration: none;
+        }
+        
+        .btn-green:active {
+            transform: translateY(-2px);
+        }
+        
         footer {
             margin-top: 40px;
             color: #7f8c8d;
@@ -111,7 +139,7 @@
                 align-items: center;
             }
             
-            .btn {
+            .btn, .btn-green {
                 max-width: 100%;
                 width: 100%;
             }
@@ -149,6 +177,12 @@
                 <a href="TEC4.html" target="_blank" class="btn">Tecnología <br> 4º ESO</a>
                 <a href="DIG4.html" target="_blank" class="btn">Digitalización <br> 4ºESO</a>
             </div>
+
+            <!-- Nueva fila de botones verdes -->
+            <div class="button-row">
+                <a href="EvaluaRubricas.html" target="_blank" class="btn-green">Evaluación de rúbricas</a>
+                <a href="CriteriosTareas.html" target="_blank" class="btn-green">Evaluación completa del alumnado por tareas</a>
+            </div>
         </div>
         
         <footer>
@@ -156,6 +190,5 @@
         </footer>
     </div>
     <script src="./regist_serviceWorker.js"></script>
-
 </body>
 </html>
