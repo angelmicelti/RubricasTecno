@@ -13,6 +13,9 @@
             --dark-color: #333;
             --border-radius: 8px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --github-color: #24292e;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
         }
         
         * {
@@ -66,7 +69,7 @@
             font-weight: bold;
         }
         
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], input[type="password"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -224,6 +227,22 @@
         
         button.calculate:hover {
             background-color: #ff9a7a;
+        }
+        
+        button.github {
+            background-color: var(--github-color);
+        }
+        
+        button.github:hover {
+            background-color: #3a3f44;
+        }
+        
+        button.success {
+            background-color: var(--success-color);
+        }
+        
+        button.success:hover {
+            background-color: #45a049;
         }
         
         .results {
@@ -454,6 +473,134 @@
             color: #999;
             font-style: italic;
         }
+        
+        /* Estilos para la sección de GitHub */
+        .github-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f6f8fa;
+            border-radius: var(--border-radius);
+            border: 1px solid #d0d7de;
+        }
+        
+        .github-section h4 {
+            margin-top: 0;
+            color: var(--github-color);
+        }
+        
+        .github-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .github-gists-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .github-gist-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .github-gist-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .github-gist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .github-gist-name {
+            font-weight: bold;
+        }
+        
+        .github-gist-date {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .github-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .github-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .github-gist-type {
+            font-size: 0.7em;
+            background-color: #e1e4e8;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        
+        .github-config-type {
+            background-color: #d1f7c4;
+            color: #0e4429;
+        }
+        
+        .github-eval-type {
+            background-color: #c5e0ff;
+            color: #0c2d6b;
+        }
+        
+        .github-token-section {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid #ff9800;
+            margin-bottom: 15px;
+        }
+        
+        .github-data-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .github-data-card {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .github-data-card h5 {
+            margin-top: 0;
+            color: var(--github-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .github-data-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .github-data-actions button {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -469,6 +616,7 @@
                 <p>3. En cada pestaña de alumno, introduce cómo ha evaluado a sus compañeros.</p>
                 <p>4. Haz clic en "Calcular Notas" para obtener los resultados.</p>
                 <p>5. Usa los botones "Exportar" e "Importar" para guardar o cargar los datos.</p>
+                <p>6. <strong>NUEVO:</strong> Conecta con GitHub Gists para guardar tus datos en la nube.</p>
                 <p class="note">Los datos se guardan automáticamente en tu navegador.</p>
             </div>
         </details>
@@ -549,8 +697,60 @@
                 </div>
             </div>
             
+            <!-- Nueva sección para GitHub Gists -->
+            <div class="step">
+                <h3>Guardar en GitHub Gists</h3>
+                <div class="github-section">
+                    <div class="github-status">
+                        <span class="status-indicator" id="github-status"></span>
+                        <span id="github-status-text">No conectado a GitHub</span>
+                    </div>
+                    
+                    <div class="github-token-section">
+                        <div class="form-group">
+                            <label for="github-token">Token de acceso personal de GitHub:</label>
+                            <input type="password" id="github-token" placeholder="Introduce tu token de GitHub">
+                            <p class="note">Para crear un token, ve a GitHub > Settings > Developer settings > Personal access tokens > Tokens (classic). Asegúrate de que tiene permiso para "gist".</p>
+                        </div>
+                        
+                        <div class="github-actions">
+                            <button id="save-github-token" class="github">Guardar Token</button>
+                            <button id="load-gists" class="github">Cargar Gists</button>
+                        </div>
+                    </div>
+                    
+                    <div class="github-data-section">
+                        <div class="github-data-card">
+                            <h5>Configuración</h5>
+                            <p>Guarda solo la configuración (estudiantes, aspectos, valores, ponderación)</p>
+                            <div class="github-data-actions">
+                                <button id="save-config-gist" class="success">Guardar Configuración en Gist</button>
+                                <button id="load-config-gist" class="github">Cargar Configuración desde Gist</button>
+                            </div>
+                        </div>
+                        
+                        <div class="github-data-card">
+                            <h5>Evaluación Completa</h5>
+                            <p>Guarda toda la evaluación (configuración + puntuaciones del profesor y alumnos)</p>
+                            <div class="github-data-actions">
+                                <button id="save-eval-gist" class="success">Guardar Evaluación en Gist</button>
+                                <button id="load-eval-gist" class="github">Cargar Evaluación desde Gist</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="github-gists-list" id="github-gists-list">
+                        <!-- Los gists se mostrarán aquí -->
+                    </div>
+                    
+                    <div class="github-info">
+                        <p><strong>Nota:</strong> Los Gists se guardan como archivos secretos en GitHub. Solo tú puedes verlos.</p>
+                    </div>
+                </div>
+            </div>
+            
             <div class="config-buttons">
-                <button id="save-config">Guardar Configuración</button>
+                <button id="save-config">Continuar a Evaluación</button>
                 <button id="export-config">Exportar Configuración</button>
                 <button id="import-config">Importar Configuración</button>
                 <input type="file" id="import-config-file" class="file-input hidden" accept=".json">
@@ -644,6 +844,8 @@
                 <input type="file" id="import-file" class="file-input hidden" accept=".json">
                 <button id="clear-data-btn">Limpiar Datos</button>
                 <button id="back-to-setup">Volver a Configuración</button>
+                <button id="save-config-gist-eval" class="success">Guardar Configuración en Gist</button>
+                <button id="save-eval-gist-eval" class="success">Guardar Evaluación en Gist</button>
             </div>
             
             <div class="auto-save-info">
@@ -678,8 +880,14 @@
         let evaluationName = "Exposición";
         let groupName = "Sin especificar";
         
+        // Variables para GitHub
+        let githubToken = null;
+        let currentConfigGistId = null;
+        let currentEvalGistId = null;
+        
         // Clave para localStorage
         const STORAGE_KEY = 'rubricData';
+        const GITHUB_TOKEN_KEY = 'githubToken';
         
         // Objeto para almacenar todos los datos
         let rubricData = {
@@ -1868,6 +2076,499 @@
             document.getElementById('setup-section').classList.remove('hidden');
         }
         
+        // ===== FUNCIONES PARA GITHUB GISTS =====
+        
+        // Cargar token de GitHub desde localStorage
+        function loadGitHubToken() {
+            const token = localStorage.getItem(GITHUB_TOKEN_KEY);
+            if (token) {
+                githubToken = token;
+                document.getElementById('github-token').value = token;
+                updateGitHubStatus(true);
+            } else {
+                updateGitHubStatus(false);
+            }
+        }
+        
+        // Guardar token de GitHub en localStorage
+        function saveGitHubToken() {
+            const token = document.getElementById('github-token').value.trim();
+            if (!token) {
+                alert('Por favor, introduce un token de GitHub válido');
+                return;
+            }
+            
+            githubToken = token;
+            localStorage.setItem(GITHUB_TOKEN_KEY, token);
+            updateGitHubStatus(true);
+            alert('Token de GitHub guardado correctamente');
+        }
+        
+        // Actualizar estado de GitHub en la interfaz
+        function updateGitHubStatus(connected) {
+            const statusIndicator = document.getElementById('github-status');
+            const statusText = document.getElementById('github-status-text');
+            
+            if (connected) {
+                statusIndicator.className = 'status-indicator status-saved';
+                statusText.textContent = 'Conectado a GitHub';
+            } else {
+                statusIndicator.className = 'status-indicator status-unsaved';
+                statusText.textContent = 'No conectado a GitHub';
+            }
+        }
+        
+        // Obtener los gists del usuario
+        async function loadGists() {
+            if (!githubToken) {
+                alert('Primero debes configurar tu token de GitHub');
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://api.github.com/gists', {
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error al cargar gists: ${response.status}`);
+                }
+                
+                const gists = await response.json();
+                displayGists(gists);
+            } catch (error) {
+                console.error('Error al cargar gists:', error);
+                alert('Error al cargar gists: ' + error.message);
+            }
+        }
+        
+        // Mostrar la lista de gists en la interfaz
+        function displayGists(gists) {
+            const gistsList = document.getElementById('github-gists-list');
+            gistsList.innerHTML = '';
+            
+            // Filtrar gists que contengan datos de rúbricas
+            const rubricGists = gists.filter(gist => {
+                return Object.keys(gist.files).some(filename => 
+                    filename.includes('Evaluacion') || filename.includes('Config'));
+            });
+            
+            if (rubricGists.length === 0) {
+                gistsList.innerHTML = '<div class="github-gist-item">No se encontraron gists de rúbricas</div>';
+                return;
+            }
+            
+            rubricGists.forEach(gist => {
+                const gistItem = document.createElement('div');
+                gistItem.className = 'github-gist-item';
+                
+                // Obtener el primer archivo del gist
+                const filename = Object.keys(gist.files)[0];
+                const file = gist.files[filename];
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'github-gist-name';
+                nameDiv.textContent = file.filename;
+                
+                // Añadir indicador de tipo
+                const typeIndicator = document.createElement('span');
+                if (filename.includes('Config')) {
+                    typeIndicator.textContent = 'Config';
+                    typeIndicator.className = 'github-gist-type github-config-type';
+                } else if (filename.includes('Evaluacion')) {
+                    typeIndicator.textContent = 'Evaluación';
+                    typeIndicator.className = 'github-gist-type github-eval-type';
+                }
+                nameDiv.appendChild(typeIndicator);
+                
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'github-gist-date';
+                dateDiv.textContent = new Date(gist.updated_at).toLocaleDateString();
+                
+                const actionsDiv = document.createElement('div');
+                
+                const loadButton = document.createElement('button');
+                loadButton.textContent = 'Cargar';
+                loadButton.className = 'github';
+                loadButton.style.padding = '5px 10px';
+                loadButton.style.fontSize = '0.8em';
+                loadButton.addEventListener('click', () => {
+                    loadGistData(gist.id, filename);
+                });
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.className = 'remove-btn';
+                deleteButton.style.padding = '5px 10px';
+                deleteButton.style.fontSize = '0.8em';
+                deleteButton.addEventListener('click', () => {
+                    deleteGist(gist.id);
+                });
+                
+                actionsDiv.appendChild(loadButton);
+                actionsDiv.appendChild(deleteButton);
+                
+                gistItem.appendChild(nameDiv);
+                gistItem.appendChild(dateDiv);
+                gistItem.appendChild(actionsDiv);
+                
+                gistsList.appendChild(gistItem);
+            });
+        }
+        
+        // Cargar datos desde un gist
+        async function loadGistData(gistId, filename) {
+            if (!githubToken) {
+                alert('Primero debes configurar tu token de GitHub');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error al cargar gist: ${response.status}`);
+                }
+                
+                const gist = await response.json();
+                const file = gist.files[filename];
+                
+                if (!file || !file.content) {
+                    throw new Error('El gist no contiene datos válidos');
+                }
+                
+                const importedData = JSON.parse(file.content);
+                
+                // Determinar si es configuración o evaluación completa
+                if (filename.includes('Config')) {
+                    // Es una configuración
+                    if (importedData.students && importedData.aspects && importedData.values) {
+                        // Actualizar variables globales
+                        students = importedData.students || [];
+                        aspects = importedData.aspects || [];
+                        values = importedData.values || ["NE"];
+                        teacherWeight = importedData.teacherWeight || 75;
+                        evaluationName = importedData.evaluationName || "Exposición";
+                        groupName = importedData.groupName || "Sin especificar";
+                        
+                        // Asegurar que "NE" está en los valores
+                        if (!values.includes("NE")) {
+                            values.unshift("NE");
+                        }
+                        
+                        // Actualizar interfaz
+                        updateWeightDisplay();
+                        updateTitleAndSubtitle();
+                        renderStudentsList();
+                        renderAspectsList();
+                        renderValuesList();
+                        
+                        // Actualizar campos de información general
+                        document.getElementById('evaluation-name').value = evaluationName;
+                        document.getElementById('group-name-input').value = groupName;
+                        
+                        // Inicializar datos si es necesario
+                        initializeData();
+                        
+                        // Guardar automáticamente la configuración
+                        saveToStorage();
+                        
+                        currentConfigGistId = gistId;
+                        
+                        alert('Configuración cargada correctamente desde GitHub Gist');
+                    } else {
+                        alert('El gist de configuración no tiene el formato correcto');
+                    }
+                } else if (filename.includes('Evaluacion')) {
+                    // Es una evaluación completa
+                    if (importedData.config && importedData.teacher && importedData.students) {
+                        rubricData = importedData;
+                        
+                        // Actualizar variables globales
+                        students = rubricData.config.students || [];
+                        aspects = rubricData.config.aspects || [];
+                        values = rubricData.config.values || ["NE"];
+                        teacherWeight = rubricData.config.teacherWeight || 75;
+                        evaluationName = rubricData.config.evaluationName || "Exposición";
+                        groupName = rubricData.config.groupName || "Sin especificar";
+                        
+                        // Asegurar que "NE" está en los valores
+                        if (!values.includes("NE")) {
+                            values.unshift("NE");
+                        }
+                        
+                        // Actualizar interfaz
+                        updateWeightDisplay();
+                        updateTitleAndSubtitle();
+                        renderStudentsList();
+                        renderAspectsList();
+                        renderValuesList();
+                        
+                        // Actualizar campos de información general
+                        document.getElementById('evaluation-name').value = evaluationName;
+                        document.getElementById('group-name-input').value = groupName;
+                        
+                        // Si estamos en la sección de evaluación, actualizar las tablas
+                        if (!document.getElementById('evaluation-section').classList.contains('hidden')) {
+                            createTeacherTable();
+                            createStudentTabs();
+                            createBulkActions();
+                            createCoevaluationBulkActions();
+                        }
+                        
+                        // Guardar automáticamente los datos importados
+                        saveToStorage();
+                        
+                        currentEvalGistId = gistId;
+                        
+                        alert('Evaluación completa cargada correctamente desde GitHub Gist');
+                    } else {
+                        alert('El gist de evaluación no tiene el formato correcto');
+                    }
+                } else {
+                    alert('Tipo de archivo no reconocido');
+                }
+            } catch (error) {
+                console.error('Error al cargar gist:', error);
+                alert('Error al cargar gist: ' + error.message);
+            }
+        }
+        
+        // Guardar configuración en un gist
+        async function saveConfigToGist() {
+            if (!githubToken) {
+                alert('Primero debes configurar tu token de GitHub');
+                return;
+            }
+            
+            // Generar nombre de archivo
+            const filename = `Config${groupName.replace(/\s+/g, '')}${evaluationName.replace(/\s+/g, '')}.json`;
+            const content = JSON.stringify({
+                students: students,
+                aspects: aspects,
+                values: values,
+                teacherWeight: teacherWeight,
+                evaluationName: evaluationName,
+                groupName: groupName
+            }, null, 2);
+            
+            try {
+                let response;
+                
+                if (currentConfigGistId) {
+                    // Actualizar gist existente
+                    response = await fetch(`https://api.github.com/gists/${currentConfigGistId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `token ${githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            description: `Configuración: ${evaluationName} - Grupo: ${groupName}`,
+                            files: {
+                                [filename]: {
+                                    content: content
+                                }
+                            }
+                        })
+                    });
+                } else {
+                    // Crear nuevo gist
+                    response = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            description: `Configuración: ${evaluationName} - Grupo: ${groupName}`,
+                            public: false,
+                            files: {
+                                [filename]: {
+                                    content: content
+                                }
+                            }
+                        })
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`Error al guardar gist: ${response.status}`);
+                }
+                
+                const gist = await response.json();
+                currentConfigGistId = gist.id;
+                
+                // Recargar la lista de gists
+                await loadGists();
+                
+                alert('Configuración guardada correctamente en GitHub Gist');
+            } catch (error) {
+                console.error('Error al guardar gist:', error);
+                alert('Error al guardar gist: ' + error.message);
+            }
+        }
+        
+        // Guardar evaluación completa en un gist
+        async function saveEvalToGist() {
+            if (!githubToken) {
+                alert('Primero debes configurar tu token de GitHub');
+                return;
+            }
+            
+            // Generar nombre de archivo
+            const filename = `Evaluacion${evaluationName.replace(/\s+/g, '')}${groupName.replace(/\s+/g, '')}.json`;
+            const content = JSON.stringify(rubricData, null, 2);
+            
+            try {
+                let response;
+                
+                if (currentEvalGistId) {
+                    // Actualizar gist existente
+                    response = await fetch(`https://api.github.com/gists/${currentEvalGistId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `token ${githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            description: `Evaluación: ${evaluationName} - Grupo: ${groupName}`,
+                            files: {
+                                [filename]: {
+                                    content: content
+                                }
+                            }
+                        })
+                    });
+                } else {
+                    // Crear nuevo gist
+                    response = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            description: `Evaluación: ${evaluationName} - Grupo: ${groupName}`,
+                            public: false,
+                            files: {
+                                [filename]: {
+                                    content: content
+                                }
+                            }
+                        })
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`Error al guardar gist: ${response.status}`);
+                }
+                
+                const gist = await response.json();
+                currentEvalGistId = gist.id;
+                
+                // Recargar la lista de gists
+                await loadGists();
+                
+                alert('Evaluación guardada correctamente en GitHub Gist');
+            } catch (error) {
+                console.error('Error al guardar gist:', error);
+                alert('Error al guardar gist: ' + error.message);
+            }
+        }
+        
+        // Cargar configuración desde un gist
+        async function loadConfigFromGist() {
+            // Primero cargamos la lista de gists
+            await loadGists();
+            
+            // Buscamos un gist de configuración
+            const configGists = Array.from(document.querySelectorAll('.github-gist-item'))
+                .filter(item => item.querySelector('.github-config-type'));
+            
+            if (configGists.length === 0) {
+                alert('No se encontraron gists de configuración');
+                return;
+            }
+            
+            // Simulamos un clic en el primer gist de configuración
+            if (configGists[0]) {
+                const loadButton = configGists[0].querySelector('button');
+                if (loadButton) {
+                    loadButton.click();
+                }
+            }
+        }
+        
+        // Cargar evaluación desde un gist
+        async function loadEvalFromGist() {
+            // Primero cargamos la lista de gists
+            await loadGists();
+            
+            // Buscamos un gist de evaluación
+            const evalGists = Array.from(document.querySelectorAll('.github-gist-item'))
+                .filter(item => item.querySelector('.github-eval-type'));
+            
+            if (evalGists.length === 0) {
+                alert('No se encontraron gists de evaluación');
+                return;
+            }
+            
+            // Simulamos un clic en el primer gist de evaluación
+            if (evalGists[0]) {
+                const loadButton = evalGists[0].querySelector('button');
+                if (loadButton) {
+                    loadButton.click();
+                }
+            }
+        }
+        
+        // Eliminar un gist
+        async function deleteGist(gistId) {
+            if (!githubToken) {
+                alert('Primero debes configurar tu token de GitHub');
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que quieres eliminar este gist? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error al eliminar gist: ${response.status}`);
+                }
+                
+                // Recargar la lista de gists
+                await loadGists();
+                
+                alert('Gist eliminado correctamente');
+            } catch (error) {
+                console.error('Error al eliminar gist:', error);
+                alert('Error al eliminar gist: ' + error.message);
+            }
+        }
+        
         // Inicializar la aplicación
         function initApp() {
             // Intentar cargar datos existentes
@@ -1892,6 +2593,9 @@
                 renderValuesList();
                 updateWeightDisplay();
             }
+            
+            // Cargar token de GitHub si existe
+            loadGitHubToken();
             
             // Event listeners para configuración
             document.getElementById('add-student').addEventListener('click', () => {
@@ -1960,6 +2664,22 @@
                 // Limpiar el input para permitir cargar el mismo archivo otra vez
                 e.target.value = '';
             });
+            
+            // Event listeners para GitHub Gists
+            document.getElementById('save-github-token').addEventListener('click', saveGitHubToken);
+            document.getElementById('load-gists').addEventListener('click', loadGists);
+            
+            // Event listeners para Configuración en GitHub
+            document.getElementById('save-config-gist').addEventListener('click', saveConfigToGist);
+            document.getElementById('load-config-gist').addEventListener('click', loadConfigFromGist);
+            
+            // Event listeners para Evaluación en GitHub
+            document.getElementById('save-eval-gist').addEventListener('click', saveEvalToGist);
+            document.getElementById('load-eval-gist').addEventListener('click', loadEvalFromGist);
+            
+            // Event listeners para GitHub en la sección de evaluación
+            document.getElementById('save-config-gist-eval').addEventListener('click', saveConfigToGist);
+            document.getElementById('save-eval-gist-eval').addEventListener('click', saveEvalToGist);
             
             document.getElementById('save-config').addEventListener('click', showEvaluationSection);
             
