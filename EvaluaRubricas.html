@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluador Genérico de Rúbricas</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --light-color: #f5f7fa;
+            --dark-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .aspects-list, .students-list, .values-list {
+            margin-top: 10px;
+        }
+        
+        .aspect-item, .student-item, .value-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .aspect-item input, .student-item input, .value-item input {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .remove-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .add-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .slider-container {
+            margin-top: 15px;
+        }
+        
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .tab:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        button.calculate {
+            background-color: var(--accent-color);
+        }
+        
+        button.calculate:hover {
+            background-color: #ff9a7a;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .results table {
+            background-color: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .file-input {
+            margin: 10px 0;
+        }
+        
+        .instructions {
+            background-color: #fff9e6;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Estilos para elementos desplegables */
+        details {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        summary {
+            padding: 15px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        summary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        details[open] summary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .details-content {
+            padding: 15px;
+            background-color: white;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-saved {
+            background-color: #4CAF50;
+        }
+        
+        .status-unsaved {
+            background-color: #FF9800;
+        }
+        
+        .auto-save-info {
+            font-size: 0.8em;
+            color: #666;
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .step {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+        }
+        
+        .app-title {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .app-subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .bulk-actions {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: var(--border-radius);
+            border: 1px solid #b3d9ff;
+        }
+        
+        .bulk-actions h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .bulk-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .bulk-controls select {
+            width: auto;
+            min-width: 150px;
+        }
+        
+        .bulk-controls button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        
+        .bulk-aspects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .bulk-aspect {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .bulk-aspect button {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        
+        .coevaluation-bulk-actions {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f0fff0;
+            border-radius: var(--border-radius);
+            border: 1px solid #b3ffb3;
+        }
+        
+        .config-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .bulk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .bulk-indicator-icon {
+            font-size: 1.2em;
+        }
+        
+        .student-bulk-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .student-bulk-action select {
+            width: auto;
+            min-width: 120px;
+        }
+        
+        .student-bulk-action button {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        
+        /* Estilos para el botón de importar alumnado */
+        .import-students-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: var(--border-radius);
+            border: 1px solid #b3d9ff;
+        }
+        
+        .import-students-section h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        /* Estilo para el valor NE */
+        .ne-option {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="main-title" class="app-title">Evaluación: <span id="evaluation-title">Exposición</span></h1>
+        <h2 id="main-subtitle" class="app-subtitle">Grupo: <span id="group-name">Sin especificar</span></h2>
+        
+        <details class="instructions">
+            <summary>Instrucciones (haz clic para desplegar)</summary>
+            <div class="details-content">
+                <p>1. Configura los parámetros de evaluación en el Paso 1.</p>
+                <p>2. Introduce las puntuaciones del profesor para cada alumno en cada aspecto.</p>
+                <p>3. En cada pestaña de alumno, introduce cómo ha evaluado a sus compañeros.</p>
+                <p>4. Haz clic en "Calcular Notas" para obtener los resultados.</p>
+                <p>5. Usa los botones "Exportar" e "Importar" para guardar o cargar los datos.</p>
+                <p class="note">Los datos se guardan automáticamente en tu navegador.</p>
+            </div>
+        </details>
+        
+        <div id="setup-section" class="section">
+            <h2><span class="step-number">1</span> Configuración de la Evaluación</h2>
+            
+            <div class="step">
+                <h3>Información General</h3>
+                <div class="form-group">
+                    <label for="evaluation-name">Título de la evaluación:</label>
+                    <input type="text" id="evaluation-name" placeholder="Ej: Exposición, Proyecto..." value="Exposición">
+                </div>
+                
+                <div class="form-group">
+                    <label for="group-name-input">Grupo:</label>
+                    <input type="text" id="group-name-input" placeholder="Nombre del grupo">
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Estudiantes</h3>
+                <div class="form-group">
+                    <label for="student-name">Nombre del estudiante:</label>
+                    <input type="text" id="student-name" placeholder="Introduce un nombre">
+                    <button id="add-student" class="add-btn">Añadir Estudiante</button>
+                </div>
+                
+                <div class="students-list" id="students-list">
+                    <!-- Los estudiantes se añadirán aquí -->
+                </div>
+                
+                <!-- Nueva sección para importar alumnado desde JSON -->
+                <div class="import-students-section">
+                    <h4>Importar Alumnado desde Archivo JSON</h4>
+                    <p>Puedes importar un archivo JSON con la estructura de la clase completa para cargar automáticamente todos los estudiantes y el nombre del grupo.</p>
+                    <div class="button-group">
+                        <button id="import-students-json">Importar Alumnado JSON</button>
+                        <input type="file" id="import-students-file" class="file-input hidden" accept=".json">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Aspectos a Evaluar</h3>
+                <div class="form-group">
+                    <label for="aspect-name">Nombre del aspecto:</label>
+                    <input type="text" id="aspect-name" placeholder="Ej: Pronunciación, Contenido...">
+                    <button id="add-aspect" class="add-btn">Añadir Aspecto</button>
+                </div>
+                
+                <div class="aspects-list" id="aspects-list">
+                    <!-- Los aspectos se añadirán aquí -->
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Valores de Puntuación</h3>
+                <div class="form-group">
+                    <label for="value-name">Valor de puntuación (de más bajo a más alto):</label>
+                    <input type="text" id="value-name" placeholder="Ej: Excelente, Bueno, Regular...">
+                    <button id="add-value" class="add-btn">Añadir Valor</button>
+                </div>
+                
+                <div class="values-list" id="values-list">
+                    <!-- Los valores se añadirán aquí -->
+                </div>
+                <p class="note">Nota: El valor "NE" (No Evaluado) se añade automáticamente y no se computa en los cálculos.</p>
+            </div>
+            
+            <div class="step">
+                <h3>Ponderación</h3>
+                <div class="form-group">
+                    <label>Peso de la evaluación del profesor (%):</label>
+                    <input type="range" min="0" max="100" value="75" class="slider" id="teacher-weight">
+                    <div class="slider-value" id="teacher-weight-value">75%</div>
+                    <div class="note">El peso de la coevaluación será: <span id="student-weight-value">25%</span></div>
+                </div>
+            </div>
+            
+            <div class="config-buttons">
+                <button id="save-config">Guardar Configuración</button>
+                <button id="export-config">Exportar Configuración</button>
+                <button id="import-config">Importar Configuración</button>
+                <input type="file" id="import-config-file" class="file-input hidden" accept=".json">
+            </div>
+        </div>
+        
+        <div id="evaluation-section" class="section hidden">
+            <details id="teacher-section">
+                <summary>
+                    <span class="status-indicator status-saved" id="teacher-status"></span>
+                    Evaluación del Profesor (<span id="teacher-percent">75</span>% de la nota final)
+                </summary>
+                <div class="details-content">
+                    <details class="bulk-actions">
+                        <summary>
+                            Acciones Masivas Globales
+                            <span class="bulk-indicator">
+                                <span class="bulk-indicator-icon">⚡</span>
+                                Aplicar valores en bloque
+                            </span>
+                        </summary>
+                        <div class="details-content">
+                            <div class="bulk-controls">
+                                <label>Valor a aplicar:</label>
+                                <select id="bulk-value">
+                                    <!-- Se llenará con los valores disponibles -->
+                                </select>
+                                <button id="apply-all-aspects">Aplicar a todos los aspectos</button>
+                            </div>
+                            <div class="bulk-aspects">
+                                <!-- Se generarán botones para cada aspecto -->
+                            </div>
+                        </div>
+                    </details>
+                    
+                    <table id="teacher-table">
+                        <thead>
+                            <tr id="teacher-table-header">
+                                <!-- Las columnas se generarán dinámicamente -->
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-table-body">
+                            <!-- Las filas se generarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            
+            <details id="students-section">
+                <summary>
+                    <span class="status-indicator status-saved" id="students-status"></span>
+                    Coevaluación del Alumnado (<span id="student-percent">25</span>% de la nota final)
+                </summary>
+                <div class="details-content">
+                    <details class="coevaluation-bulk-actions">
+                        <summary>
+                            Acciones Masivas para Todos los Estudiantes
+                            <span class="bulk-indicator">
+                                <span class="bulk-indicator-icon">⚡</span>
+                                Aplicar valores en bloque
+                            </span>
+                        </summary>
+                        <div class="details-content">
+                            <div class="bulk-controls">
+                                <label>Valor a aplicar:</label>
+                                <select id="coevaluation-bulk-value">
+                                    <!-- Se llenará con los valores disponibles -->
+                                </select>
+                                <button id="apply-all-coevaluation">Aplicar a todos los aspectos</button>
+                            </div>
+                            <div class="bulk-aspects">
+                                <!-- Se generarán botones para cada aspecto -->
+                            </div>
+                        </div>
+                    </details>
+                    
+                    <div class="tabs" id="student-tabs">
+                        <!-- Las pestañas se generarán dinámicamente -->
+                    </div>
+                    
+                    <div id="student-tab-contents">
+                        <!-- Los contenidos de las pestañas se generarán dinámicamente -->
+                    </div>
+                </div>
+            </details>
+            
+            <div class="button-group">
+                <button id="calculate-btn" class="calculate">Calcular Notas</button>
+                <button id="export-btn">Exportar Datos</button>
+                <button id="import-btn">Importar Datos</button>
+                <input type="file" id="import-file" class="file-input hidden" accept=".json">
+                <button id="clear-data-btn">Limpiar Datos</button>
+                <button id="back-to-setup">Volver a Configuración</button>
+            </div>
+            
+            <div class="auto-save-info">
+                <span class="status-indicator status-saved"></span> Datos guardados automáticamente
+            </div>
+            
+            <div id="results-section" class="results hidden">
+                <h2>Resultados</h2>
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Nota Profesor</th>
+                            <th>Nota Coevaluación</th>
+                            <th>Nota Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <!-- Los resultados se generarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let students = [];
+        let aspects = [];
+        let values = ["NE"]; // Añadimos "NE" como valor por defecto
+        let teacherWeight = 75;
+        let evaluationName = "Exposición";
+        let groupName = "Sin especificar";
+        
+        // Clave para localStorage
+        const STORAGE_KEY = 'rubricData';
+        
+        // Objeto para almacenar todos los datos
+        let rubricData = {
+            config: {
+                students: [],
+                aspects: [],
+                values: ["NE"], // Añadimos "NE" como valor por defecto
+                teacherWeight: 75,
+                evaluationName: "Exposición",
+                groupName: "Sin especificar"
+            },
+            teacher: {},
+            students: {}
+        };
+        
+        // Variables para control de cambios
+        let hasUnsavedChanges = false;
+        let saveTimeout = null;
+        
+        // Inicializar datos
+        function initializeData() {
+            // Inicializar datos del profesor
+            students.forEach(student => {
+                rubricData.teacher[student] = {};
+                aspects.forEach(aspect => {
+                    rubricData.teacher[student][aspect] = "NE"; // Valor por defecto: "NE"
+                });
+            });
+            
+            // Inicializar datos de los estudiantes
+            students.forEach(evaluator => {
+                rubricData.students[evaluator] = {};
+                students.forEach(evaluated => {
+                    if (evaluator !== evaluated) {
+                        rubricData.students[evaluator][evaluated] = {};
+                        aspects.forEach(aspect => {
+                            rubricData.students[evaluator][evaluated][aspect] = "NE"; // Valor por defecto: "NE"
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Cargar datos desde localStorage
+        function loadFromStorage() {
+            const storedData = localStorage.getItem(STORAGE_KEY);
+            if (storedData) {
+                try {
+                    const parsedData = JSON.parse(storedData);
+                    // Validar estructura básica
+                    if (parsedData.config && parsedData.teacher && parsedData.students) {
+                        rubricData = parsedData;
+                        
+                        // Actualizar variables globales
+                        students = rubricData.config.students || [];
+                        aspects = rubricData.config.aspects || [];
+                        values = rubricData.config.values || ["NE"];
+                        teacherWeight = rubricData.config.teacherWeight || 75;
+                        evaluationName = rubricData.config.evaluationName || "Exposición";
+                        groupName = rubricData.config.groupName || "Sin especificar";
+                        
+                        // Asegurar que "NE" está en los valores
+                        if (!values.includes("NE")) {
+                            values.unshift("NE");
+                        }
+                        
+                        console.log('Datos cargados desde localStorage');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar datos desde localStorage:', error);
+                }
+            }
+            return false;
+        }
+        
+        // Guardar datos en localStorage
+        function saveToStorage() {
+            try {
+                // Actualizar configuración
+                rubricData.config.students = students;
+                rubricData.config.aspects = aspects;
+                rubricData.config.values = values;
+                rubricData.config.teacherWeight = teacherWeight;
+                rubricData.config.evaluationName = evaluationName;
+                rubricData.config.groupName = groupName;
+                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(rubricData));
+                hasUnsavedChanges = false;
+                updateStatusIndicators();
+                console.log('Datos guardados en localStorage');
+            } catch (error) {
+                console.error('Error al guardar en localStorage:', error);
+            }
+        }
+        
+        // Programar guardado (debounce)
+        function scheduleSave() {
+            hasUnsavedChanges = true;
+            updateStatusIndicators();
+            
+            // Cancelar guardado anterior si existe
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+            }
+            
+            // Programar nuevo guardado
+            saveTimeout = setTimeout(saveToStorage, 1000);
+        }
+        
+        // Actualizar indicadores de estado
+        function updateStatusIndicators() {
+            const teacherStatus = document.getElementById('teacher-status');
+            const studentsStatus = document.getElementById('students-status');
+            
+            if (hasUnsavedChanges) {
+                teacherStatus.className = 'status-indicator status-unsaved';
+                studentsStatus.className = 'status-indicator status-unsaved';
+            } else {
+                teacherStatus.className = 'status-indicator status-saved';
+                studentsStatus.className = 'status-indicator status-saved';
+            }
+        }
+        
+        // Actualizar título y subtítulo en la interfaz
+        function updateTitleAndSubtitle() {
+            document.getElementById('evaluation-title').textContent = evaluationName;
+            document.getElementById('group-name').textContent = groupName;
+        }
+        
+        // Función para convertir valor a escala 0-10 (ignora "NE")
+        function scaleScore(score) {
+            if (score === "NE") return 0;
+            
+            if (values.length === 0) return 0;
+            
+            // Si los valores son numéricos, escalamos linealmente
+            if (!isNaN(values[0])) {
+                const minValue = Math.min(...values.filter(v => v !== "NE"));
+                const maxValue = Math.max(...values.filter(v => v !== "NE"));
+                return ((score - minValue) / (maxValue - minValue) * 10).toFixed(2);
+            }
+            
+            // Si son valores cualitativos, asignamos puntuación por posición
+            const validValues = values.filter(v => v !== "NE");
+            const index = validValues.indexOf(score);
+            if (index === -1) return 0;
+            
+            return ((index / (validValues.length - 1)) * 10).toFixed(2);
+        }
+        
+        // Renderizar lista de estudiantes
+        function renderStudentsList() {
+            const list = document.getElementById('students-list');
+            list.innerHTML = '';
+            
+            students.forEach((student, index) => {
+                const item = document.createElement('div');
+                item.className = 'student-item';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = student;
+                input.addEventListener('change', (e) => {
+                    students[index] = e.target.value;
+                    scheduleSave();
+                });
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = 'Eliminar';
+                removeBtn.addEventListener('click', () => {
+                    students.splice(index, 1);
+                    renderStudentsList();
+                    scheduleSave();
+                });
+                
+                item.appendChild(input);
+                item.appendChild(removeBtn);
+                list.appendChild(item);
+            });
+        }
+        
+        // Renderizar lista de aspectos
+        function renderAspectsList() {
+            const list = document.getElementById('aspects-list');
+            list.innerHTML = '';
+            
+            aspects.forEach((aspect, index) => {
+                const item = document.createElement('div');
+                item.className = 'aspect-item';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = aspect;
+                input.addEventListener('change', (e) => {
+                    aspects[index] = e.target.value;
+                    scheduleSave();
+                });
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = 'Eliminar';
+                removeBtn.addEventListener('click', () => {
+                    aspects.splice(index, 1);
+                    renderAspectsList();
+                    scheduleSave();
+                });
+                
+                item.appendChild(input);
+                item.appendChild(removeBtn);
+                list.appendChild(item);
+            });
+        }
+        
+        // Renderizar lista de valores
+        function renderValuesList() {
+            const list = document.getElementById('values-list');
+            list.innerHTML = '';
+            
+            values.forEach((value, index) => {
+                const item = document.createElement('div');
+                item.className = 'value-item';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = value;
+                input.addEventListener('change', (e) => {
+                    values[index] = e.target.value;
+                    scheduleSave();
+                });
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = 'Eliminar';
+                removeBtn.addEventListener('click', () => {
+                    // No permitir eliminar "NE"
+                    if (value === "NE") {
+                        alert('No se puede eliminar el valor "NE" (No Evaluado)');
+                        return;
+                    }
+                    values.splice(index, 1);
+                    renderValuesList();
+                    scheduleSave();
+                });
+                
+                item.appendChild(input);
+                item.appendChild(removeBtn);
+                list.appendChild(item);
+            });
+        }
+        
+        // Función para importar alumnado desde JSON
+        function importStudentsFromJSON(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validar estructura del archivo
+                    if (!importedData.clase || !importedData.alumnos) {
+                        alert('El archivo no tiene la estructura esperada. Debe contener "clase" y "alumnos".');
+                        return;
+                    }
+                    
+                    // Preguntar al usuario qué hacer con los datos existentes
+                    let action;
+                    if (students.length > 0) {
+                        action = confirm(
+                            '¿Quieres reemplazar la lista actual de estudiantes?\n\n' +
+                            'Haz clic en "Aceptar" para reemplazar la lista actual.\n' +
+                            'Haz clic en "Cancelar" para añadir los nuevos estudiantes a la lista existente.'
+                        );
+                    } else {
+                        action = true; // Si no hay estudiantes, simplemente reemplazar
+                    }
+                    
+                    // Procesar los estudiantes
+                    if (action) {
+                        // Reemplazar la lista actual
+                        students = [...importedData.alumnos];
+                    } else {
+                        // Añadir a la lista existente (evitando duplicados)
+                        importedData.alumnos.forEach(alumno => {
+                            if (!students.includes(alumno)) {
+                                students.push(alumno);
+                            }
+                        });
+                    }
+                    
+                    // Actualizar el nombre del grupo
+                    groupName = importedData.clase;
+                    document.getElementById('group-name-input').value = groupName;
+                    
+                    // Actualizar la interfaz
+                    updateTitleAndSubtitle();
+                    renderStudentsList();
+                    
+                    // Guardar los cambios
+                    scheduleSave();
+                    
+                    alert(`Alumnado importado correctamente. Ahora hay ${students.length} estudiantes en el grupo "${groupName}".`);
+                    
+                } catch (error) {
+                    alert('Error al leer el archivo JSON: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('Error al leer el archivo');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Crear controles de acciones masivas para el profesor
+        function createBulkActions() {
+            const bulkValueSelect = document.getElementById('bulk-value');
+            const bulkAspectsContainer = document.querySelector('.bulk-actions .bulk-aspects');
+            
+            // Limpiar select y contenedor
+            bulkValueSelect.innerHTML = '';
+            bulkAspectsContainer.innerHTML = '';
+            
+            // Llenar select con valores disponibles
+            values.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                if (value === "NE") {
+                    option.className = "ne-option";
+                }
+                bulkValueSelect.appendChild(option);
+            });
+            
+            // Crear botones para cada aspecto
+            aspects.forEach(aspect => {
+                const aspectContainer = document.createElement('div');
+                aspectContainer.className = 'bulk-aspect';
+                
+                const button = document.createElement('button');
+                button.textContent = `Aplicar a "${aspect}"`;
+                button.addEventListener('click', () => {
+                    applyValueToAspect(bulkValueSelect.value, aspect);
+                });
+                
+                aspectContainer.appendChild(button);
+                bulkAspectsContainer.appendChild(aspectContainer);
+            });
+            
+            // Configurar botón para aplicar a todos los aspectos
+            document.getElementById('apply-all-aspects').addEventListener('click', () => {
+                applyValueToAllAspects(bulkValueSelect.value);
+            });
+        }
+        
+        // Aplicar un valor a todos los estudiantes en un aspecto específico (profesor)
+        function applyValueToAspect(value, aspect) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" a todos los estudiantes en el aspecto "${aspect}"?`)) {
+                return;
+            }
+            
+            students.forEach(student => {
+                if (!rubricData.teacher[student]) {
+                    rubricData.teacher[student] = {};
+                }
+                rubricData.teacher[student][aspect] = value;
+            });
+            
+            scheduleSave();
+            createTeacherTable(); // Refrescar la tabla
+        }
+        
+        // Aplicar un valor a todos los estudiantes en todos los aspectos (profesor)
+        function applyValueToAllAspects(value) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" a todos los estudiantes en todos los aspectos?`)) {
+                return;
+            }
+            
+            students.forEach(student => {
+                if (!rubricData.teacher[student]) {
+                    rubricData.teacher[student] = {};
+                }
+                aspects.forEach(aspect => {
+                    rubricData.teacher[student][aspect] = value;
+                });
+            });
+            
+            scheduleSave();
+            createTeacherTable(); // Refrescar la tabla
+        }
+        
+        // Aplicar un valor a todos los aspectos de un estudiante específico (profesor)
+        function applyValueToAllAspectsOfStudent(student, value) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" a todos los aspectos de ${student}?`)) {
+                return;
+            }
+            
+            if (!rubricData.teacher[student]) {
+                rubricData.teacher[student] = {};
+            }
+            
+            aspects.forEach(aspect => {
+                rubricData.teacher[student][aspect] = value;
+            });
+            
+            scheduleSave();
+            createTeacherTable(); // Refrescar la tabla
+        }
+        
+        // Crear tabla del profesor
+        function createTeacherTable() {
+            const tableHeader = document.getElementById('teacher-table-header');
+            const tableBody = document.getElementById('teacher-table-body');
+            
+            // Limpiar tabla
+            tableHeader.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            // Crear encabezados
+            const studentHeader = document.createElement('th');
+            studentHeader.textContent = 'Estudiante';
+            tableHeader.appendChild(studentHeader);
+            
+            aspects.forEach(aspect => {
+                const aspectHeader = document.createElement('th');
+                aspectHeader.textContent = aspect;
+                tableHeader.appendChild(aspectHeader);
+            });
+            
+            // Añadir columna para acciones por estudiante
+            const actionHeader = document.createElement('th');
+            actionHeader.textContent = 'Acciones';
+            tableHeader.appendChild(actionHeader);
+            
+            // Crear filas para cada estudiante
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                
+                // Celda con el nombre del estudiante
+                const nameCell = document.createElement('td');
+                nameCell.textContent = student;
+                row.appendChild(nameCell);
+                
+                // Celdas para cada aspecto
+                aspects.forEach(aspect => {
+                    const cell = document.createElement('td');
+                    const select = document.createElement('select');
+                    
+                    // Añadir opciones para cada valor
+                    values.forEach(value => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = value;
+                        if (value === "NE") {
+                            option.className = "ne-option";
+                        }
+                        if (rubricData.teacher[student] && rubricData.teacher[student][aspect] === value) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                    
+                    select.addEventListener('change', (e) => {
+                        if (!rubricData.teacher[student]) {
+                            rubricData.teacher[student] = {};
+                        }
+                        rubricData.teacher[student][aspect] = e.target.value;
+                        scheduleSave();
+                    });
+                    
+                    cell.appendChild(select);
+                    row.appendChild(cell);
+                });
+                
+                // Celda para acciones por estudiante
+                const actionCell = document.createElement('td');
+                const actionContainer = document.createElement('div');
+                actionContainer.className = 'student-bulk-action';
+                
+                const select = document.createElement('select');
+                select.className = 'student-bulk-select';
+                
+                // Añadir opciones para cada valor
+                values.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    if (value === "NE") {
+                        option.className = "ne-option";
+                    }
+                    select.appendChild(option);
+                });
+                
+                const button = document.createElement('button');
+                button.textContent = 'Aplicar';
+                button.addEventListener('click', () => {
+                    applyValueToAllAspectsOfStudent(student, select.value);
+                });
+                
+                actionContainer.appendChild(select);
+                actionContainer.appendChild(button);
+                actionCell.appendChild(actionContainer);
+                row.appendChild(actionCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Crear controles de acciones masivas para la coevaluación global
+        function createCoevaluationBulkActions() {
+            const coevaluationBulkValueSelect = document.getElementById('coevaluation-bulk-value');
+            const coevaluationBulkAspectsContainer = document.querySelector('#students-section .coevaluation-bulk-actions .bulk-aspects');
+            
+            // Limpiar select y contenedor
+            coevaluationBulkValueSelect.innerHTML = '';
+            coevaluationBulkAspectsContainer.innerHTML = '';
+            
+            // Llenar select con valores disponibles
+            values.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                if (value === "NE") {
+                    option.className = "ne-option";
+                }
+                coevaluationBulkValueSelect.appendChild(option);
+            });
+            
+            // Crear botones para cada aspecto
+            aspects.forEach(aspect => {
+                const aspectContainer = document.createElement('div');
+                aspectContainer.className = 'bulk-aspect';
+                
+                const button = document.createElement('button');
+                button.textContent = `Aplicar a "${aspect}"`;
+                button.addEventListener('click', () => {
+                    applyCoevaluationValueToAspectForAllStudents(coevaluationBulkValueSelect.value, aspect);
+                });
+                
+                aspectContainer.appendChild(button);
+                coevaluationBulkAspectsContainer.appendChild(aspectContainer);
+            });
+            
+            // Configurar botón para aplicar a todos los aspectos
+            document.getElementById('apply-all-coevaluation').addEventListener('click', () => {
+                applyCoevaluationValueToAllAspectsForAllStudents(coevaluationBulkValueSelect.value);
+            });
+        }
+        
+        // Aplicar un valor a todos los aspectos de todos los estudiantes (coevaluación global)
+        function applyCoevaluationValueToAllAspectsForAllStudents(value) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" a todos los aspectos de coevaluación para todos los estudiantes?`)) {
+                return;
+            }
+            
+            students.forEach(evaluator => {
+                students.forEach(evaluated => {
+                    if (evaluator !== evaluated) {
+                        if (!rubricData.students[evaluator]) {
+                            rubricData.students[evaluator] = {};
+                        }
+                        if (!rubricData.students[evaluator][evaluated]) {
+                            rubricData.students[evaluator][evaluated] = {};
+                        }
+                        
+                        aspects.forEach(aspect => {
+                            rubricData.students[evaluator][evaluated][aspect] = value;
+                        });
+                    }
+                });
+            });
+            
+            scheduleSave();
+            createStudentTabs(); // Refrescar las pestañas
+        }
+        
+        // Aplicar un valor a un aspecto específico de todos los estudiantes (coevaluación global)
+        function applyCoevaluationValueToAspectForAllStudents(value, aspect) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" al aspecto "${aspect}" en todas las coevaluaciones?`)) {
+                return;
+            }
+            
+            students.forEach(evaluator => {
+                students.forEach(evaluated => {
+                    if (evaluator !== evaluated) {
+                        if (!rubricData.students[evaluator]) {
+                            rubricData.students[evaluator] = {};
+                        }
+                        if (!rubricData.students[evaluator][evaluated]) {
+                            rubricData.students[evaluator][evaluated] = {};
+                        }
+                        
+                        rubricData.students[evaluator][evaluated][aspect] = value;
+                    }
+                });
+            });
+            
+            scheduleSave();
+            createStudentTabs(); // Refrescar las pestañas
+        }
+        
+        // Crear pestañas y contenido para estudiantes
+        function createStudentTabs() {
+            const tabsContainer = document.getElementById('student-tabs');
+            const contentsContainer = document.getElementById('student-tab-contents');
+            
+            tabsContainer.innerHTML = '';
+            contentsContainer.innerHTML = '';
+            
+            students.forEach((student, index) => {
+                // Crear pestaña
+                const tab = document.createElement('div');
+                tab.className = index === 0 ? 'tab active' : 'tab';
+                tab.textContent = student;
+                tab.dataset.student = student;
+                tab.addEventListener('click', () => switchStudentTab(student));
+                tabsContainer.appendChild(tab);
+                
+                // Crear contenido de la pestaña
+                const content = document.createElement('div');
+                content.className = index === 0 ? 'tab-content active' : 'tab-content';
+                content.id = `tab-${student}`;
+                
+                // Añadir acciones masivas para la coevaluación individual
+                const bulkActions = document.createElement('details');
+                bulkActions.className = 'coevaluation-bulk-actions';
+                bulkActions.innerHTML = `
+                    <summary>
+                        Acciones Masivas para ${student}
+                        <span class="bulk-indicator">
+                            <span class="bulk-indicator-icon">⚡</span>
+                            Aplicar valores en bloque
+                        </span>
+                    </summary>
+                    <div class="details-content">
+                        <div class="bulk-controls">
+                            <label>Valor a aplicar:</label>
+                            <select class="coevaluation-bulk-value">
+                                <!-- Se llenará con los valores disponibles -->
+                            </select>
+                            <button class="apply-all-coevaluation">Aplicar a todos los aspectos</button>
+                        </div>
+                        <div class="bulk-aspects coevaluation-bulk-aspects">
+                            <!-- Se generarán botones para cada aspecto -->
+                        </div>
+                    </div>
+                `;
+                
+                // Configurar acciones masivas para esta pestaña
+                const coevaluationBulkValue = bulkActions.querySelector('.coevaluation-bulk-value');
+                const coevaluationBulkAspects = bulkActions.querySelector('.coevaluation-bulk-aspects');
+                const applyAllCoevaluationBtn = bulkActions.querySelector('.apply-all-coevaluation');
+                
+                // Llenar select con valores disponibles
+                values.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    if (value === "NE") {
+                        option.className = "ne-option";
+                    }
+                    coevaluationBulkValue.appendChild(option);
+                });
+                
+                // Crear botones para cada aspecto
+                aspects.forEach(aspect => {
+                    const aspectContainer = document.createElement('div');
+                    aspectContainer.className = 'bulk-aspect';
+                    
+                    const button = document.createElement('button');
+                    button.textContent = `Aplicar a "${aspect}"`;
+                    button.addEventListener('click', () => {
+                        applyCoevaluationValueToAspect(student, coevaluationBulkValue.value, aspect);
+                    });
+                    
+                    aspectContainer.appendChild(button);
+                    coevaluationBulkAspects.appendChild(aspectContainer);
+                });
+                
+                // Configurar botón para aplicar a todos los aspectos
+                applyAllCoevaluationBtn.addEventListener('click', () => {
+                    applyCoevaluationValueToAllAspects(student, coevaluationBulkValue.value);
+                });
+                
+                content.appendChild(bulkActions);
+                
+                // Crear tabla de coevaluación
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                
+                // Encabezados de la tabla
+                const evaluatedHeader = document.createElement('th');
+                evaluatedHeader.textContent = 'Evaluado';
+                headerRow.appendChild(evaluatedHeader);
+                
+                aspects.forEach(aspect => {
+                    const aspectHeader = document.createElement('th');
+                    aspectHeader.textContent = aspect;
+                    headerRow.appendChild(aspectHeader);
+                });
+                
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+                
+                const tbody = document.createElement('tbody');
+                
+                // Filas para cada compañero evaluado
+                students.forEach(evaluated => {
+                    if (evaluated !== student) {
+                        const row = document.createElement('tr');
+                        
+                        // Celda con el nombre del evaluado
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = evaluated;
+                        row.appendChild(nameCell);
+                        
+                        // Celdas para cada aspecto
+                        aspects.forEach(aspect => {
+                            const cell = document.createElement('td');
+                            const select = document.createElement('select');
+                            
+                            // Añadir opciones para cada valor
+                            values.forEach(value => {
+                                const option = document.createElement('option');
+                                option.value = value;
+                                option.textContent = value;
+                                if (value === "NE") {
+                                    option.className = "ne-option";
+                                }
+                                if (rubricData.students[student] && 
+                                    rubricData.students[student][evaluated] && 
+                                    rubricData.students[student][evaluated][aspect] === value) {
+                                    option.selected = true;
+                                }
+                                select.appendChild(option);
+                            });
+                            
+                            select.addEventListener('change', (e) => {
+                                if (!rubricData.students[student]) {
+                                    rubricData.students[student] = {};
+                                }
+                                if (!rubricData.students[student][evaluated]) {
+                                    rubricData.students[student][evaluated] = {};
+                                }
+                                rubricData.students[student][evaluated][aspect] = e.target.value;
+                                scheduleSave();
+                            });
+                            
+                            cell.appendChild(select);
+                            row.appendChild(cell);
+                        });
+                        
+                        tbody.appendChild(row);
+                    }
+                });
+                
+                table.appendChild(tbody);
+                content.appendChild(table);
+                contentsContainer.appendChild(content);
+            });
+        }
+        
+        // Aplicar un valor a todos los aspectos de un evaluador (coevaluación individual)
+        function applyCoevaluationValueToAllAspects(evaluator, value) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" a todos los aspectos y compañeros evaluados por ${evaluator}?`)) {
+                return;
+            }
+            
+            students.forEach(evaluated => {
+                if (evaluated !== evaluator) {
+                    if (!rubricData.students[evaluator]) {
+                        rubricData.students[evaluator] = {};
+                    }
+                    if (!rubricData.students[evaluator][evaluated]) {
+                        rubricData.students[evaluator][evaluated] = {};
+                    }
+                    
+                    aspects.forEach(aspect => {
+                        rubricData.students[evaluator][evaluated][aspect] = value;
+                    });
+                }
+            });
+            
+            scheduleSave();
+            createStudentTabs(); // Refrescar las pestañas
+        }
+        
+        // Aplicar un valor a un aspecto específico de un evaluador (coevaluación individual)
+        function applyCoevaluationValueToAspect(evaluator, value, aspect) {
+            if (!confirm(`¿Estás seguro de que quieres aplicar "${value}" al aspecto "${aspect}" para todos los compañeros evaluados por ${evaluator}?`)) {
+                return;
+            }
+            
+            students.forEach(evaluated => {
+                if (evaluated !== evaluator) {
+                    if (!rubricData.students[evaluator]) {
+                        rubricData.students[evaluator] = {};
+                    }
+                    if (!rubricData.students[evaluator][evaluated]) {
+                        rubricData.students[evaluator][evaluated] = {};
+                    }
+                    
+                    rubricData.students[evaluator][evaluated][aspect] = value;
+                }
+            });
+            
+            scheduleSave();
+            createStudentTabs(); // Refrescar las pestañas
+        }
+        
+        // Cambiar pestaña de estudiante
+        function switchStudentTab(student) {
+            // Desactivar todas las pestañas y contenidos
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Activar la pestaña seleccionada
+            document.querySelector(`.tab[data-student="${student}"]`).classList.add('active');
+            document.getElementById(`tab-${student}`).classList.add('active');
+        }
+        
+        // Calcular notas (ignorando los valores "NE")
+        function calculateGrades() {
+            const results = {};
+            const studentWeight = 100 - teacherWeight;
+            
+            students.forEach(student => {
+                // Calcular nota del profesor
+                let teacherScoreSum = 0;
+                let teacherAspectCount = 0;
+                
+                if (rubricData.teacher[student]) {
+                    aspects.forEach(aspect => {
+                        if (rubricData.teacher[student][aspect] && rubricData.teacher[student][aspect] !== "NE") {
+                            teacherScoreSum += parseFloat(scaleScore(rubricData.teacher[student][aspect]));
+                            teacherAspectCount++;
+                        }
+                    });
+                }
+                
+                const teacherScore = teacherAspectCount > 0 ? teacherScoreSum / teacherAspectCount : 0;
+                
+                // Calcular nota de coevaluación
+                let coevaluationScoreSum = 0;
+                let coevaluationCount = 0;
+                
+                students.forEach(evaluator => {
+                    if (evaluator !== student && rubricData.students[evaluator] && rubricData.students[evaluator][student]) {
+                        let evaluatorScoreSum = 0;
+                        let evaluatorAspectCount = 0;
+                        
+                        aspects.forEach(aspect => {
+                            if (rubricData.students[evaluator][student][aspect] && rubricData.students[evaluator][student][aspect] !== "NE") {
+                                evaluatorScoreSum += parseFloat(scaleScore(rubricData.students[evaluator][student][aspect]));
+                                evaluatorAspectCount++;
+                            }
+                        });
+                        
+                        if (evaluatorAspectCount > 0) {
+                            coevaluationScoreSum += evaluatorScoreSum / evaluatorAspectCount;
+                            coevaluationCount++;
+                        }
+                    }
+                });
+                
+                const coevaluationScore = coevaluationCount > 0 ? coevaluationScoreSum / coevaluationCount : 0;
+                
+                // Calcular nota final
+                const finalScore = (teacherScore * teacherWeight / 100) + (coevaluationScore * studentWeight / 100);
+                
+                results[student] = {
+                    teacherScore: teacherScore.toFixed(2),
+                    coevaluationScore: coevaluationScore.toFixed(2),
+                    finalScore: finalScore.toFixed(2)
+                };
+            });
+            
+            displayResults(results);
+        }
+        
+        // Mostrar resultados
+        function displayResults(results) {
+            const resultsSection = document.getElementById('results-section');
+            const resultsBody = document.getElementById('results-table-body');
+            
+            resultsBody.innerHTML = '';
+            
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = student;
+                row.appendChild(nameCell);
+                
+                const teacherCell = document.createElement('td');
+                teacherCell.textContent = results[student].teacherScore;
+                row.appendChild(teacherCell);
+                
+                const coevalCell = document.createElement('td');
+                coevalCell.textContent = results[student].coevaluationScore;
+                row.appendChild(coevalCell);
+                
+                const finalCell = document.createElement('td');
+                finalCell.textContent = results[student].finalScore;
+                row.appendChild(finalCell);
+                
+                resultsBody.appendChild(row);
+            });
+            
+            resultsSection.classList.remove('hidden');
+        }
+        
+        // Exportar datos a JSON
+        function exportData() {
+            const dataStr = JSON.stringify(rubricData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            // Generar nombre de archivo con formato: Evaluacion[Actividad]Grupo.json
+            const fileName = `Evaluacion${evaluationName.replace(/\s+/g, '')}${groupName.replace(/\s+/g, '')}.json`;
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = fileName;
+            link.click();
+        }
+        
+        // Exportar configuración a JSON
+        function exportConfig() {
+            const configData = {
+                students: students,
+                aspects: aspects,
+                values: values,
+                teacherWeight: teacherWeight,
+                evaluationName: evaluationName,
+                groupName: groupName
+            };
+            
+            const dataStr = JSON.stringify(configData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            // Generar nombre de archivo con formato: Config[Grupo][Tarea].json
+            const fileName = `Config${groupName.replace(/\s+/g, '')}${evaluationName.replace(/\s+/g, '')}.json`;
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = fileName;
+            link.click();
+        }
+        
+        // Importar datos desde JSON
+        function importData() {
+            document.getElementById('import-file').click();
+        }
+        
+        // Importar configuración desde JSON
+        function importConfig() {
+            document.getElementById('import-config-file').click();
+        }
+        
+        // Manejar la carga de archivos de datos
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validar estructura básica de los datos importados
+                    if (importedData.config && importedData.teacher && importedData.students) {
+                        rubricData = importedData;
+                        
+                        // Actualizar variables globales
+                        students = rubricData.config.students || [];
+                        aspects = rubricData.config.aspects || [];
+                        values = rubricData.config.values || ["NE"];
+                        teacherWeight = rubricData.config.teacherWeight || 75;
+                        evaluationName = rubricData.config.evaluationName || "Exposición";
+                        groupName = rubricData.config.groupName || "Sin especificar";
+                        
+                        // Asegurar que "NE" está en los valores
+                        if (!values.includes("NE")) {
+                            values.unshift("NE");
+                        }
+                        
+                        // Actualizar interfaz
+                        updateWeightDisplay();
+                        updateTitleAndSubtitle();
+                        renderStudentsList();
+                        renderAspectsList();
+                        renderValuesList();
+                        
+                        // Actualizar campos de información general
+                        document.getElementById('evaluation-name').value = evaluationName;
+                        document.getElementById('group-name-input').value = groupName;
+                        
+                        // Si estamos en la sección de evaluación, actualizar las tablas
+                        if (!document.getElementById('evaluation-section').classList.contains('hidden')) {
+                            createTeacherTable();
+                            createStudentTabs();
+                            createBulkActions();
+                            createCoevaluationBulkActions();
+                        }
+                        
+                        // Guardar automáticamente los datos importados
+                        saveToStorage();
+                        
+                        alert('Datos importados correctamente');
+                    } else {
+                        alert('El archivo no tiene el formato correcto');
+                    }
+                } catch (error) {
+                    alert('Error al leer el archivo: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Limpiar el input para permitir cargar el mismo archivo otra vez
+            event.target.value = '';
+        }
+        
+        // Manejar la carga de archivos de configuración
+        function handleConfigUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedConfig = JSON.parse(e.target.result);
+                    
+                    // Validar estructura básica de la configuración importada
+                    if (importedConfig.students && importedConfig.aspects && importedConfig.values) {
+                        // Actualizar variables globales
+                        students = importedConfig.students || [];
+                        aspects = importedConfig.aspects || [];
+                        values = importedConfig.values || ["NE"];
+                        teacherWeight = importedConfig.teacherWeight || 75;
+                        evaluationName = importedConfig.evaluationName || "Exposición";
+                        groupName = importedConfig.groupName || "Sin especificar";
+                        
+                        // Asegurar que "NE" está en los valores
+                        if (!values.includes("NE")) {
+                            values.unshift("NE");
+                        }
+                        
+                        // Actualizar interfaz
+                        updateWeightDisplay();
+                        updateTitleAndSubtitle();
+                        renderStudentsList();
+                        renderAspectsList();
+                        renderValuesList();
+                        
+                        // Actualizar campos de información general
+                        document.getElementById('evaluation-name').value = evaluationName;
+                        document.getElementById('group-name-input').value = groupName;
+                        
+                        // Inicializar datos si es necesario
+                        initializeData();
+                        
+                        // Guardar automáticamente la configuración
+                        saveToStorage();
+                        
+                        alert('Configuración importada correctamente');
+                    } else {
+                        alert('El archivo de configuración no tiene el formato correcto');
+                    }
+                } catch (error) {
+                    alert('Error al leer el archivo de configuración: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Limpiar el input para permitir cargar el mismo archivo otra vez
+            event.target.value = '';
+        }
+        
+        // Limpiar todos los datos
+        function clearData() {
+            if (confirm('¿Estás seguro de que quieres limpiar todos los datos? Esta acción no se puede deshacer.')) {
+                // Limpiar localStorage
+                localStorage.removeItem(STORAGE_KEY);
+                
+                // Restablecer variables globales
+                students = [];
+                aspects = [];
+                values = ["NE"];
+                teacherWeight = 75;
+                evaluationName = "Exposición";
+                groupName = "Sin especificar";
+                
+                // Restablecer rubricData
+                rubricData = {
+                    config: {
+                        students: [],
+                        aspects: [],
+                        values: ["NE"],
+                        teacherWeight: 75,
+                        evaluationName: "Exposición",
+                        groupName: "Sin especificar"
+                    },
+                    teacher: {},
+                    students: {}
+                };
+                
+                // Actualizar la interfaz de configuración
+                updateTitleAndSubtitle();
+                renderStudentsList();
+                renderAspectsList();
+                renderValuesList();
+                updateWeightDisplay();
+                
+                // Restablecer campos de información general
+                document.getElementById('evaluation-name').value = evaluationName;
+                document.getElementById('group-name-input').value = "";
+                
+                // Ocultar resultados
+                document.getElementById('results-section').classList.add('hidden');
+                
+                // Mostrar sección de configuración y ocultar evaluación
+                document.getElementById('evaluation-section').classList.add('hidden');
+                document.getElementById('setup-section').classList.remove('hidden');
+                
+                alert('Datos limpiados correctamente');
+            }
+        }
+        
+        // Actualizar visualización de pesos
+        function updateWeightDisplay() {
+            document.getElementById('teacher-weight').value = teacherWeight;
+            document.getElementById('teacher-weight-value').textContent = teacherWeight + '%';
+            document.getElementById('student-weight-value').textContent = (100 - teacherWeight) + '%';
+            document.getElementById('teacher-percent').textContent = teacherWeight;
+            document.getElementById('student-percent').textContent = 100 - teacherWeight;
+        }
+        
+        // Mostrar sección de evaluación
+        function showEvaluationSection() {
+            // Validar que hay al menos un estudiante, un aspecto y un valor
+            if (students.length === 0) {
+                alert('Debe haber al menos un estudiante');
+                return;
+            }
+            
+            if (aspects.length === 0) {
+                alert('Debe haber al menos un aspecto a evaluar');
+                return;
+            }
+            
+            if (values.length === 0) {
+                alert('Debe haber al menos un valor de puntuación');
+                return;
+            }
+            
+            // Inicializar datos si es necesario
+            if (Object.keys(rubricData.teacher).length === 0) {
+                initializeData();
+            }
+            
+            // Crear tablas y controles
+            createTeacherTable();
+            createStudentTabs();
+            createBulkActions();
+            createCoevaluationBulkActions();
+            
+            // Mostrar sección de evaluación
+            document.getElementById('setup-section').classList.add('hidden');
+            document.getElementById('evaluation-section').classList.remove('hidden');
+            
+            // Guardar configuración
+            saveToStorage();
+        }
+        
+        // Volver a la configuración
+        function showSetupSection() {
+            document.getElementById('evaluation-section').classList.add('hidden');
+            document.getElementById('setup-section').classList.remove('hidden');
+        }
+        
+        // Inicializar la aplicación
+        function initApp() {
+            // Intentar cargar datos existentes
+            if (loadFromStorage()) {
+                // Si hay datos, mostrar directamente la evaluación
+                updateTitleAndSubtitle();
+                renderStudentsList();
+                renderAspectsList();
+                renderValuesList();
+                updateWeightDisplay();
+                
+                // Actualizar campos de información general
+                document.getElementById('evaluation-name').value = evaluationName;
+                document.getElementById('group-name-input').value = groupName;
+                
+                showEvaluationSection();
+            } else {
+                // Si no hay datos, mostrar configuración
+                updateTitleAndSubtitle();
+                renderStudentsList();
+                renderAspectsList();
+                renderValuesList();
+                updateWeightDisplay();
+            }
+            
+            // Event listeners para configuración
+            document.getElementById('add-student').addEventListener('click', () => {
+                const studentName = document.getElementById('student-name').value.trim();
+                if (studentName) {
+                    students.push(studentName);
+                    renderStudentsList();
+                    document.getElementById('student-name').value = '';
+                    scheduleSave();
+                }
+            });
+            
+            document.getElementById('add-aspect').addEventListener('click', () => {
+                const aspectName = document.getElementById('aspect-name').value.trim();
+                if (aspectName) {
+                    aspects.push(aspectName);
+                    renderAspectsList();
+                    document.getElementById('aspect-name').value = '';
+                    scheduleSave();
+                }
+            });
+            
+            document.getElementById('add-value').addEventListener('click', () => {
+                const valueName = document.getElementById('value-name').value.trim();
+                if (valueName) {
+                    // No permitir añadir "NE" manualmente
+                    if (valueName === "NE") {
+                        alert('El valor "NE" (No Evaluado) ya existe y no se puede añadir manualmente');
+                        return;
+                    }
+                    values.push(valueName);
+                    renderValuesList();
+                    document.getElementById('value-name').value = '';
+                    scheduleSave();
+                }
+            });
+            
+            document.getElementById('teacher-weight').addEventListener('input', (e) => {
+                teacherWeight = parseInt(e.target.value);
+                updateWeightDisplay();
+                scheduleSave();
+            });
+            
+            // Event listeners para información general
+            document.getElementById('evaluation-name').addEventListener('change', (e) => {
+                evaluationName = e.target.value || "Exposición";
+                updateTitleAndSubtitle();
+                scheduleSave();
+            });
+            
+            document.getElementById('group-name-input').addEventListener('change', (e) => {
+                groupName = e.target.value || "Sin especificar";
+                updateTitleAndSubtitle();
+                scheduleSave();
+            });
+            
+            // Event listeners para importar alumnado desde JSON
+            document.getElementById('import-students-json').addEventListener('click', () => {
+                document.getElementById('import-students-file').click();
+            });
+            
+            document.getElementById('import-students-file').addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    importStudentsFromJSON(e.target.files[0]);
+                }
+                // Limpiar el input para permitir cargar el mismo archivo otra vez
+                e.target.value = '';
+            });
+            
+            document.getElementById('save-config').addEventListener('click', showEvaluationSection);
+            
+            // Event listeners para exportación/importación de configuración
+            document.getElementById('export-config').addEventListener('click', exportConfig);
+            document.getElementById('import-config').addEventListener('click', importConfig);
+            document.getElementById('import-config-file').addEventListener('change', handleConfigUpload);
+            
+            // Event listeners para evaluación
+            document.getElementById('calculate-btn').addEventListener('click', calculateGrades);
+            document.getElementById('export-btn').addEventListener('click', exportData);
+            document.getElementById('import-btn').addEventListener('click', importData);
+            document.getElementById('import-file').addEventListener('change', handleFileUpload);
+            document.getElementById('clear-data-btn').addEventListener('click', clearData);
+            document.getElementById('back-to-setup').addEventListener('click', showSetupSection);
+            
+            // Actualizar indicadores de estado
+            updateStatusIndicators();
+        }
+        
+        // Iniciar la aplicación cuando se carga la página
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
