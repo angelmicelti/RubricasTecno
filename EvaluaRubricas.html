@@ -77,11 +77,7 @@
             font-size: 16px;
         }
         
-        .aspects-list, .students-list, .values-list {
-            margin-top: 10px;
-        }
-        
-        .aspect-item, .student-item, .value-item {
+        .list-item {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
@@ -91,7 +87,7 @@
             border: 1px solid #ddd;
         }
         
-        .aspect-item input, .student-item input, .value-item input {
+        .list-item input {
             flex: 1;
             margin-right: 10px;
         }
@@ -253,10 +249,6 @@
             box-shadow: var(--box-shadow);
         }
         
-        .results table {
-            background-color: white;
-        }
-        
         .hidden {
             display: none;
         }
@@ -279,7 +271,6 @@
             font-style: italic;
         }
         
-        /* Estilos para elementos desplegables */
         details {
             margin-bottom: 15px;
             border: 1px solid #ddd;
@@ -362,17 +353,38 @@
             margin-bottom: 30px;
         }
         
-        .bulk-actions {
+        .bulk-actions, .coevaluation-bulk-actions, .import-students-section, .github-section {
             margin: 15px 0;
             padding: 15px;
-            background-color: #f0f8ff;
             border-radius: var(--border-radius);
             border: 1px solid #b3d9ff;
         }
         
-        .bulk-actions h3 {
+        .bulk-actions {
+            background-color: #f0f8ff;
+        }
+        
+        .coevaluation-bulk-actions {
+            background-color: #f0fff0;
+            border-color: #b3ffb3;
+        }
+        
+        .import-students-section {
+            background-color: #f0f8ff;
+        }
+        
+        .github-section {
+            background-color: #f6f8fa;
+            border-color: #d0d7de;
+        }
+        
+        .bulk-actions h3, .coevaluation-bulk-actions h3, .import-students-section h4, .github-section h4 {
             margin-top: 0;
             color: var(--primary-color);
+        }
+        
+        .github-section h4 {
+            color: var(--github-color);
         }
         
         .bulk-controls {
@@ -408,14 +420,6 @@
         .bulk-aspect button {
             padding: 5px 10px;
             font-size: 0.8em;
-        }
-        
-        .coevaluation-bulk-actions {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f0fff0;
-            border-radius: var(--border-radius);
-            border: 1px solid #b3ffb3;
         }
         
         .config-buttons {
@@ -454,38 +458,9 @@
             font-size: 0.8em;
         }
         
-        /* Estilos para el botón de importar alumnado */
-        .import-students-section {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f0f8ff;
-            border-radius: var(--border-radius);
-            border: 1px solid #b3d9ff;
-        }
-        
-        .import-students-section h4 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-        
-        /* Estilo para el valor NE */
         .ne-option {
             color: #999;
             font-style: italic;
-        }
-        
-        /* Estilos para la sección de GitHub */
-        .github-section {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f6f8fa;
-            border-radius: var(--border-radius);
-            border: 1px solid #d0d7de;
-        }
-        
-        .github-section h4 {
-            margin-top: 0;
-            color: var(--github-color);
         }
         
         .github-status {
@@ -645,11 +620,10 @@
                     <button id="add-student" class="add-btn">Añadir Estudiante</button>
                 </div>
                 
-                <div class="students-list" id="students-list">
+                <div id="students-list">
                     <!-- Los estudiantes se añadirán aquí -->
                 </div>
                 
-                <!-- Nueva sección para importar alumnado desde JSON -->
                 <div class="import-students-section">
                     <h4>Importar Alumnado desde Archivo JSON</h4>
                     <p>Puedes importar un archivo JSON con la estructura de la clase completa para cargar automáticamente todos los estudiantes y el nombre del grupo.</p>
@@ -668,7 +642,7 @@
                     <button id="add-aspect" class="add-btn">Añadir Aspecto</button>
                 </div>
                 
-                <div class="aspects-list" id="aspects-list">
+                <div id="aspects-list">
                     <!-- Los aspectos se añadirán aquí -->
                 </div>
             </div>
@@ -681,7 +655,7 @@
                     <button id="add-value" class="add-btn">Añadir Valor</button>
                 </div>
                 
-                <div class="values-list" id="values-list">
+                <div id="values-list">
                     <!-- Los valores se añadirán aquí -->
                 </div>
                 <p class="note">Nota: El valor "NE" (No Evaluado) se añade automáticamente y no se computa en los cálculos.</p>
@@ -697,7 +671,6 @@
                 </div>
             </div>
             
-            <!-- Nueva sección para GitHub Gists -->
             <div class="step">
                 <h3>Guardar en GitHub Gists</h3>
                 <div class="github-section">
@@ -875,7 +848,7 @@
         // Variables globales
         let students = [];
         let aspects = [];
-        let values = ["NE"]; // Añadimos "NE" como valor por defecto
+        let values = ["NE"];
         let teacherWeight = 75;
         let evaluationName = "Exposición";
         let groupName = "Sin especificar";
@@ -885,7 +858,7 @@
         let currentConfigGistId = null;
         let currentEvalGistId = null;
         
-        // Clave para localStorage
+        // Claves para localStorage
         const STORAGE_KEY = 'rubricData';
         const GITHUB_TOKEN_KEY = 'githubToken';
         
@@ -894,7 +867,7 @@
             config: {
                 students: [],
                 aspects: [],
-                values: ["NE"], // Añadimos "NE" como valor por defecto
+                values: ["NE"],
                 teacherWeight: 75,
                 evaluationName: "Exposición",
                 groupName: "Sin especificar"
@@ -909,22 +882,20 @@
         
         // Inicializar datos
         function initializeData() {
-            // Inicializar datos del profesor
             students.forEach(student => {
                 rubricData.teacher[student] = {};
                 aspects.forEach(aspect => {
-                    rubricData.teacher[student][aspect] = "NE"; // Valor por defecto: "NE"
+                    rubricData.teacher[student][aspect] = "NE";
                 });
             });
             
-            // Inicializar datos de los estudiantes
             students.forEach(evaluator => {
                 rubricData.students[evaluator] = {};
                 students.forEach(evaluated => {
                     if (evaluator !== evaluated) {
                         rubricData.students[evaluator][evaluated] = {};
                         aspects.forEach(aspect => {
-                            rubricData.students[evaluator][evaluated][aspect] = "NE"; // Valor por defecto: "NE"
+                            rubricData.students[evaluator][evaluated][aspect] = "NE";
                         });
                     }
                 });
@@ -937,7 +908,6 @@
             if (storedData) {
                 try {
                     const parsedData = JSON.parse(storedData);
-                    // Validar estructura básica
                     if (parsedData.config && parsedData.teacher && parsedData.students) {
                         rubricData = parsedData;
                         
@@ -949,7 +919,6 @@
                         evaluationName = rubricData.config.evaluationName || "Exposición";
                         groupName = rubricData.config.groupName || "Sin especificar";
                         
-                        // Asegurar que "NE" está en los valores
                         if (!values.includes("NE")) {
                             values.unshift("NE");
                         }
@@ -967,7 +936,6 @@
         // Guardar datos en localStorage
         function saveToStorage() {
             try {
-                // Actualizar configuración
                 rubricData.config.students = students;
                 rubricData.config.aspects = aspects;
                 rubricData.config.values = values;
@@ -989,12 +957,10 @@
             hasUnsavedChanges = true;
             updateStatusIndicators();
             
-            // Cancelar guardado anterior si existe
             if (saveTimeout) {
                 clearTimeout(saveTimeout);
             }
             
-            // Programar nuevo guardado
             saveTimeout = setTimeout(saveToStorage, 1000);
         }
         
@@ -1039,20 +1005,20 @@
             return ((index / (validValues.length - 1)) * 10).toFixed(2);
         }
         
-        // Renderizar lista de estudiantes
-        function renderStudentsList() {
-            const list = document.getElementById('students-list');
-            list.innerHTML = '';
+        // Función genérica para renderizar listas
+        function renderList(items, containerId, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
             
-            students.forEach((student, index) => {
-                const item = document.createElement('div');
-                item.className = 'student-item';
+            items.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'list-item';
                 
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.value = student;
+                input.value = item;
                 input.addEventListener('change', (e) => {
-                    students[index] = e.target.value;
+                    items[index] = e.target.value;
                     scheduleSave();
                 });
                 
@@ -1060,83 +1026,18 @@
                 removeBtn.className = 'remove-btn';
                 removeBtn.textContent = 'Eliminar';
                 removeBtn.addEventListener('click', () => {
-                    students.splice(index, 1);
-                    renderStudentsList();
-                    scheduleSave();
-                });
-                
-                item.appendChild(input);
-                item.appendChild(removeBtn);
-                list.appendChild(item);
-            });
-        }
-        
-        // Renderizar lista de aspectos
-        function renderAspectsList() {
-            const list = document.getElementById('aspects-list');
-            list.innerHTML = '';
-            
-            aspects.forEach((aspect, index) => {
-                const item = document.createElement('div');
-                item.className = 'aspect-item';
-                
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = aspect;
-                input.addEventListener('change', (e) => {
-                    aspects[index] = e.target.value;
-                    scheduleSave();
-                });
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-btn';
-                removeBtn.textContent = 'Eliminar';
-                removeBtn.addEventListener('click', () => {
-                    aspects.splice(index, 1);
-                    renderAspectsList();
-                    scheduleSave();
-                });
-                
-                item.appendChild(input);
-                item.appendChild(removeBtn);
-                list.appendChild(item);
-            });
-        }
-        
-        // Renderizar lista de valores
-        function renderValuesList() {
-            const list = document.getElementById('values-list');
-            list.innerHTML = '';
-            
-            values.forEach((value, index) => {
-                const item = document.createElement('div');
-                item.className = 'value-item';
-                
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = value;
-                input.addEventListener('change', (e) => {
-                    values[index] = e.target.value;
-                    scheduleSave();
-                });
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-btn';
-                removeBtn.textContent = 'Eliminar';
-                removeBtn.addEventListener('click', () => {
-                    // No permitir eliminar "NE"
-                    if (value === "NE") {
+                    if (type === 'values' && item === "NE") {
                         alert('No se puede eliminar el valor "NE" (No Evaluado)');
                         return;
                     }
-                    values.splice(index, 1);
-                    renderValuesList();
+                    items.splice(index, 1);
+                    renderList(items, containerId, type);
                     scheduleSave();
                 });
                 
-                item.appendChild(input);
-                item.appendChild(removeBtn);
-                list.appendChild(item);
+                itemElement.appendChild(input);
+                itemElement.appendChild(removeBtn);
+                container.appendChild(itemElement);
             });
         }
         
@@ -1148,13 +1049,11 @@
                 try {
                     const importedData = JSON.parse(e.target.result);
                     
-                    // Validar estructura del archivo
                     if (!importedData.clase || !importedData.alumnos) {
                         alert('El archivo no tiene la estructura esperada. Debe contener "clase" y "alumnos".');
                         return;
                     }
                     
-                    // Preguntar al usuario qué hacer con los datos existentes
                     let action;
                     if (students.length > 0) {
                         action = confirm(
@@ -1163,15 +1062,12 @@
                             'Haz clic en "Cancelar" para añadir los nuevos estudiantes a la lista existente.'
                         );
                     } else {
-                        action = true; // Si no hay estudiantes, simplemente reemplazar
+                        action = true;
                     }
                     
-                    // Procesar los estudiantes
                     if (action) {
-                        // Reemplazar la lista actual
                         students = [...importedData.alumnos];
                     } else {
-                        // Añadir a la lista existente (evitando duplicados)
                         importedData.alumnos.forEach(alumno => {
                             if (!students.includes(alumno)) {
                                 students.push(alumno);
@@ -1179,15 +1075,12 @@
                         });
                     }
                     
-                    // Actualizar el nombre del grupo
                     groupName = importedData.clase;
                     document.getElementById('group-name-input').value = groupName;
                     
-                    // Actualizar la interfaz
                     updateTitleAndSubtitle();
-                    renderStudentsList();
+                    renderList(students, 'students-list', 'students');
                     
-                    // Guardar los cambios
                     scheduleSave();
                     
                     alert(`Alumnado importado correctamente. Ahora hay ${students.length} estudiantes en el grupo "${groupName}".`);
@@ -1209,11 +1102,9 @@
             const bulkValueSelect = document.getElementById('bulk-value');
             const bulkAspectsContainer = document.querySelector('.bulk-actions .bulk-aspects');
             
-            // Limpiar select y contenedor
             bulkValueSelect.innerHTML = '';
             bulkAspectsContainer.innerHTML = '';
             
-            // Llenar select con valores disponibles
             values.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
@@ -1224,7 +1115,6 @@
                 bulkValueSelect.appendChild(option);
             });
             
-            // Crear botones para cada aspecto
             aspects.forEach(aspect => {
                 const aspectContainer = document.createElement('div');
                 aspectContainer.className = 'bulk-aspect';
@@ -1239,7 +1129,6 @@
                 bulkAspectsContainer.appendChild(aspectContainer);
             });
             
-            // Configurar botón para aplicar a todos los aspectos
             document.getElementById('apply-all-aspects').addEventListener('click', () => {
                 applyValueToAllAspects(bulkValueSelect.value);
             });
@@ -1259,7 +1148,7 @@
             });
             
             scheduleSave();
-            createTeacherTable(); // Refrescar la tabla
+            createTeacherTable();
         }
         
         // Aplicar un valor a todos los estudiantes en todos los aspectos (profesor)
@@ -1278,7 +1167,7 @@
             });
             
             scheduleSave();
-            createTeacherTable(); // Refrescar la tabla
+            createTeacherTable();
         }
         
         // Aplicar un valor a todos los aspectos de un estudiante específico (profesor)
@@ -1296,7 +1185,7 @@
             });
             
             scheduleSave();
-            createTeacherTable(); // Refrescar la tabla
+            createTeacherTable();
         }
         
         // Crear tabla del profesor
@@ -1304,11 +1193,9 @@
             const tableHeader = document.getElementById('teacher-table-header');
             const tableBody = document.getElementById('teacher-table-body');
             
-            // Limpiar tabla
             tableHeader.innerHTML = '';
             tableBody.innerHTML = '';
             
-            // Crear encabezados
             const studentHeader = document.createElement('th');
             studentHeader.textContent = 'Estudiante';
             tableHeader.appendChild(studentHeader);
@@ -1319,26 +1206,21 @@
                 tableHeader.appendChild(aspectHeader);
             });
             
-            // Añadir columna para acciones por estudiante
             const actionHeader = document.createElement('th');
             actionHeader.textContent = 'Acciones';
             tableHeader.appendChild(actionHeader);
             
-            // Crear filas para cada estudiante
             students.forEach(student => {
                 const row = document.createElement('tr');
                 
-                // Celda con el nombre del estudiante
                 const nameCell = document.createElement('td');
                 nameCell.textContent = student;
                 row.appendChild(nameCell);
                 
-                // Celdas para cada aspecto
                 aspects.forEach(aspect => {
                     const cell = document.createElement('td');
                     const select = document.createElement('select');
                     
-                    // Añadir opciones para cada valor
                     values.forEach(value => {
                         const option = document.createElement('option');
                         option.value = value;
@@ -1364,7 +1246,6 @@
                     row.appendChild(cell);
                 });
                 
-                // Celda para acciones por estudiante
                 const actionCell = document.createElement('td');
                 const actionContainer = document.createElement('div');
                 actionContainer.className = 'student-bulk-action';
@@ -1372,7 +1253,6 @@
                 const select = document.createElement('select');
                 select.className = 'student-bulk-select';
                 
-                // Añadir opciones para cada valor
                 values.forEach(value => {
                     const option = document.createElement('option');
                     option.value = value;
@@ -1403,11 +1283,9 @@
             const coevaluationBulkValueSelect = document.getElementById('coevaluation-bulk-value');
             const coevaluationBulkAspectsContainer = document.querySelector('#students-section .coevaluation-bulk-actions .bulk-aspects');
             
-            // Limpiar select y contenedor
             coevaluationBulkValueSelect.innerHTML = '';
             coevaluationBulkAspectsContainer.innerHTML = '';
             
-            // Llenar select con valores disponibles
             values.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
@@ -1418,7 +1296,6 @@
                 coevaluationBulkValueSelect.appendChild(option);
             });
             
-            // Crear botones para cada aspecto
             aspects.forEach(aspect => {
                 const aspectContainer = document.createElement('div');
                 aspectContainer.className = 'bulk-aspect';
@@ -1433,7 +1310,6 @@
                 coevaluationBulkAspectsContainer.appendChild(aspectContainer);
             });
             
-            // Configurar botón para aplicar a todos los aspectos
             document.getElementById('apply-all-coevaluation').addEventListener('click', () => {
                 applyCoevaluationValueToAllAspectsForAllStudents(coevaluationBulkValueSelect.value);
             });
@@ -1463,7 +1339,7 @@
             });
             
             scheduleSave();
-            createStudentTabs(); // Refrescar las pestañas
+            createStudentTabs();
         }
         
         // Aplicar un valor a un aspecto específico de todos los estudiantes (coevaluación global)
@@ -1488,7 +1364,7 @@
             });
             
             scheduleSave();
-            createStudentTabs(); // Refrescar las pestañas
+            createStudentTabs();
         }
         
         // Crear pestañas y contenido para estudiantes
@@ -1500,7 +1376,6 @@
             contentsContainer.innerHTML = '';
             
             students.forEach((student, index) => {
-                // Crear pestaña
                 const tab = document.createElement('div');
                 tab.className = index === 0 ? 'tab active' : 'tab';
                 tab.textContent = student;
@@ -1508,12 +1383,10 @@
                 tab.addEventListener('click', () => switchStudentTab(student));
                 tabsContainer.appendChild(tab);
                 
-                // Crear contenido de la pestaña
                 const content = document.createElement('div');
                 content.className = index === 0 ? 'tab-content active' : 'tab-content';
                 content.id = `tab-${student}`;
                 
-                // Añadir acciones masivas para la coevaluación individual
                 const bulkActions = document.createElement('details');
                 bulkActions.className = 'coevaluation-bulk-actions';
                 bulkActions.innerHTML = `
@@ -1538,12 +1411,10 @@
                     </div>
                 `;
                 
-                // Configurar acciones masivas para esta pestaña
                 const coevaluationBulkValue = bulkActions.querySelector('.coevaluation-bulk-value');
                 const coevaluationBulkAspects = bulkActions.querySelector('.coevaluation-bulk-aspects');
                 const applyAllCoevaluationBtn = bulkActions.querySelector('.apply-all-coevaluation');
                 
-                // Llenar select con valores disponibles
                 values.forEach(value => {
                     const option = document.createElement('option');
                     option.value = value;
@@ -1554,7 +1425,6 @@
                     coevaluationBulkValue.appendChild(option);
                 });
                 
-                // Crear botones para cada aspecto
                 aspects.forEach(aspect => {
                     const aspectContainer = document.createElement('div');
                     aspectContainer.className = 'bulk-aspect';
@@ -1569,19 +1439,16 @@
                     coevaluationBulkAspects.appendChild(aspectContainer);
                 });
                 
-                // Configurar botón para aplicar a todos los aspectos
                 applyAllCoevaluationBtn.addEventListener('click', () => {
                     applyCoevaluationValueToAllAspects(student, coevaluationBulkValue.value);
                 });
                 
                 content.appendChild(bulkActions);
                 
-                // Crear tabla de coevaluación
                 const table = document.createElement('table');
                 const thead = document.createElement('thead');
                 const headerRow = document.createElement('tr');
                 
-                // Encabezados de la tabla
                 const evaluatedHeader = document.createElement('th');
                 evaluatedHeader.textContent = 'Evaluado';
                 headerRow.appendChild(evaluatedHeader);
@@ -1597,22 +1464,18 @@
                 
                 const tbody = document.createElement('tbody');
                 
-                // Filas para cada compañero evaluado
                 students.forEach(evaluated => {
                     if (evaluated !== student) {
                         const row = document.createElement('tr');
                         
-                        // Celda con el nombre del evaluado
                         const nameCell = document.createElement('td');
                         nameCell.textContent = evaluated;
                         row.appendChild(nameCell);
                         
-                        // Celdas para cada aspecto
                         aspects.forEach(aspect => {
                             const cell = document.createElement('td');
                             const select = document.createElement('select');
                             
-                            // Añadir opciones para cada valor
                             values.forEach(value => {
                                 const option = document.createElement('option');
                                 option.value = value;
@@ -1675,7 +1538,7 @@
             });
             
             scheduleSave();
-            createStudentTabs(); // Refrescar las pestañas
+            createStudentTabs();
         }
         
         // Aplicar un valor a un aspecto específico de un evaluador (coevaluación individual)
@@ -1698,12 +1561,11 @@
             });
             
             scheduleSave();
-            createStudentTabs(); // Refrescar las pestañas
+            createStudentTabs();
         }
         
         // Cambiar pestaña de estudiante
         function switchStudentTab(student) {
-            // Desactivar todas las pestañas y contenidos
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1712,7 +1574,6 @@
                 content.classList.remove('active');
             });
             
-            // Activar la pestaña seleccionada
             document.querySelector(`.tab[data-student="${student}"]`).classList.add('active');
             document.getElementById(`tab-${student}`).classList.add('active');
         }
@@ -1723,7 +1584,6 @@
             const studentWeight = 100 - teacherWeight;
             
             students.forEach(student => {
-                // Calcular nota del profesor
                 let teacherScoreSum = 0;
                 let teacherAspectCount = 0;
                 
@@ -1738,7 +1598,6 @@
                 
                 const teacherScore = teacherAspectCount > 0 ? teacherScoreSum / teacherAspectCount : 0;
                 
-                // Calcular nota de coevaluación
                 let coevaluationScoreSum = 0;
                 let coevaluationCount = 0;
                 
@@ -1763,7 +1622,6 @@
                 
                 const coevaluationScore = coevaluationCount > 0 ? coevaluationScoreSum / coevaluationCount : 0;
                 
-                // Calcular nota final
                 const finalScore = (teacherScore * teacherWeight / 100) + (coevaluationScore * studentWeight / 100);
                 
                 results[student] = {
@@ -1813,7 +1671,6 @@
             const dataStr = JSON.stringify(rubricData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
             
-            // Generar nombre de archivo con formato: Evaluacion[Actividad]Grupo.json
             const fileName = `Evaluacion${evaluationName.replace(/\s+/g, '')}${groupName.replace(/\s+/g, '')}.json`;
             
             const link = document.createElement('a');
@@ -1836,7 +1693,6 @@
             const dataStr = JSON.stringify(configData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
             
-            // Generar nombre de archivo con formato: Config[Grupo][Tarea].json
             const fileName = `Config${groupName.replace(/\s+/g, '')}${evaluationName.replace(/\s+/g, '')}.json`;
             
             const link = document.createElement('a');
@@ -1865,11 +1721,9 @@
                 try {
                     const importedData = JSON.parse(e.target.result);
                     
-                    // Validar estructura básica de los datos importados
                     if (importedData.config && importedData.teacher && importedData.students) {
                         rubricData = importedData;
                         
-                        // Actualizar variables globales
                         students = rubricData.config.students || [];
                         aspects = rubricData.config.aspects || [];
                         values = rubricData.config.values || ["NE"];
@@ -1877,23 +1731,19 @@
                         evaluationName = rubricData.config.evaluationName || "Exposición";
                         groupName = rubricData.config.groupName || "Sin especificar";
                         
-                        // Asegurar que "NE" está en los valores
                         if (!values.includes("NE")) {
                             values.unshift("NE");
                         }
                         
-                        // Actualizar interfaz
                         updateWeightDisplay();
                         updateTitleAndSubtitle();
-                        renderStudentsList();
-                        renderAspectsList();
-                        renderValuesList();
+                        renderList(students, 'students-list', 'students');
+                        renderList(aspects, 'aspects-list', 'aspects');
+                        renderList(values, 'values-list', 'values');
                         
-                        // Actualizar campos de información general
                         document.getElementById('evaluation-name').value = evaluationName;
                         document.getElementById('group-name-input').value = groupName;
                         
-                        // Si estamos en la sección de evaluación, actualizar las tablas
                         if (!document.getElementById('evaluation-section').classList.contains('hidden')) {
                             createTeacherTable();
                             createStudentTabs();
@@ -1901,7 +1751,6 @@
                             createCoevaluationBulkActions();
                         }
                         
-                        // Guardar automáticamente los datos importados
                         saveToStorage();
                         
                         alert('Datos importados correctamente');
@@ -1914,7 +1763,6 @@
             };
             reader.readAsText(file);
             
-            // Limpiar el input para permitir cargar el mismo archivo otra vez
             event.target.value = '';
         }
         
@@ -1928,9 +1776,7 @@
                 try {
                     const importedConfig = JSON.parse(e.target.result);
                     
-                    // Validar estructura básica de la configuración importada
                     if (importedConfig.students && importedConfig.aspects && importedConfig.values) {
-                        // Actualizar variables globales
                         students = importedConfig.students || [];
                         aspects = importedConfig.aspects || [];
                         values = importedConfig.values || ["NE"];
@@ -1938,26 +1784,20 @@
                         evaluationName = importedConfig.evaluationName || "Exposición";
                         groupName = importedConfig.groupName || "Sin especificar";
                         
-                        // Asegurar que "NE" está en los valores
                         if (!values.includes("NE")) {
                             values.unshift("NE");
                         }
                         
-                        // Actualizar interfaz
                         updateWeightDisplay();
                         updateTitleAndSubtitle();
-                        renderStudentsList();
-                        renderAspectsList();
-                        renderValuesList();
+                        renderList(students, 'students-list', 'students');
+                        renderList(aspects, 'aspects-list', 'aspects');
+                        renderList(values, 'values-list', 'values');
                         
-                        // Actualizar campos de información general
                         document.getElementById('evaluation-name').value = evaluationName;
                         document.getElementById('group-name-input').value = groupName;
                         
-                        // Inicializar datos si es necesario
                         initializeData();
-                        
-                        // Guardar automáticamente la configuración
                         saveToStorage();
                         
                         alert('Configuración importada correctamente');
@@ -1970,17 +1810,14 @@
             };
             reader.readAsText(file);
             
-            // Limpiar el input para permitir cargar el mismo archivo otra vez
             event.target.value = '';
         }
         
         // Limpiar todos los datos
         function clearData() {
             if (confirm('¿Estás seguro de que quieres limpiar todos los datos? Esta acción no se puede deshacer.')) {
-                // Limpiar localStorage
                 localStorage.removeItem(STORAGE_KEY);
                 
-                // Restablecer variables globales
                 students = [];
                 aspects = [];
                 values = ["NE"];
@@ -1988,7 +1825,6 @@
                 evaluationName = "Exposición";
                 groupName = "Sin especificar";
                 
-                // Restablecer rubricData
                 rubricData = {
                     config: {
                         students: [],
@@ -2002,21 +1838,17 @@
                     students: {}
                 };
                 
-                // Actualizar la interfaz de configuración
                 updateTitleAndSubtitle();
-                renderStudentsList();
-                renderAspectsList();
-                renderValuesList();
+                renderList(students, 'students-list', 'students');
+                renderList(aspects, 'aspects-list', 'aspects');
+                renderList(values, 'values-list', 'values');
                 updateWeightDisplay();
                 
-                // Restablecer campos de información general
                 document.getElementById('evaluation-name').value = evaluationName;
                 document.getElementById('group-name-input').value = "";
                 
-                // Ocultar resultados
                 document.getElementById('results-section').classList.add('hidden');
                 
-                // Mostrar sección de configuración y ocultar evaluación
                 document.getElementById('evaluation-section').classList.add('hidden');
                 document.getElementById('setup-section').classList.remove('hidden');
                 
@@ -2035,7 +1867,6 @@
         
         // Mostrar sección de evaluación
         function showEvaluationSection() {
-            // Validar que hay al menos un estudiante, un aspecto y un valor
             if (students.length === 0) {
                 alert('Debe haber al menos un estudiante');
                 return;
@@ -2051,22 +1882,18 @@
                 return;
             }
             
-            // Inicializar datos si es necesario
             if (Object.keys(rubricData.teacher).length === 0) {
                 initializeData();
             }
             
-            // Crear tablas y controles
             createTeacherTable();
             createStudentTabs();
             createBulkActions();
             createCoevaluationBulkActions();
             
-            // Mostrar sección de evaluación
             document.getElementById('setup-section').classList.add('hidden');
             document.getElementById('evaluation-section').classList.remove('hidden');
             
-            // Guardar configuración
             saveToStorage();
         }
         
@@ -2150,7 +1977,6 @@
             const gistsList = document.getElementById('github-gists-list');
             gistsList.innerHTML = '';
             
-            // Filtrar gists que contengan datos de rúbricas
             const rubricGists = gists.filter(gist => {
                 return Object.keys(gist.files).some(filename => 
                     filename.includes('Evaluacion') || filename.includes('Config'));
@@ -2165,7 +1991,6 @@
                 const gistItem = document.createElement('div');
                 gistItem.className = 'github-gist-item';
                 
-                // Obtener el primer archivo del gist
                 const filename = Object.keys(gist.files)[0];
                 const file = gist.files[filename];
                 
@@ -2173,7 +1998,6 @@
                 nameDiv.className = 'github-gist-name';
                 nameDiv.textContent = file.filename;
                 
-                // Añadir indicador de tipo
                 const typeIndicator = document.createElement('span');
                 if (filename.includes('Config')) {
                     typeIndicator.textContent = 'Config';
@@ -2247,11 +2071,8 @@
                 
                 const importedData = JSON.parse(file.content);
                 
-                // Determinar si es configuración o evaluación completa
                 if (filename.includes('Config')) {
-                    // Es una configuración
                     if (importedData.students && importedData.aspects && importedData.values) {
-                        // Actualizar variables globales
                         students = importedData.students || [];
                         aspects = importedData.aspects || [];
                         values = importedData.values || ["NE"];
@@ -2259,26 +2080,20 @@
                         evaluationName = importedData.evaluationName || "Exposición";
                         groupName = importedData.groupName || "Sin especificar";
                         
-                        // Asegurar que "NE" está en los valores
                         if (!values.includes("NE")) {
                             values.unshift("NE");
                         }
                         
-                        // Actualizar interfaz
                         updateWeightDisplay();
                         updateTitleAndSubtitle();
-                        renderStudentsList();
-                        renderAspectsList();
-                        renderValuesList();
+                        renderList(students, 'students-list', 'students');
+                        renderList(aspects, 'aspects-list', 'aspects');
+                        renderList(values, 'values-list', 'values');
                         
-                        // Actualizar campos de información general
                         document.getElementById('evaluation-name').value = evaluationName;
                         document.getElementById('group-name-input').value = groupName;
                         
-                        // Inicializar datos si es necesario
                         initializeData();
-                        
-                        // Guardar automáticamente la configuración
                         saveToStorage();
                         
                         currentConfigGistId = gistId;
@@ -2288,11 +2103,9 @@
                         alert('El gist de configuración no tiene el formato correcto');
                     }
                 } else if (filename.includes('Evaluacion')) {
-                    // Es una evaluación completa
                     if (importedData.config && importedData.teacher && importedData.students) {
                         rubricData = importedData;
                         
-                        // Actualizar variables globales
                         students = rubricData.config.students || [];
                         aspects = rubricData.config.aspects || [];
                         values = rubricData.config.values || ["NE"];
@@ -2300,23 +2113,19 @@
                         evaluationName = rubricData.config.evaluationName || "Exposición";
                         groupName = rubricData.config.groupName || "Sin especificar";
                         
-                        // Asegurar que "NE" está en los valores
                         if (!values.includes("NE")) {
                             values.unshift("NE");
                         }
                         
-                        // Actualizar interfaz
                         updateWeightDisplay();
                         updateTitleAndSubtitle();
-                        renderStudentsList();
-                        renderAspectsList();
-                        renderValuesList();
+                        renderList(students, 'students-list', 'students');
+                        renderList(aspects, 'aspects-list', 'aspects');
+                        renderList(values, 'values-list', 'values');
                         
-                        // Actualizar campos de información general
                         document.getElementById('evaluation-name').value = evaluationName;
                         document.getElementById('group-name-input').value = groupName;
                         
-                        // Si estamos en la sección de evaluación, actualizar las tablas
                         if (!document.getElementById('evaluation-section').classList.contains('hidden')) {
                             createTeacherTable();
                             createStudentTabs();
@@ -2324,7 +2133,6 @@
                             createCoevaluationBulkActions();
                         }
                         
-                        // Guardar automáticamente los datos importados
                         saveToStorage();
                         
                         currentEvalGistId = gistId;
@@ -2349,7 +2157,6 @@
                 return;
             }
             
-            // Generar nombre de archivo
             const filename = `Config${groupName.replace(/\s+/g, '')}${evaluationName.replace(/\s+/g, '')}.json`;
             const content = JSON.stringify({
                 students: students,
@@ -2364,7 +2171,6 @@
                 let response;
                 
                 if (currentConfigGistId) {
-                    // Actualizar gist existente
                     response = await fetch(`https://api.github.com/gists/${currentConfigGistId}`, {
                         method: 'PATCH',
                         headers: {
@@ -2382,7 +2188,6 @@
                         })
                     });
                 } else {
-                    // Crear nuevo gist
                     response = await fetch('https://api.github.com/gists', {
                         method: 'POST',
                         headers: {
@@ -2409,7 +2214,6 @@
                 const gist = await response.json();
                 currentConfigGistId = gist.id;
                 
-                // Recargar la lista de gists
                 await loadGists();
                 
                 alert('Configuración guardada correctamente en GitHub Gist');
@@ -2426,7 +2230,6 @@
                 return;
             }
             
-            // Generar nombre de archivo
             const filename = `Evaluacion${evaluationName.replace(/\s+/g, '')}${groupName.replace(/\s+/g, '')}.json`;
             const content = JSON.stringify(rubricData, null, 2);
             
@@ -2434,7 +2237,6 @@
                 let response;
                 
                 if (currentEvalGistId) {
-                    // Actualizar gist existente
                     response = await fetch(`https://api.github.com/gists/${currentEvalGistId}`, {
                         method: 'PATCH',
                         headers: {
@@ -2452,7 +2254,6 @@
                         })
                     });
                 } else {
-                    // Crear nuevo gist
                     response = await fetch('https://api.github.com/gists', {
                         method: 'POST',
                         headers: {
@@ -2479,7 +2280,6 @@
                 const gist = await response.json();
                 currentEvalGistId = gist.id;
                 
-                // Recargar la lista de gists
                 await loadGists();
                 
                 alert('Evaluación guardada correctamente en GitHub Gist');
@@ -2491,10 +2291,8 @@
         
         // Cargar configuración desde un gist
         async function loadConfigFromGist() {
-            // Primero cargamos la lista de gists
             await loadGists();
             
-            // Buscamos un gist de configuración
             const configGists = Array.from(document.querySelectorAll('.github-gist-item'))
                 .filter(item => item.querySelector('.github-config-type'));
             
@@ -2503,7 +2301,6 @@
                 return;
             }
             
-            // Simulamos un clic en el primer gist de configuración
             if (configGists[0]) {
                 const loadButton = configGists[0].querySelector('button');
                 if (loadButton) {
@@ -2514,10 +2311,8 @@
         
         // Cargar evaluación desde un gist
         async function loadEvalFromGist() {
-            // Primero cargamos la lista de gists
             await loadGists();
             
-            // Buscamos un gist de evaluación
             const evalGists = Array.from(document.querySelectorAll('.github-gist-item'))
                 .filter(item => item.querySelector('.github-eval-type'));
             
@@ -2526,7 +2321,6 @@
                 return;
             }
             
-            // Simulamos un clic en el primer gist de evaluación
             if (evalGists[0]) {
                 const loadButton = evalGists[0].querySelector('button');
                 if (loadButton) {
@@ -2559,7 +2353,6 @@
                     throw new Error(`Error al eliminar gist: ${response.status}`);
                 }
                 
-                // Recargar la lista de gists
                 await loadGists();
                 
                 alert('Gist eliminado correctamente');
@@ -2571,38 +2364,32 @@
         
         // Inicializar la aplicación
         function initApp() {
-            // Intentar cargar datos existentes
             if (loadFromStorage()) {
-                // Si hay datos, mostrar directamente la evaluación
                 updateTitleAndSubtitle();
-                renderStudentsList();
-                renderAspectsList();
-                renderValuesList();
+                renderList(students, 'students-list', 'students');
+                renderList(aspects, 'aspects-list', 'aspects');
+                renderList(values, 'values-list', 'values');
                 updateWeightDisplay();
                 
-                // Actualizar campos de información general
                 document.getElementById('evaluation-name').value = evaluationName;
                 document.getElementById('group-name-input').value = groupName;
                 
                 showEvaluationSection();
             } else {
-                // Si no hay datos, mostrar configuración
                 updateTitleAndSubtitle();
-                renderStudentsList();
-                renderAspectsList();
-                renderValuesList();
+                renderList(students, 'students-list', 'students');
+                renderList(aspects, 'aspects-list', 'aspects');
+                renderList(values, 'values-list', 'values');
                 updateWeightDisplay();
             }
             
-            // Cargar token de GitHub si existe
             loadGitHubToken();
             
-            // Event listeners para configuración
             document.getElementById('add-student').addEventListener('click', () => {
                 const studentName = document.getElementById('student-name').value.trim();
                 if (studentName) {
                     students.push(studentName);
-                    renderStudentsList();
+                    renderList(students, 'students-list', 'students');
                     document.getElementById('student-name').value = '';
                     scheduleSave();
                 }
@@ -2612,7 +2399,7 @@
                 const aspectName = document.getElementById('aspect-name').value.trim();
                 if (aspectName) {
                     aspects.push(aspectName);
-                    renderAspectsList();
+                    renderList(aspects, 'aspects-list', 'aspects');
                     document.getElementById('aspect-name').value = '';
                     scheduleSave();
                 }
@@ -2621,13 +2408,12 @@
             document.getElementById('add-value').addEventListener('click', () => {
                 const valueName = document.getElementById('value-name').value.trim();
                 if (valueName) {
-                    // No permitir añadir "NE" manualmente
                     if (valueName === "NE") {
                         alert('El valor "NE" (No Evaluado) ya existe y no se puede añadir manualmente');
                         return;
                     }
                     values.push(valueName);
-                    renderValuesList();
+                    renderList(values, 'values-list', 'values');
                     document.getElementById('value-name').value = '';
                     scheduleSave();
                 }
@@ -2639,7 +2425,6 @@
                 scheduleSave();
             });
             
-            // Event listeners para información general
             document.getElementById('evaluation-name').addEventListener('change', (e) => {
                 evaluationName = e.target.value || "Exposición";
                 updateTitleAndSubtitle();
@@ -2652,7 +2437,6 @@
                 scheduleSave();
             });
             
-            // Event listeners para importar alumnado desde JSON
             document.getElementById('import-students-json').addEventListener('click', () => {
                 document.getElementById('import-students-file').click();
             });
@@ -2661,34 +2445,27 @@
                 if (e.target.files.length > 0) {
                     importStudentsFromJSON(e.target.files[0]);
                 }
-                // Limpiar el input para permitir cargar el mismo archivo otra vez
                 e.target.value = '';
             });
             
-            // Event listeners para GitHub Gists
             document.getElementById('save-github-token').addEventListener('click', saveGitHubToken);
             document.getElementById('load-gists').addEventListener('click', loadGists);
             
-            // Event listeners para Configuración en GitHub
             document.getElementById('save-config-gist').addEventListener('click', saveConfigToGist);
             document.getElementById('load-config-gist').addEventListener('click', loadConfigFromGist);
             
-            // Event listeners para Evaluación en GitHub
             document.getElementById('save-eval-gist').addEventListener('click', saveEvalToGist);
             document.getElementById('load-eval-gist').addEventListener('click', loadEvalFromGist);
             
-            // Event listeners para GitHub en la sección de evaluación
             document.getElementById('save-config-gist-eval').addEventListener('click', saveConfigToGist);
             document.getElementById('save-eval-gist-eval').addEventListener('click', saveEvalToGist);
             
             document.getElementById('save-config').addEventListener('click', showEvaluationSection);
             
-            // Event listeners para exportación/importación de configuración
             document.getElementById('export-config').addEventListener('click', exportConfig);
             document.getElementById('import-config').addEventListener('click', importConfig);
             document.getElementById('import-config-file').addEventListener('change', handleConfigUpload);
             
-            // Event listeners para evaluación
             document.getElementById('calculate-btn').addEventListener('click', calculateGrades);
             document.getElementById('export-btn').addEventListener('click', exportData);
             document.getElementById('import-btn').addEventListener('click', importData);
@@ -2696,11 +2473,9 @@
             document.getElementById('clear-data-btn').addEventListener('click', clearData);
             document.getElementById('back-to-setup').addEventListener('click', showSetupSection);
             
-            // Actualizar indicadores de estado
             updateStatusIndicators();
         }
         
-        // Iniciar la aplicación cuando se carga la página
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
