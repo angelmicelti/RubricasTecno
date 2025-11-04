@@ -8,1084 +8,292 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
-    /* Todos los estilos anteriores permanecen igual */
-    :root {
-      --primary: #2c3e50;
-      --secondary: #3498db;
-      --success: #27ae60;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --light: #ecf0f1;
-      --dark: #34495e;
-      --gray: #95a5a6;
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
-      color: #333;
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    
-    header {
-      text-align: center;
-      margin-bottom: 25px;
-      padding: 25px;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    header::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c);
-    }
-    
-    h1 {
-      color: var(--primary);
-      margin-bottom: 10px;
-      font-size: 2.5rem;
-      font-weight: 700;
-    }
-    
-    .subtitle {
-      color: #555;
-      font-size: 1.2rem;
-      max-width: 800px;
-      margin: 0 auto;
-      font-weight: 300;
-    }
-    
-    .config-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    
-    @media (max-width: 1000px) {
-      .config-section {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .config-section {
-        gap: 15px;
-      }
-    }
-    
-    .config-panel {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-    }
-    
-    @media (max-width: 768px) {
-      .config-panel {
-        padding: 20px;
-      }
-    }
-    
-    .panel-title {
-      color: var(--primary);
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid var(--secondary);
-      font-size: 1.6rem;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.3s ease;
-    }
-    
-    .panel-title:hover {
-      color: var(--secondary);
-    }
-    
-    .panel-title i {
-      margin-right: 15px;
-      color: var(--secondary);
-    }
-    
-    .panel-title .toggle-icon {
-      margin-left: auto;
-      transition: transform 0.3s ease;
-    }
-    
-    .panel-title.collapsed .toggle-icon {
-      transform: rotate(-90deg);
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--dark);
-    }
-    
-    input[type="number"], 
-    input[type="text"],
-    input[type="password"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-      outline: none;
-    }
-    
-    .btn {
-      background: linear-gradient(135deg, var(--secondary), #1a6ca9);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
-    
-    .btn i {
-      margin-right: 10px;
-    }
-    
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
-    }
-    
-    .btn:active {
-      transform: translateY(0);
-    }
-    
-    .btn-success {
-      background: linear-gradient(135deg, var(--success), #1e8449);
-    }
-    
-    .btn-warning {
-      background: linear-gradient(135deg, var(--warning), #d35400);
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, var(--danger), #c0392b);
-    }
-    
-    .btn-block {
-      width: 100%;
-      margin-top: 15px;
-    }
-    
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 20px 0;
-      gap: 10px;
-    }
-    
-    @media (max-width: 768px) {
-      .controls {
-        flex-direction: column;
-      }
-      
-      .btn {
-        width: 100%;
-        margin-right: 0;
-      }
-    }
-    
-    .controls-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .controls-vertical .btn {
-      width: 100%;
-      margin-right: 0;
-    }
-    
-    .tareas-section {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-bottom: 20px;
-    }
-    
-    .tareas-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      .tareas-container {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .tarea-item {
-      display: flex;
-      flex-direction: column;
-      padding: 15px;
-      border: 1px solid #e0e6ed;
-      border-radius: 12px;
-      background: linear-gradient(to bottom, #ffffff, #f8f9fa);
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    
-    .tarea-item:hover {
-      border-color: var(--secondary);
-      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2);
-      transform: translateY(-3px);
-    }
-    
-    .tarea-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    
-    .tarea-header label {
-      flex: 1;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--primary);
-      font-size: 1.1rem;
-      margin-right: 50px;
-    }
-    
-    .valor-input {
-      width: 30px;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: 600;
-      color: var(--primary);
-    }
-    
-    .tarea-criteria {
-      padding: 10px;
-      background-color: #f8fafc;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: #555;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    
-    .tarea-criteria h4 {
-      margin: 8px 0;
-      color: var(--primary);
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .tarea-criteria h4 i {
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-    
-    .tarea-criteria h4 i.rotated {
-      transform: rotate(180deg);
-    }
-    
-    .criterios-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5px;
-    }
-    
-    @media (max-width: 480px) {
-      .criterios-list {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .criterio-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 4px;
-      position: relative;
-    }
-    
-    .criterio-item input {
-      margin-right: 8px;
-    }
-    
-    .criterio-item label {
-      font-size: 0.85rem;
-      font-weight: normal;
-      cursor: pointer;
-      position: relative;
-    }
-    
-    [data-tooltip] {
-      position: relative;
-      cursor: pointer;
-    }
-    
-    [data-tooltip]::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #2c3e50;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      white-space: nowrap;
-      z-index: 1000;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      min-width: 200px;
-      max-width: 300px;
-      text-align: center;
-      line-height: 1.4;
-    }
-    
-    [data-tooltip]::before {
-      content: '';
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(6px);
-      border: 6px solid transparent;
-      border-top-color: #2c3e50;
-      z-index: 1001;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    [data-tooltip]:hover::after,
-    [data-tooltip]:hover::before {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    
-    .tooltip-left::after {
-      left: 0;
-      transform: translateX(0);
-    }
-    
-    .tooltip-left::before {
-      left: 10px;
-      transform: translateX(0) translateY(6px);
-    }
-    
-    .tooltip-left:hover::after {
-      transform: translateX(0) translateY(0);
-    }
-    
-    .tooltip-left:hover::before {
-      transform: translateX(0) translateY(0);
-    }
-    
-    .tooltip-right::after {
-      left: auto;
-      right: 0;
-      transform: translateX(0);
-    }
-    
-    .tooltip-right::before {
-      left: auto;
-      right: 10px;
-      transform: translateX(0) translateY(6px);
-    }
-    
-    .tooltip-right:hover::after {
-      transform: translateX(0) translateY(0);
-    }
-    
-    .tooltip-right:hover::before {
-      transform: translateX(0) translateY(0);
-    }
-    
-    .evaluation-section {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-top: 20px;
-      display: none;
-    }
-    
-    .table-container {
-      overflow-x: auto;
-      margin: 20px 0;
-      border: 1px solid #e0e6ed;
-      border-radius: 12px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-    }
-    
-    th, td {
-      border: 1px solid #e0e6ed;
-      padding: 8px;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-    
-    th {
-      background: linear-gradient(135deg, var(--primary), #1c2e40);
-      color: white;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-    }
-    
-    tr:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-    
-    tr:hover {
-      background-color: #f1f9ff;
-    }
-    
-    .student-score {
-      width: 60px;
-      padding: 6px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      text-align: center;
-      font-weight: 600;
-      transition: all 0.3s;
-      font-size: 0.9rem;
-    }
-    
-    .student-score:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-      outline: none;
-    }
-    
-    .student-score.invalid {
-      border-color: var(--danger);
-      background-color: #fee;
-      animation: shake 0.5s;
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    
-    .criteria-cell {
-      max-width: 150px;
-      word-wrap: break-word;
-      text-align: left;
-      padding: 8px 10px;
-      font-weight: 600;
-      color: var(--primary);
-      position: relative;
-    }
-    
-    .student-header-cell {
-      min-width: 80px;
-      max-width: 120px;
-      word-wrap: break-word;
-      padding: 8px 5px;
-      font-size: 0.85rem;
-    }
-    
-    .max-value-cell {
-      width: 70px;
-      font-weight: 600;
-      color: var(--dark);
-    }
-    
-    .results-section {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-top: 20px;
-      display: none;
-    }
-    
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      .results-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .student-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-      border: 1px solid #e0e6ed;
-    }
-    
-    .student-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-    
-    .student-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    @media (max-width: 480px) {
-      .student-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      
-      .student-avg {
-        margin-top: 10px;
-      }
-    }
-    
-    .student-name {
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: var(--primary);
-    }
-    
-    .student-avg {
-      font-weight: 700;
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, var(--secondary), #1a6ca9);
-      color: white;
-      padding: 5px 15px;
-      border-radius: 20px;
-    }
-    
-    .criteria-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px dashed #eee;
-    }
-    
-    .criteria-name {
-      font-weight: 500;
-      flex: 1;
-      position: relative;
-    }
-    
-    .criteria-score {
-      font-weight: 600;
-      min-width: 60px;
-      text-align: right;
-    }
-    
-    .criteria-group {
-      font-weight: 700;
-      color: var(--primary);
-      background-color: #e1f5fe;
-      padding: 8px 15px;
-      border-radius: 6px;
-      margin: 10px 0;
-    }
-    
-    .text-danger {
-      color: var(--danger);
-    }
-    
-    .text-warning {
-      color: var(--warning);
-    }
-    
-    .text-success {
-      color: var(--success);
-    }
-    
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      padding: 25px;
-      color: #666;
-      font-size: 1rem;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    }
-    
-    .message {
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      text-align: center;
-      font-weight: 500;
-    }
-    
-    .message.info {
-      background-color: #d1ecf1;
-      color: #0c5460;
-      border-left: 4px solid var(--secondary);
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .nombres-alumnos-section {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-top: 20px;
-      display: none;
-    }
-    
-    .alumnos-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      .alumnos-container {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .alumno-item {
-      display: flex;
-      flex-direction: column;
-      padding: 15px;
-      border: 1px solid #e0e6ed;
-      border-radius: 12px;
-      background: linear-gradient(to bottom, #ffffff, #f8f9fa);
-    }
-    
-    .alumno-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    
-    .alumno-header label {
-      flex: 1;
-      font-weight: 600;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-    
-    .alumno-input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .fade-in {
-      animation: fadeIn 0.5s ease forwards;
-    }
-    
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-      70% { box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-    }
-    
-    .help-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--secondary), #1a6ca9);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      z-index: 1000;
-      transition: all 0.3s ease;
-    }
-    
-    .help-button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
-    }
-    
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      padding: 20px;
-    }
-    
-    .modal-content {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      max-width: 800px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-    }
-    
-    .modal-header {
-      padding: 25px 25px 15px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .modal-title {
-      font-size: 1.8rem;
-      color: var(--primary);
-      font-weight: 700;
-    }
-    
-    .close-modal {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--gray);
-      transition: color 0.3s;
-    }
-    
-    .close-modal:hover {
-      color: var(--danger);
-    }
-    
-    .modal-body {
-      padding: 25px;
-    }
-    
-    .help-section {
-      margin-bottom: 30px;
-    }
-    
-    .help-section h3 {
-      color: var(--primary);
-      margin-bottom: 15px;
-      font-size: 1.4rem;
-      display: flex;
-      align-items: center;
-    }
-    
-    .help-section h3 i {
-      margin-right: 10px;
-      color: var(--secondary);
-    }
-    
-    .help-section p {
-      margin-bottom: 15px;
-      line-height: 1.6;
-    }
-    
-    .help-section ul {
-      padding-left: 20px;
-      margin-bottom: 15px;
-    }
-    
-    .help-section li {
-      margin-bottom: 8px;
-      line-height: 1.5;
-    }
-    
-    .feature-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    
-    .feature-item {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 10px;
-      border-left: 4px solid var(--secondary);
-    }
-    
-    .feature-item h4 {
-      color: var(--primary);
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-    }
-    
-    .feature-item p {
-      font-size: 0.9rem;
-      color: #555;
-      margin: 0;
-    }
-    
-    .section-content {
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    
-    .section-content.collapsed {
-      max-height: 0;
-      opacity: 0;
-      margin-bottom: 0;
-      padding: 0;
-    }
-    
-    .section-content.expanded {
-      max-height: 5000px;
-      opacity: 1;
-    }
-    
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-      
-      header {
-        padding: 15px;
-      }
-      
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      .subtitle {
-        font-size: 1rem;
-      }
-      
-      .config-panel, .tareas-section, .evaluation-section, .results-section, .nombres-alumnos-section {
-        padding: 15px;
-      }
-      
-      .panel-title {
-        font-size: 1.3rem;
-      }
-      
-      .tarea-item {
-        padding: 10px;
-      }
-      
-      .student-card {
-        padding: 15px;
-      }
-      
-      .help-button {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        bottom: 15px;
-        right: 15px;
-      }
-    }
-
-    .github-panel {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-top: 20px;
-      display: none;
-    }
-    
-    .github-config {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-    
-    @media (max-width: 768px) {
-      .github-config {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .github-info {
-      margin-top: 15px;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      border-left: 4px solid var(--secondary);
-    }
-    
-    .github-info p {
-      margin-bottom: 10px;
-    }
-    
-    .github-info ul {
-      padding-left: 20px;
-      margin-bottom: 10px;
-    }
-    
-    .github-info li {
-      margin-bottom: 5px;
-    }
-    
-    .github-status {
-      padding: 10px 15px;
-      border-radius: 8px;
-      margin: 10px 0;
-      font-weight: 500;
-    }
-    
-    .github-status.connected {
-      background-color: #d4edda;
-      color: #155724;
-      border-left: 4px solid var(--success);
-    }
-    
-    .github-status.disconnected {
-      background-color: #f8d7da;
-      color: #721c24;
-      border-left: 4px solid var(--danger);
-    }
-    
-    /* Estilos para el modal de selección de evaluaciones */
-    .gist-list {
-      max-height: 400px;
-      overflow-y: auto;
-      margin: 15px 0;
-      border: 1px solid #e0e6ed;
-      border-radius: 8px;
-    }
-    
-    .gist-item {
-      padding: 15px;
-      border-bottom: 1px solid #e0e6ed;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    
-    .gist-item:hover {
-      background-color: #f8f9fa;
-    }
-    
-    .gist-item:last-child {
-      border-bottom: none;
-    }
-    
-    .gist-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    
-    .gist-title {
-      font-weight: 600;
-      color: var(--primary);
-    }
-    
-    .gist-date {
-      color: var(--gray);
-      font-size: 0.9rem;
-    }
-    
-    .gist-description {
-      color: #555;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
-    
-    .gist-filename {
-      color: var(--secondary);
-      font-size: 0.85rem;
-      font-family: monospace;
-    }
-    
-    .gist-actions {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-    
-    .gist-actions .btn {
-      flex: 1;
+    :root { 
+      --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; 
+      --warning: #f39c12; --danger: #e74c3c; --light: #ecf0f1; 
+      --dark: #34495e; --gray: #95a5a6; 
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%); 
+      color: #333; line-height: 1.6; min-height: 100vh; padding: 20px; 
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { 
+      text-align: center; margin-bottom: 25px; padding: 25px; 
+      background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+      position: relative; overflow: hidden; 
+    }
+    header::before { 
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 5px; 
+      background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c); 
+    }
+    h1 { color: var(--primary); margin-bottom: 10px; font-size: 2.5rem; font-weight: 700; }
+    .subtitle { color: #555; font-size: 1.2rem; max-width: 800px; margin: 0 auto; font-weight: 300; }
+    .config-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .config-panel, .tareas-section, .evaluation-section, .results-section, .nombres-alumnos-section, .github-panel { 
+      background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+      padding: 25px; margin-bottom: 20px; 
+    }
+    .panel-title { 
+      color: var(--primary); margin-bottom: 20px; padding-bottom: 15px; 
+      border-bottom: 2px solid var(--secondary); font-size: 1.6rem; 
+      display: flex; align-items: center; cursor: pointer; user-select: none; transition: all 0.3s ease; 
+    }
+    .panel-title:hover { color: var(--secondary); }
+    .panel-title i { margin-right: 15px; color: var(--secondary); }
+    .panel-title .toggle-icon { margin-left: auto; transition: transform 0.3s ease; }
+    .panel-title.collapsed .toggle-icon { transform: rotate(-90deg); }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
+    input[type="number"], input[type="text"], input[type="password"], select, textarea { 
+      width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; 
+      font-size: 1rem; transition: all 0.3s; 
+    }
+    input:focus, select:focus, textarea:focus { 
+      border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); outline: none; 
+    }
+    .btn { 
+      background: linear-gradient(135deg, var(--secondary), #1a6ca9); color: white; 
+      border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; 
+      font-size: 1rem; font-weight: 600; transition: all 0.3s; 
+      display: inline-flex; align-items: center; justify-content: center; 
+      margin-right: 10px; margin-bottom: 10px; 
+    }
+    .btn i { margin-right: 10px; }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4); }
+    .btn-success { background: linear-gradient(135deg, var(--success), #1e8449); }
+    .btn-warning { background: linear-gradient(135deg, var(--warning), #d35400); }
+    .btn-danger { background: linear-gradient(135deg, var(--danger), #c0392b); }
+    .btn-block { width: 100%; margin-top: 15px; }
+    .controls { display: flex; flex-wrap: wrap; margin: 20px 0; gap: 10px; }
+    .controls-vertical { display: flex; flex-direction: column; gap: 10px; }
+    .controls-vertical .btn { width: 100%; margin-right: 0; }
+    .tareas-container, .alumnos-container { 
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+      gap: 15px; margin-bottom: 20px; 
+    }
+    .tarea-item, .alumno-item { 
+      display: flex; flex-direction: column; padding: 15px; border: 1px solid #e0e6ed; 
+      border-radius: 12px; background: linear-gradient(to bottom, #ffffff, #f8f9fa); 
+      transition: all 0.3s ease; 
+    }
+    .tarea-item:hover { 
+      border-color: var(--secondary); box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2); 
+      transform: translateY(-3px); 
+    }
+    .tarea-header, .alumno-header { display: flex; align-items: center; margin-bottom: 10px; }
+    .tarea-header label, .alumno-header label { 
+      flex: 1; font-weight: 600; cursor: pointer; color: var(--primary); 
+      font-size: 1.1rem; margin-right: 50px; 
+    }
+    .valor-input, .alumno-input { 
+      width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; 
+    }
+    .valor-input { width: 30px; padding: 8px; text-align: center; font-weight: 600; color: var(--primary); }
+    .tarea-criteria { 
+      padding: 10px; background-color: #f8fafc; border-radius: 8px; 
+      font-size: 0.9rem; color: #555; max-height: 150px; overflow-y: auto; 
+    }
+    .tarea-criteria h4 { 
+      margin: 8px 0; color: var(--primary); font-size: 0.95rem; 
+      display: flex; align-items: center; justify-content: space-between; 
+    }
+    .tarea-criteria h4 i { cursor: pointer; transition: transform 0.3s; }
+    .tarea-criteria h4 i.rotated { transform: rotate(180deg); }
+    .criterios-list { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .criterio-item { display: flex; align-items: center; margin-bottom: 4px; position: relative; }
+    .criterio-item input { margin-right: 8px; }
+    .criterio-item label { font-size: 0.85rem; font-weight: normal; cursor: pointer; position: relative; }
+    [data-tooltip] { position: relative; cursor: pointer; }
+    [data-tooltip]::after { 
+      content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; 
+      transform: translateX(-50%); background-color: #2c3e50; color: white; 
+      padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; white-space: nowrap; 
+      z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); pointer-events: none; 
+      opacity: 0; transition: opacity 0.3s, transform 0.3s; 
+      min-width: 200px; max-width: 300px; text-align: center; line-height: 1.4; 
+    }
+    [data-tooltip]:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .table-container { 
+      overflow-x: auto; margin: 20px 0; border: 1px solid #e0e6ed; 
+      border-radius: 12px; max-height: 70vh; overflow-y: auto; 
+    }
+    table { width: 100%; border-collapse: collapse; background-color: #fff; }
+    th, td { border: 1px solid #e0e6ed; padding: 8px; text-align: center; font-size: 0.9rem; }
+    th { 
+      background: linear-gradient(135deg, var(--primary), #1c2e40); color: white; 
+      font-weight: 600; position: sticky; top: 0; 
+    }
+    tr:nth-child(even) { background-color: #f8f9fa; }
+    tr:hover { background-color: #f1f9ff; }
+    .student-score { 
+      width: 60px; padding: 6px; border: 1px solid #ddd; border-radius: 5px; 
+      text-align: center; font-weight: 600; transition: all 0.3s; font-size: 0.9rem; 
+    }
+    .student-score:focus { 
+      border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); 
+      outline: none; 
+    }
+    .student-score.invalid { 
+      border-color: var(--danger); background-color: #fee; animation: shake 0.5s; 
+    }
+    @keyframes shake { 
+      0%, 100% { transform: translateX(0); } 
+      25% { transform: translateX(-5px); } 
+      75% { transform: translateX(5px); } 
+    }
+    .criteria-cell { 
+      max-width: 150px; word-wrap: break-word; text-align: left; padding: 8px 10px; 
+      font-weight: 600; color: var(--primary); position: relative; 
+    }
+    .student-header-cell { min-width: 80px; max-width: 120px; word-wrap: break-word; padding: 8px 5px; font-size: 0.85rem; }
+    .max-value-cell { width: 70px; font-weight: 600; color: var(--dark); }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 20px; }
+    .student-card { 
+      background: white; border-radius: 12px; padding: 20px; 
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; 
+      border: 1px solid #e0e6ed; 
+    }
+    .student-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+    .student-header { 
+      display: flex; justify-content: space-between; align-items: center; 
+      margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; 
+    }
+    .student-name { font-weight: 700; font-size: 1.3rem; color: var(--primary); }
+    .student-avg { 
+      font-weight: 700; font-size: 1.5rem; background: linear-gradient(135deg, var(--secondary), #1a6ca9); 
+      color: white; padding: 5px 15px; border-radius: 20px; 
+    }
+    .criteria-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+    .criteria-name { font-weight: 500; flex: 1; position: relative; }
+    .criteria-score { font-weight: 600; min-width: 60px; text-align: right; }
+    .criteria-group { 
+      font-weight: 700; color: var(--primary); background-color: #e1f5fe; 
+      padding: 8px 15px; border-radius: 6px; margin: 10px 0; 
+    }
+    .text-danger { color: var(--danger); }
+    .text-warning { color: var(--warning); }
+    .text-success { color: var(--success); }
+    .footer { 
+      text-align: center; margin-top: 40px; padding: 25px; color: #666; 
+      font-size: 1rem; background: white; border-radius: 15px; 
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); 
+    }
+    .message { padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; font-weight: 500; }
+    .message.info { 
+      background-color: #d1ecf1; color: #0c5460; border-left: 4px solid var(--secondary); 
+    }
+    .hidden { display: none; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(20px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    .fade-in { animation: fadeIn 0.5s ease forwards; }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 
+      0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); } 
+      70% { box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); } 
+      100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } 
+    }
+    .help-button { 
+      position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; 
+      background: linear-gradient(135deg, var(--secondary), #1a6ca9); color: white; 
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+      font-size: 24px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); cursor: pointer; 
+      z-index: 1000; transition: all 0.3s ease; 
+    }
+    .help-button:hover { transform: scale(1.1); box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4); }
+    .modal-overlay { 
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+      background-color: rgba(0, 0, 0, 0.5); display: none; 
+      align-items: center; justify-content: center; z-index: 2000; padding: 20px; 
+    }
+    .modal-content { 
+      background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); 
+      max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; 
+    }
+    .modal-header { 
+      padding: 25px 25px 15px; border-bottom: 1px solid #eee; 
+      display: flex; justify-content: space-between; align-items: center; 
+    }
+    .modal-title { font-size: 1.8rem; color: var(--primary); font-weight: 700; }
+    .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray); transition: color 0.3s; }
+    .close-modal:hover { color: var(--danger); }
+    .modal-body { padding: 25px; }
+    .help-section { margin-bottom: 30px; }
+    .help-section h3 { 
+      color: var(--primary); margin-bottom: 15px; font-size: 1.4rem; 
+      display: flex; align-items: center; 
+    }
+    .help-section h3 i { margin-right: 10px; color: var(--secondary); }
+    .help-section p { margin-bottom: 15px; line-height: 1.6; }
+    .help-section ul { padding-left: 20px; margin-bottom: 15px; }
+    .help-section li { margin-bottom: 8px; line-height: 1.5; }
+    .feature-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+    .feature-item { background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid var(--secondary); }
+    .feature-item h4 { color: var(--primary); margin-bottom: 8px; font-size: 1.1rem; }
+    .feature-item p { font-size: 0.9rem; color: #555; margin: 0; }
+    .section-content { transition: all 0.3s ease; overflow: hidden; }
+    .section-content.collapsed { max-height: 0; opacity: 0; margin-bottom: 0; padding: 0; }
+    .section-content.expanded { max-height: 5000px; opacity: 1; }
+    .github-config { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .github-info { 
+      margin-top: 15px; padding: 15px; background-color: #f8f9fa; 
+      border-radius: 8px; border-left: 4px solid var(--secondary); 
+    }
+    .github-info p { margin-bottom: 10px; }
+    .github-info ul { padding-left: 20px; margin-bottom: 10px; }
+    .github-info li { margin-bottom: 5px; }
+    .github-status { padding: 10px 15px; border-radius: 8px; margin: 10px 0; font-weight: 500; }
+    .github-status.connected { 
+      background-color: #d4edda; color: #155724; border-left: 4px solid var(--success); 
+    }
+    .github-status.disconnected { 
+      background-color: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); 
+    }
+    .gist-list { max-height: 400px; overflow-y: auto; margin: 15px 0; border: 1px solid #e0e6ed; border-radius: 8px; }
+    .gist-item { 
+      padding: 15px; border-bottom: 1px solid #e0e6ed; cursor: pointer; 
+      transition: background-color 0.2s; 
+    }
+    .gist-item:hover { background-color: #f8f9fa; }
+    .gist-item:last-child { border-bottom: none; }
+    .gist-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .gist-title { font-weight: 600; color: var(--primary); }
+    .gist-date { color: var(--gray); font-size: 0.9rem; }
+    .gist-description { color: #555; font-size: 0.9rem; margin-bottom: 8px; }
+    .gist-filename { color: var(--secondary); font-size: 0.85rem; font-family: monospace; }
+    .gist-actions { margin-top: 15px; display: flex; gap: 10px; }
+    .gist-actions .btn { flex: 1; }
+    
+    @media (max-width: 1000px) { .config-section { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { 
+      .config-panel, .tareas-section, .evaluation-section, .results-section, .nombres-alumnos-section { padding: 20px; }
+      .tareas-container, .alumnos-container { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; }
+      .btn { width: 100%; margin-right: 0; }
+      .github-config { grid-template-columns: 1fr; }
+      .criterios-list { grid-template-columns: 1fr; }
+      .student-header { flex-direction: column; align-items: flex-start; }
+      .student-avg { margin-top: 10px; }
+      .help-button { width: 50px; height: 50px; font-size: 20px; bottom: 15px; right: 15px; }
+    }
+    @media (max-width: 480px) { 
+      body { padding: 10px; }
+      header { padding: 15px; }
+      h1 { font-size: 1.8rem; }
+      .subtitle { font-size: 1rem; }
+      .config-panel, .tareas-section, .evaluation-section, .results-section, .nombres-alumnos-section { padding: 15px; }
+      .panel-title { font-size: 1.3rem; }
+      .tarea-item { padding: 10px; }
+      .student-card { padding: 15px; }
     }
   </style>
 </head>
 <body>
-  <div class="help-button" id="help-button">
-    <i class="fas fa-question"></i>
-  </div>
+  <div class="help-button" id="help-button"><i class="fas fa-question"></i></div>
 
   <!-- Modal de Ayuda -->
   <div class="modal-overlay" id="help-modal">
@@ -1103,38 +311,14 @@
         <div class="help-section">
           <h3><i class="fas fa-list-ol"></i> Funcionalidades principales</h3>
           <div class="feature-list">
-            <div class="feature-item">
-              <h4><i class="fas fa-users"></i> Gestión de alumnos</h4>
-              <p>Configura el número de estudiantes y sus nombres para la evaluación.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fas fa-tasks"></i> Selección de tareas</h4>
-              <p>Elige entre más de 20 tipos de actividades con criterios predefinidos.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fas fa-clipboard-check"></i> Evaluación personalizada</h4>
-              <p>Asigna puntuaciones individuales para cada estudiante y tarea.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fas fa-chart-bar"></i> Cálculo automático</h4>
-              <p>Calcula promedios por criterio y estudiante automáticamente.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fas fa-file-pdf"></i> Exportación a PDF</h4>
-              <p>Genera informes detallados en formato PDF para cada estudiante.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fas fa-file-csv"></i> Exportación de rúbricas</h4>
-              <p>Exporta las rúbricas en formato CSV para importar en Google Classroom.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fas fa-file-export"></i> Exportación/Importación</h4>
-              <p>Guarda y carga listas de alumnos por clase para reutilizarlas.</p>
-            </div>
-            <div class="feature-item">
-              <h4><i class="fab fa-github"></i> Guardar en GitHub Gists</h4>
-              <p>Guarda y carga tus evaluaciones desde GitHub Gists para acceso desde cualquier lugar.</p>
-            </div>
+            <div class="feature-item"><h4><i class="fas fa-users"></i> Gestión de alumnos</h4><p>Configura el número de estudiantes y sus nombres para la evaluación.</p></div>
+            <div class="feature-item"><h4><i class="fas fa-tasks"></i> Selección de tareas</h4><p>Elige entre más de 20 tipos de actividades con criterios predefinidos.</p></div>
+            <div class="feature-item"><h4><i class="fas fa-clipboard-check"></i> Evaluación personalizada</h4><p>Asigna puntuaciones individuales para cada estudiante y tarea.</p></div>
+            <div class="feature-item"><h4><i class="fas fa-chart-bar"></i> Cálculo automático</h4><p>Calcula promedios por criterio y estudiante automáticamente.</p></div>
+            <div class="feature-item"><h4><i class="fas fa-file-pdf"></i> Exportación a PDF</h4><p>Genera informes detallados en formato PDF para cada estudiante.</p></div>
+            <div class="feature-item"><h4><i class="fas fa-file-csv"></i> Exportación de rúbricas</h4><p>Exporta las rúbricas en formato CSV para importar en Google Classroom.</p></div>
+            <div class="feature-item"><h4><i class="fas fa-file-export"></i> Exportación/Importación</h4><p>Guarda y carga listas de alumnos por clase para reutilizarlas.</p></div>
+            <div class="feature-item"><h4><i class="fab fa-github"></i> Guardar en GitHub Gists</h4><p>Guarda y carga tus evaluaciones desde GitHub Gists para acceso desde cualquier lugar.</p></div>
           </div>
         </div>
         
@@ -1189,20 +373,12 @@
         <button class="close-modal" id="close-gists-modal">&times;</button>
       </div>
       <div class="modal-body">
-        <div id="gists-loading" class="message info">
-          <i class="fas fa-spinner fa-spin"></i> Cargando evaluaciones guardadas...
-        </div>
+        <div id="gists-loading" class="message info"><i class="fas fa-spinner fa-spin"></i> Cargando evaluaciones guardadas...</div>
         <div id="gists-list" class="gist-list" style="display: none;"></div>
-        <div id="gists-empty" class="message info" style="display: none;">
-          <i class="fas fa-info-circle"></i> No se encontraron evaluaciones guardadas.
-        </div>
+        <div id="gists-empty" class="message info" style="display: none;"><i class="fas fa-info-circle"></i> No se encontraron evaluaciones guardadas.</div>
         <div class="gist-actions">
-          <button class="btn" id="refresh-gists">
-            <i class="fas fa-sync-alt"></i> Actualizar Lista
-          </button>
-          <button class="btn btn-danger" id="close-gists">
-            <i class="fas fa-times"></i> Cerrar
-          </button>
+          <button class="btn" id="refresh-gists"><i class="fas fa-sync-alt"></i> Actualizar Lista</button>
+          <button class="btn btn-danger" id="close-gists"><i class="fas fa-times"></i> Cerrar</button>
         </div>
       </div>
     </div>
@@ -1238,40 +414,25 @@
           <input type="text" id="nombre-clase" value="4ESO">
         </div>
         
-        <button class="btn btn-success btn-block pulse" id="configurar-alumnos">
-          <i class="fas fa-user-plus"></i> Configurar Alumnado
-        </button>
+        <button class="btn btn-success btn-block pulse" id="configurar-alumnos"><i class="fas fa-user-plus"></i> Configurar Alumnado</button>
       </div>
       
       <div class="config-panel">
         <h2 class="panel-title"><i class="fas fa-tasks"></i> Acciones</h2>
         
         <div class="controls controls-vertical">
-          <button class="btn btn-success" id="generar-evaluacion">
-            <i class="fas fa-play"></i> Generar Evaluación
-          </button>
-          <button class="btn" id="seleccionar-todas">
-            <i class="fas fa-check-square"></i> Seleccionar Todas las Tareas
-          </button>
-          <button class="btn" id="deseleccionar-todas">
-            <i class="fas fa-square"></i> Deseleccionar Todas las Tareas
-          </button>
-          <button class="btn" id="mostrar-github">
-            <i class="fab fa-github"></i> Configurar GitHub Gists
-          </button>
+          <button class="btn btn-success" id="generar-evaluacion"><i class="fas fa-play"></i> Generar Evaluación</button>
+          <button class="btn" id="seleccionar-todas"><i class="fas fa-check-square"></i> Seleccionar Todas las Tareas</button>
+          <button class="btn" id="deseleccionar-todas"><i class="fas fa-square"></i> Deseleccionar Todas las Tareas</button>
+          <button class="btn" id="mostrar-github"><i class="fab fa-github"></i> Configurar GitHub Gists</button>
         </div>
         
-        <div class="message info">
-          <i class="fas fa-info-circle"></i> Seleccione las tareas para la evaluación
-        </div>
+        <div class="message info"><i class="fas fa-info-circle"></i> Seleccione las tareas para la evaluación</div>
       </div>
     </section>
     
-    <section class="github-panel fade-in" id="github-panel">
-      <h2 class="panel-title collapsible" id="github-title">
-        <i class="fab fa-github"></i> Configuración de GitHub Gists
-        <i class="fas fa-chevron-down toggle-icon"></i>
-      </h2>
+    <section class="github-panel fade-in" id="github-panel" style="display:none">
+      <h2 class="panel-title collapsible" id="github-title"><i class="fab fa-github"></i> Configuración de GitHub Gists<i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div class="section-content expanded" id="github-content">
         <div class="github-config">
           <div class="form-group">
@@ -1286,23 +447,13 @@
           </div>
         </div>
         
-        <div class="github-status" id="github-status">
-          <i class="fas fa-info-circle"></i> No configurado. Introduce tu token de GitHub.
-        </div>
+        <div class="github-status" id="github-status"><i class="fas fa-info-circle"></i> No configurado. Introduce tu token de GitHub.</div>
         
         <div class="controls">
-          <button class="btn btn-success" id="guardar-token">
-            <i class="fas fa-save"></i> Guardar Token
-          </button>
-          <button class="btn" id="guardar-gist">
-            <i class="fab fa-github"></i> Guardar Evaluación en Gist
-          </button>
-          <button class="btn" id="listar-gists">
-            <i class="fas fa-list"></i> Ver Evaluaciones Guardadas
-          </button>
-          <button class="btn btn-danger" id="eliminar-token">
-            <i class="fas fa-trash"></i> Eliminar Token
-          </button>
+          <button class="btn btn-success" id="guardar-token"><i class="fas fa-save"></i> Guardar Token</button>
+          <button class="btn" id="guardar-gist"><i class="fab fa-github"></i> Guardar Evaluación en Gist</button>
+          <button class="btn" id="listar-gists"><i class="fas fa-list"></i> Ver Evaluaciones Guardadas</button>
+          <button class="btn btn-danger" id="eliminar-token"><i class="fas fa-trash"></i> Eliminar Token</button>
         </div>
         
         <div class="github-info">
@@ -1320,89 +471,57 @@
       </div>
     </section>
     
-    <section class="nombres-alumnos-section fade-in" id="nombres-alumnos-section">
-      <h2 class="panel-title collapsible" id="nombres-alumnos-title">
-        <i class="fas fa-user-edit"></i> Nombres del Alumnado
-        <i class="fas fa-chevron-down toggle-icon"></i>
-      </h2>
+    <section class="nombres-alumnos-section fade-in" id="nombres-alumnos-section" style="display:none">
+      <h2 class="panel-title collapsible" id="nombres-alumnos-title"><i class="fas fa-user-edit"></i> Nombres del Alumnado<i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div class="section-content expanded" id="nombres-alumnos-content">
         <div class="alumnos-container" id="alumnos-container"></div>
         
         <div class="controls">
-          <button class="btn btn-success" id="guardar-alumnos">
-            <i class="fas fa-save"></i> Guardar Alumnado
-          </button>
-          <button class="btn" id="exportar-alumnos">
-            <i class="fas fa-file-export"></i> Exportar Alumnado
-          </button>
-          <button class="btn" id="importar-alumnos">
-            <i class="fas fa-file-import"></i> Importar Alumnado
-          </button>
+          <button class="btn btn-success" id="guardar-alumnos"><i class="fas fa-save"></i> Guardar Alumnado</button>
+          <button class="btn" id="exportar-alumnos"><i class="fas fa-file-export"></i> Exportar Alumnado</button>
+          <button class="btn" id="importar-alumnos"><i class="fas fa-file-import"></i> Importar Alumnado</button>
           <input type="file" id="importar-alumnos-file" accept=".json" style="display: none;">
         </div>
       </div>
     </section>
     
     <section class="tareas-section fade-in">
-      <h2 class="panel-title collapsible" id="tareas-title">
-        <i class="fas fa-clipboard-list"></i> Selección de Tareas
-        <i class="fas fa-chevron-down toggle-icon"></i>
-      </h2>
+      <h2 class="panel-title collapsible" id="tareas-title"><i class="fas fa-clipboard-list"></i> Selección de Tareas<i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div class="section-content expanded" id="tareas-content">
         <div class="controls">
-          <button class="btn btn-success" id="exportar-rubricas-csv-tareas">
-            <i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV
-          </button>
+          <button class="btn btn-success" id="exportar-rubricas-csv-tareas"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
         </div>
         
         <div class="tareas-container" id="selector-tareas"></div>
       </div>
     </section>
     
-    <section class="evaluation-section fade-in" id="evaluacion-section">
-      <h2 class="panel-title collapsible" id="evaluacion-title">
-        <i class="fas fa-clipboard-check"></i> Evaluación del Alumnado
-        <i class="fas fa-chevron-down toggle-icon"></i>
-      </h2>
+    <section class="evaluation-section fade-in" id="evaluacion-section" style="display:none">
+      <h2 class="panel-title collapsible" id="evaluacion-title"><i class="fas fa-clipboard-check"></i> Evaluación del Alumnado<i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div class="section-content expanded" id="evaluacion-content">
         <div class="table-container">
           <table id="tabla-evaluacion">
-            <thead>
-              <tr id="tabla-header"></tr>
-            </thead>
+            <thead><tr id="tabla-header"></tr></thead>
             <tbody id="cuerpo-tabla"></tbody>
           </table>
         </div>
         
         <div class="controls">
-          <button class="btn btn-warning" id="calcular-resultados">
-            <i class="fas fa-calculator"></i> Calcular Resultados
-          </button>
-          <button class="btn" id="nueva-evaluacion">
-            <i class="fas fa-sync-alt"></i> Nueva Evaluación
-          </button>
+          <button class="btn btn-warning" id="calcular-resultados"><i class="fas fa-calculator"></i> Calcular Resultados</button>
+          <button class="btn" id="nueva-evaluacion"><i class="fas fa-sync-alt"></i> Nueva Evaluación</button>
         </div>
       </div>
     </section>
     
-    <section class="results-section fade-in" id="resultados-section">
-      <h2 class="panel-title collapsible" id="resultados-title">
-        <i class="fas fa-chart-bar"></i> Resultados de la Evaluación
-        <i class="fas fa-chevron-down toggle-icon"></i>
-      </h2>
+    <section class="results-section fade-in" id="resultados-section" style="display:none">
+      <h2 class="panel-title collapsible" id="resultados-title"><i class="fas fa-chart-bar"></i> Resultados de la Evaluación<i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div class="section-content expanded" id="resultados-content">
         <div class="results-grid" id="resumen-alumnos"></div>
         
         <div class="controls">
-          <button class="btn btn-danger" id="exportar-pdf">
-            <i class="fas fa-file-pdf"></i> Exportar a PDF
-          </button>
-          <button class="btn btn-success" id="exportar-rubricas-csv">
-            <i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV
-          </button>
-          <button class="btn" id="volver-evaluacion">
-            <i class="fas fa-arrow-left"></i> Volver a Evaluación
-          </button>
+          <button class="btn btn-danger" id="exportar-pdf"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+          <button class="btn btn-success" id="exportar-rubricas-csv"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
+          <button class="btn" id="volver-evaluacion"><i class="fas fa-arrow-left"></i> Volver a Evaluación</button>
         </div>
       </div>
     </section>
@@ -1418,1333 +537,1473 @@
     // === CONFIGURACIÓN Y DATOS ===
     // =========================================================================
     
-    const criterios = [
-      "TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1",
-      "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2", "TEC4.6.3"
-    ];
-
-    const tooltipTextos = {
-      "TEC4.1.1": "Idear y planificar soluciones tecnológicas emprendedoras",
-      "TEC4.1.2": "Aplicar estrategias colaborativas de gestión de proyectos",
-      "TEC4.1.3": "Gestionar proyectos de forma creativa",
-      "TEC4.2.1": "Analizar el diseño de productos",
-      "TEC4.2.2": "Fabricar productos tecnológicos",
-      "TEC4.3.1": "Intercambiar información y trabajar en equipo",
-      "TEC4.3.2": "Presentar propuestas tecnológicas",
-      "TEC4.4.1": "Diseñar y simular sistemas automáticos",
-      "TEC4.4.2": "Integrar aplicaciones como IoT, big data o IA",
-      "TEC4.5.1": "Resolver tareas con eficiencia",
-      "TEC4.6.1": "Usar la tecnología con sostenibilidad",
-      "TEC4.6.2": "Valorar beneficios del ecotransporte",
-      "TEC4.6.3": "Valorar proyectos con beneficio social"
+    const CONFIG = {
+      criterios: ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1", "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2", "TEC4.6.3"],
+      tooltipTextos: {
+        "TEC4.1.1": "Idear y planificar soluciones tecnológicas emprendedoras",
+        "TEC4.1.2": "Aplicar estrategias colaborativas de gestión de proyectos",
+        "TEC4.1.3": "Gestionar proyectos de forma creativa",
+        "TEC4.2.1": "Analizar el diseño de productos",
+        "TEC4.2.2": "Fabricar productos tecnológicos",
+        "TEC4.3.1": "Intercambiar información y trabajar en equipo",
+        "TEC4.3.2": "Presentar propuestas tecnológicas",
+        "TEC4.4.1": "Diseñar y simular sistemas automáticos",
+        "TEC4.4.2": "Integrar aplicaciones como IoT, big data o IA",
+        "TEC4.5.1": "Resolver tareas con eficiencia",
+        "TEC4.6.1": "Usar la tecnología con sostenibilidad",
+        "TEC4.6.2": "Valorar beneficios del ecotransporte",
+        "TEC4.6.3": "Valorar proyectos con beneficio social"
+      },
+      tareasCriterios: {
+        "ANÁLISIS": ["TEC4.2.1", "TEC4.3.1", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2"],
+        "ANTEPROYECTO": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.3.1", "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2"],
+        "CUADERNO": ["TEC4.3.1", "TEC4.3.2"],
+        "CUESTIONARIO": ["TEC4.3.1", "TEC4.4.1"],
+        "DEBATE": ["TEC4.3.1", "TEC4.3.2", "TEC4.6.3"],
+        "DIAGRAMA DE FLUJO": ["TEC4.1.1", "TEC4.1.3", "TEC4.2.1", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
+        "DIBUJO TIPO CANVA": ["TEC4.1.1", "TEC4.1.3", "TEC4.2.1", "TEC4.3.1", "TEC4.5.1", "TEC4.6.1"],
+        "EXPOSICION ORAL": ["TEC4.3.1", "TEC4.3.2"],
+        "HOJA DE CÁLCULO": ["TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
+        "INFORME": ["TEC4.2.1", "TEC4.3.1", "TEC4.4.1", "TEC4.4.2"],
+        "LÁMINA DE DIBUJO": ["TEC4.1.1", "TEC4.2.2", "TEC4.3.1"],
+        "LIBRECAD": ["TEC4.1.1", "TEC4.2.2", "TEC4.5.1"],
+        "LÍNEA DE TIEMPO": ["TEC4.3.1", "TEC4.5.1", "TEC4.6.3"],
+        "MAPA CONCEPTUAL": ["TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
+        "MAQUETA": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.2", "TEC4.4.1", "TEC4.4.2", "TEC4.6.1", "TEC4.6.2"],
+        "MEMORIA FINAL": ["TEC4.1.1", "TEC4.2.1", "TEC4.3.1", "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
+        "PODCAST / AUDIO": ["TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
+        "PRÁCTICA": ["TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.4.1", "TEC4.6.1", "TEC4.6.2"],
+        "PRESENTACIÓN DIGITAL": ["TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
+        "PROGRAMA/APLICACIÓN": ["TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
+        "PRUEBA ESCRITA": ["TEC4.3.1", "TEC4.4.1"],
+        "PRUEBA ORAL": ["TEC4.3.1", "TEC4.3.2", "TEC4.4.1"],
+        "RESOLUCIÓN DE PROBLEMAS": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1", "TEC4.4.1"],
+        "SIMULACIÓN": ["TEC4.1.1", "TEC4.2.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
+        "SKETCHUP / TINKERCAD 3D": ["TEC4.1.1", "TEC4.2.2", "TEC4.5.1"],
+        "SUPUESTO PRÁCTICO": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1", "TEC4.4.1"],
+        "VIDEO": ["TEC4.1.1", "TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
+        "WIKI": ["TEC4.1.1", "TEC4.3.1", "TEC4.3.2", "TEC4.5.1"]
+      },
+      maxAlumnos: 50
     };
 
-    const tareasCriterios = {
-      "ANÁLISIS": ["TEC4.2.1", "TEC4.3.1", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2"],
-      "ANTEPROYECTO": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.3.1", "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1", "TEC4.6.1", "TEC4.6.2"],
-      "CUADERNO": ["TEC4.3.1", "TEC4.3.2"],
-      "CUESTIONARIO": ["TEC4.3.1", "TEC4.4.1"],
-      "DEBATE": ["TEC4.3.1", "TEC4.3.2", "TEC4.6.3"],
-      "DIAGRAMA DE FLUJO": ["TEC4.1.1", "TEC4.1.3", "TEC4.2.1", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
-      "DIBUJO TIPO CANVA": ["TEC4.1.1", "TEC4.1.3", "TEC4.2.1", "TEC4.3.1", "TEC4.5.1", "TEC4.6.1"],
-      "EXPOSICION ORAL": ["TEC4.3.1", "TEC4.3.2"],
-      "HOJA DE CÁLCULO": ["TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
-      "INFORME": ["TEC4.2.1", "TEC4.3.1", "TEC4.4.1", "TEC4.4.2"],
-      "LÁMINA DE DIBUJO": ["TEC4.1.1", "TEC4.2.2", "TEC4.3.1"],
-      "LIBRECAD": ["TEC4.1.1", "TEC4.2.2", "TEC4.5.1"],
-      "LÍNEA DE TIEMPO": ["TEC4.3.1", "TEC4.5.1", "TEC4.6.3"],
-      "MAPA CONCEPTUAL": ["TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
-      "MAQUETA": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.2", "TEC4.4.1", "TEC4.4.2", "TEC4.6.1", "TEC4.6.2"],
-      "MEMORIA FINAL": ["TEC4.1.1", "TEC4.2.1", "TEC4.3.1", "TEC4.3.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
-      "PODCAST / AUDIO": ["TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
-      "PRÁCTICA": ["TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.4.1", "TEC4.6.1", "TEC4.6.2"],
-      "PRESENTACIÓN DIGITAL": ["TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
-      "PROGRAMA/APLICACIÓN": ["TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
-      "PRUEBA ESCRITA": ["TEC4.3.1", "TEC4.4.1"],
-      "PRUEBA ORAL": ["TEC4.3.1", "TEC4.3.2", "TEC4.4.1"],
-      "RESOLUCIÓN DE PROBLEMAS": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1", "TEC4.4.1"],
-      "SIMULACIÓN": ["TEC4.1.1", "TEC4.2.2", "TEC4.4.1", "TEC4.4.2", "TEC4.5.1"],
-      "SKETCHUP / TINKERCAD 3D": ["TEC4.1.1", "TEC4.2.2", "TEC4.5.1"],
-      "SUPUESTO PRÁCTICO": ["TEC4.1.1", "TEC4.1.2", "TEC4.1.3", "TEC4.2.1", "TEC4.2.2", "TEC4.3.1", "TEC4.4.1"],
-      "VIDEO": ["TEC4.1.1", "TEC4.3.1", "TEC4.3.2", "TEC4.5.1"],
-      "WIKI": ["TEC4.1.1", "TEC4.3.1", "TEC4.3.2", "TEC4.5.1"]
+    // =========================================================================
+    // === ESTADO GLOBAL DE LA APLICACIÓN ===
+    // =========================================================================
+    
+    const AppState = {
+      alumnos: [],
+      tareasSeleccionadas: [],
+      valoresTareas: {},
+      resultados: {},
+      criteriosPorTarea: {},
+      githubToken: localStorage.getItem('githubToken') || ''
     };
 
-    // Variables globales
-    let alumnos = [];
-    let tareasSeleccionadas = [];
-    let valoresTareas = {};
-    let resultados = {};
-    let criteriosPorTarea = {};
-    let githubToken = localStorage.getItem('githubToken') || '';
-
     // =========================================================================
-    // === FUNCIÓN PARA NORMALIZAR IDs ===
+    // === FUNCIONES DE UTILIDAD ===
     // =========================================================================
-
-    /**
-     * Normaliza un texto para crear un ID válido para CSS
-     * Elimina acentos, reemplaza espacios y caracteres especiales
-     */
-    function normalizarId(texto) {
-      return texto
-        .normalize('NFD') // Normaliza caracteres con acentos
-        .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos
-        .replace(/[^a-zA-Z0-9]/g, '_') // Reemplaza caracteres no alfanuméricos con _
-        .replace(/_+/g, '_') // Reemplaza múltiples _ con uno solo
-        .replace(/^_|_$/g, ''); // Elimina _ al principio o final
-    }
-
-    // =========================================================================
-    // === FUNCIONES DE GITHUB GISTS ===
-    // =========================================================================
-
-    /**
-     * Verifica si el token de GitHub está configurado y es válido
-     */
-    function verificarTokenGitHub() {
-      const githubStatus = document.getElementById('github-status');
+    
+    const Utils = {
+      normalizarId(texto) {
+        return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+      },
       
-      if (!githubToken) {
-        githubStatus.innerHTML = '<i class="fas fa-info-circle"></i> No configurado. Introduce tu token de GitHub.';
-        githubStatus.className = 'github-status disconnected';
-        return false;
-      }
-      
-      // Verificar el token haciendo una petición simple a la API de GitHub
-      fetch('https://api.github.com/user', {
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Accept': 'application/vnd.github.v3+json'
+      validarNumeroPositivo(input, min = 0, max = null) {
+        let value = parseFloat(input.value);
+        if (isNaN(value) || value < min) {
+          input.value = min;
+          this.mostrarErrorInput(input);
+          return min;
         }
-      })
-      .then(response => {
-        if (response.ok) {
-          githubStatus.innerHTML = '<i class="fas fa-check-circle"></i> Conectado a GitHub. Token válido.';
-          githubStatus.className = 'github-status connected';
-          return true;
+        if (max !== null && value > max) {
+          input.value = max;
+          this.mostrarErrorInput(input);
+          return max;
+        }
+        return value;
+      },
+      
+      mostrarErrorInput(input) {
+        input.classList.add('invalid');
+        setTimeout(() => input.classList.remove('invalid'), 1000);
+      },
+      
+      ajustarTooltips() {
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+          const rect = element.getBoundingClientRect();
+          const tooltipWidth = 250;
+          element.classList.remove('tooltip-left', 'tooltip-right');
+          
+          if (rect.left < tooltipWidth / 2) {
+            element.classList.add('tooltip-left');
+          } else if (window.innerWidth - rect.right < tooltipWidth / 2) {
+            element.classList.add('tooltip-right');
+          }
+        });
+      },
+      
+      scrollToElement(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    // =========================================================================
+    // === GESTIÓN DE TAREAS ===
+    // =========================================================================
+    
+    const TareasManager = {
+      inicializar() {
+        this.generarSelectorTareas();
+        this.configurarEventosTareas();
+      },
+      
+      generarSelectorTareas() {
+        const selectorDiv = document.getElementById("selector-tareas");
+        
+        // Inicializar criterios por tarea
+        Object.keys(CONFIG.tareasCriterios).forEach(tarea => {
+          AppState.criteriosPorTarea[tarea] = [...CONFIG.tareasCriterios[tarea]];
+        });
+        
+        selectorDiv.innerHTML = Object.keys(CONFIG.tareasCriterios).map(tarea => `
+          <div class="tarea-item">
+            <div class="tarea-header">
+              <label><input type="checkbox" class="tarea-checkbox" value="${tarea}"> ${tarea}</label>
+              <input type="number" min="1" value="10" class="valor-input" data-tarea="${tarea}" placeholder="Valor">
+            </div>
+            <div class="tarea-criteria">
+              <h4>Criterios de evaluación <i class="fas fa-chevron-down"></i></h4>
+              <div class="criterios-list" id="criterios-${Utils.normalizarId(tarea)}">
+                ${CONFIG.criterios.map(criterio => this.generarCheckboxCriterio(tarea, criterio)).join('')}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      },
+      
+      generarCheckboxCriterio(tarea, criterio) {
+        const idNormalizado = `criterio-${Utils.normalizarId(tarea)}-${Utils.normalizarId(criterio)}`;
+        const isChecked = AppState.criteriosPorTarea[tarea].includes(criterio);
+        
+        return `
+          <div class="criterio-item">
+            <input type="checkbox" id="${idNormalizado}" value="${criterio}" 
+                   ${isChecked ? 'checked' : ''} data-tarea="${tarea}">
+            <label for="${idNormalizado}" data-tooltip="${CONFIG.tooltipTextos[criterio] || 'Descripción no disponible'}">
+              ${criterio}
+            </label>
+          </div>
+        `;
+      },
+      
+      configurarEventosTareas() {
+        // Evento para checkboxes de criterios
+        document.addEventListener('change', (e) => {
+          if (e.target.matches('.criterio-item input')) {
+            this.actualizarCriterioTarea(e.target);
+          }
+        });
+        
+        // Evento para toggle de criterios
+        document.addEventListener('click', (e) => {
+          if (e.target.matches('.tarea-criteria h4') || e.target.matches('.tarea-criteria h4 i')) {
+            const header = e.target.closest('h4');
+            const icon = header.querySelector('i');
+            const criteriosList = header.nextElementSibling;
+            const isHidden = criteriosList.style.display === 'none' || !criteriosList.style.display;
+            
+            criteriosList.style.display = isHidden ? 'grid' : 'none';
+            icon.classList.toggle('rotated', isHidden);
+            setTimeout(Utils.ajustarTooltips, 50);
+          }
+        });
+        
+        // Evento para validar valores de tareas
+        document.addEventListener('input', (e) => {
+          if (e.target.matches('.valor-input')) {
+            Utils.validarNumeroPositivo(e.target, 1);
+          }
+        });
+      },
+      
+      actualizarCriterioTarea(checkbox) {
+        const tarea = checkbox.dataset.tarea;
+        const criterio = checkbox.value;
+        
+        if (checkbox.checked) {
+          if (!AppState.criteriosPorTarea[tarea].includes(criterio)) {
+            AppState.criteriosPorTarea[tarea].push(criterio);
+          }
         } else {
-          githubStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Token inválido. Verifica tu token de GitHub.';
-          githubStatus.className = 'github-status disconnected';
+          AppState.criteriosPorTarea[tarea] = AppState.criteriosPorTarea[tarea].filter(c => c !== criterio);
+        }
+      },
+      
+      seleccionarTodas() {
+        document.querySelectorAll('.tarea-checkbox').forEach(cb => cb.checked = true);
+      },
+      
+      deseleccionarTodas() {
+        document.querySelectorAll('.tarea-checkbox').forEach(cb => cb.checked = false);
+      }
+    };
+
+    // =========================================================================
+    // === GESTIÓN DE ALUMNOS ===
+    // =========================================================================
+    
+    const AlumnosManager = {
+      generarFormulario() {
+        const numAlumnosInput = document.getElementById('num-alumnos');
+        let numAlumnos = parseInt(numAlumnosInput.value);
+        
+        if (isNaN(numAlumnos)) {
+          numAlumnos = 5;
+          numAlumnosInput.value = 5;
+        } else if (numAlumnos < 1) {
+          numAlumnos = 1;
+          numAlumnosInput.value = 1;
+        } else if (numAlumnos > CONFIG.maxAlumnos) {
+          numAlumnos = CONFIG.maxAlumnos;
+          numAlumnosInput.value = CONFIG.maxAlumnos;
+        }
+        
+        const alumnosContainer = document.getElementById('alumnos-container');
+        alumnosContainer.innerHTML = '';
+        
+        for (let i = 0; i < numAlumnos; i++) {
+          const alumnoItem = document.createElement('div');
+          alumnoItem.className = 'alumno-item';
+          
+          const nombreGuardado = AppState.alumnos[i] || '';
+          
+          alumnoItem.innerHTML = `
+            <div class="alumno-header">
+              <label>Alumno ${i + 1}</label>
+            </div>
+            <input type="text" class="alumno-input" value="${nombreGuardado}" placeholder="Nombre completo">
+          `;
+          alumnosContainer.appendChild(alumnoItem);
+        }
+        
+        document.getElementById('nombres-alumnos-section').style.display = 'block';
+        Utils.scrollToElement('nombres-alumnos-section');
+      },
+      
+      guardar() {
+        const inputsAlumnos = document.querySelectorAll('.alumno-input');
+        AppState.alumnos = [];
+        let todosLlenos = true;
+        let nombresVacios = [];
+        
+        inputsAlumnos.forEach((input, index) => {
+          const nombre = input.value.trim();
+          
+          if (nombre === '') {
+            nombresVacios.push(index + 1);
+            todosLlenos = false;
+          } else {
+            AppState.alumnos.push(nombre);
+          }
+        });
+        
+        if (!todosLlenos) {
+          if (nombresVacios.length > 0) {
+            alert(`Por favor, ingrese el nombre para los siguientes alumnos: ${nombresVacios.join(', ')}`);
+          }
           return false;
         }
-      })
-      .catch(error => {
-        githubStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión. Verifica tu conexión a Internet.';
-        githubStatus.className = 'github-status disconnected';
-        return false;
-      });
-      
-      return true;
-    }
-
-    /**
-     * Guarda el token de GitHub en localStorage
-     */
-    function guardarTokenGitHub() {
-      const tokenInput = document.getElementById('github-token');
-      githubToken = tokenInput.value.trim();
-      
-      if (!githubToken) {
-        alert('Por favor, introduce un token de GitHub válido.');
-        return;
-      }
-      
-      localStorage.setItem('githubToken', githubToken);
-      tokenInput.value = ''; // Limpiar el campo por seguridad
-      
-      // Verificar el token
-      verificarTokenGitHub();
-      
-      alert('Token guardado correctamente.');
-    }
-
-    /**
-     * Elimina el token de GitHub de localStorage
-     */
-    function eliminarTokenGitHub() {
-      if (confirm('¿Estás seguro de que quieres eliminar el token de GitHub?')) {
-        githubToken = '';
-        localStorage.removeItem('githubToken');
-        document.getElementById('github-status').innerHTML = '<i class="fas fa-info-circle"></i> Token eliminado.';
-        document.getElementById('github-status').className = 'github-status disconnected';
-        alert('Token eliminado correctamente.');
-      }
-    }
-
-    /**
-     * Prepara los datos de la evaluación para guardar en Gist
-     */
-    function prepararDatosParaGist() {
-      // Recopilar todas las puntuaciones de los alumnos
-      const puntuaciones = {};
-      
-      alumnos.forEach((alumno, index) => {
-        puntuaciones[alumno] = {};
         
-        tareasSeleccionadas.forEach(tarea => {
-          const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
-          const input = inputs[index];
-          const maxValor = valoresTareas[tarea];
-          const value = validarNumeroPositivo(input, 0, maxValor);
-          
-          puntuaciones[alumno][tarea] = value;
-        });
-      });
+        return true;
+      },
       
-      // Crear objeto con todos los datos
-      const datosEvaluacion = {
-        clase: document.getElementById('nombre-clase').value,
-        actividad: document.getElementById('actividad').value,
-        fecha: new Date().toISOString(),
-        alumnos: alumnos,
-        tareasSeleccionadas: tareasSeleccionadas,
-        criteriosPorTarea: criteriosPorTarea,
-        valoresTareas: valoresTareas,
-        puntuaciones: puntuaciones,
-        resultados: resultados
-      };
-      
-      return datosEvaluacion;
-    }
-
-    /**
-     * Guarda la evaluación actual en un nuevo Gist de GitHub (no sobrescribe)
-     */
-    async function guardarEnGist() {
-      if (!githubToken) {
-        alert('Primero debes configurar tu token de GitHub.');
-        return;
-      }
-      
-      // Verificar que hay datos para guardar
-      if (alumnos.length === 0 || tareasSeleccionadas.length === 0) {
-        alert('No hay datos de evaluación para guardar. Configura los alumnos y selecciona tareas primero.');
-        return;
-      }
-      
-      const datosEvaluacion = prepararDatosParaGist();
-      const descripcion = document.getElementById('gist-description').value || 
-                         `Evaluación: ${datosEvaluacion.actividad} - ${datosEvaluacion.clase}`;
-      
-      const nombreArchivo = `evaluacion_${datosEvaluacion.clase}_${datosEvaluacion.actividad}_${new Date().toISOString().slice(0, 10)}.json`;
-      
-      const gistData = {
-        description: descripcion,
-        public: false,
-        files: {
-          [nombreArchivo]: {
-            content: JSON.stringify(datosEvaluacion, null, 2)
-          }
-        }
-      };
-      
-      try {
-        const response = await fetch('https://api.github.com/gists', {
-          method: 'POST',
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json'
-          },
-          body: JSON.stringify(gistData)
+      actualizarInterfaz() {
+        const alumnosContainer = document.getElementById('alumnos-container');
+        alumnosContainer.innerHTML = '';
+        
+        AppState.alumnos.forEach((alumno, index) => {
+          const alumnoItem = document.createElement('div');
+          alumnoItem.className = 'alumno-item';
+          alumnoItem.innerHTML = `
+            <div class="alumno-header">
+              <label>Alumno ${index + 1}</label>
+            </div>
+            <input type="text" class="alumno-input" value="${alumno}" placeholder="Nombre completo">
+          `;
+          alumnosContainer.appendChild(alumnoItem);
         });
         
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        alert(`Evaluación guardada correctamente en GitHub Gists.\n\nID del Gist: ${data.id}\nURL: ${data.html_url}`);
-        
-      } catch (error) {
-        console.error('Error al guardar en Gist:', error);
-        alert(`Error al guardar en GitHub Gists: ${error.message}`);
-      }
-    }
-
-    /**
-     * Muestra un modal con todas las evaluaciones guardadas en GitHub Gists
-     */
-    async function mostrarEvaluacionesGuardadas() {
-      if (!githubToken) {
-        alert('Primero debes configurar tu token de GitHub.');
-        return;
-      }
+        document.getElementById('nombres-alumnos-section').style.display = 'block';
+      },
       
-      const modal = document.getElementById('gists-modal');
-      const loading = document.getElementById('gists-loading');
-      const list = document.getElementById('gists-list');
-      const empty = document.getElementById('gists-empty');
-      
-      // Mostrar modal y estado de carga
-      modal.style.display = 'flex';
-      loading.style.display = 'block';
-      list.style.display = 'none';
-      empty.style.display = 'none';
-      
-      try {
-        // Obtener todos los gists del usuario
-        const response = await fetch('https://api.github.com/gists', {
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
+      exportar() {
+        const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
+        const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
         
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-        
-        const gists = await response.json();
-        
-        // Filtrar solo los gists que contienen evaluaciones
-        const evaluaciones = gists.filter(gist => {
-          return Object.keys(gist.files).some(filename => 
-            filename.startsWith('evaluacion_') && filename.endsWith('.json')
-          );
-        });
-        
-        // Ocultar carga y mostrar resultados
-        loading.style.display = 'none';
-        
-        if (evaluaciones.length === 0) {
-          empty.style.display = 'block';
+        if (AppState.alumnos.length === 0) {
+          alert("No hay alumnos guardados para exportar.");
           return;
         }
         
-        list.style.display = 'block';
-        list.innerHTML = '';
-        
-        // Ordenar por fecha de creación (más recientes primero)
-        evaluaciones.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        
-        // Crear elementos para cada evaluación
-        evaluaciones.forEach(gist => {
-          const evaluacionFile = Object.keys(gist.files).find(filename => 
-            filename.startsWith('evaluacion_') && filename.endsWith('.json')
-          );
-          
-          if (!evaluacionFile) return;
-          
-          const item = document.createElement('div');
-          item.className = 'gist-item';
-          item.dataset.gistId = gist.id;
-          
-          const fecha = new Date(gist.created_at).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-          
-          item.innerHTML = `
-            <div class="gist-header">
-              <div class="gist-title">${gist.description || 'Evaluación sin descripción'}</div>
-              <div class="gist-date">${fecha}</div>
-            </div>
-            <div class="gist-description">${evaluacionFile}</div>
-          `;
-          
-          item.addEventListener('click', () => {
-            cargarEvaluacionDesdeGist(gist.id);
-          });
-          
-          list.appendChild(item);
-        });
-        
-      } catch (error) {
-        console.error('Error al cargar evaluaciones:', error);
-        loading.style.display = 'none';
-        alert(`Error al cargar las evaluaciones guardadas: ${error.message}`);
-      }
-    }
-
-    /**
-     * Carga una evaluación específica desde un Gist
-     */
-    async function cargarEvaluacionDesdeGist(gistId) {
-      try {
-        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-        
-        const gist = await response.json();
-        
-        // Buscar archivo de evaluación
-        const evaluacionFile = Object.keys(gist.files).find(filename => 
-          filename.startsWith('evaluacion_') && filename.endsWith('.json')
-        );
-        
-        if (!evaluacionFile) {
-          throw new Error('No se encontró un archivo de evaluación en este Gist.');
-        }
-        
-        // Cargar los datos del archivo
-        const contenido = gist.files[evaluacionFile].content;
-        const datosEvaluacion = JSON.parse(contenido);
-        
-        // Restaurar los datos en la aplicación
-        restaurarDatosDesdeGist(datosEvaluacion);
-        
-        // Cerrar el modal
-        document.getElementById('gists-modal').style.display = 'none';
-        
-        alert(`Evaluación cargada correctamente:\n\nClase: ${datosEvaluacion.clase}\nActividad: ${datosEvaluacion.actividad}\nFecha: ${new Date(datosEvaluacion.fecha).toLocaleDateString()}`);
-        
-      } catch (error) {
-        console.error('Error al cargar desde Gist:', error);
-        alert(`Error al cargar la evaluación: ${error.message}`);
-      }
-    }
-
-    /**
-     * Restaura los datos de la evaluación desde un objeto cargado desde Gist
-     */
-    function restaurarDatosDesdeGist(datosEvaluacion) {
-      // Restaurar configuración básica
-      document.getElementById('nombre-clase').value = datosEvaluacion.clase;
-      document.getElementById('actividad').value = datosEvaluacion.actividad;
-      
-      // Restaurar alumnos
-      alumnos = datosEvaluacion.alumnos;
-      actualizarInterfazAlumnos();
-      
-      // Restaurar tareas y criterios
-      tareasSeleccionadas = datosEvaluacion.tareasSeleccionadas;
-      criteriosPorTarea = datosEvaluacion.criteriosPorTarea;
-      valoresTareas = datosEvaluacion.valoresTareas;
-      
-      // Marcar las tareas seleccionadas en la interfaz
-      document.querySelectorAll('.tarea-checkbox').forEach(cb => {
-        cb.checked = tareasSeleccionadas.includes(cb.value);
-      });
-      
-      // Actualizar los valores de las tareas
-      Object.keys(valoresTareas).forEach(tarea => {
-        const valorInput = document.querySelector(`.valor-input[data-tarea="${tarea}"]`);
-        if (valorInput) {
-          valorInput.value = valoresTareas[tarea];
-        }
-      });
-      
-      // Actualizar los criterios seleccionados para cada tarea
-      Object.keys(criteriosPorTarea).forEach(tarea => {
-        criteriosPorTarea[tarea].forEach(criterio => {
-          // Usar IDs normalizados para los selectores
-          const idNormalizado = `criterio-${normalizarId(tarea)}-${normalizarId(criterio)}`;
-          const checkbox = document.getElementById(idNormalizado);
-          if (checkbox) {
-            checkbox.checked = true;
-          }
-        });
-      });
-      
-      // Generar la interfaz de evaluación
-      generarEvaluacion();
-      
-      // Restaurar las puntuaciones si existen
-      if (datosEvaluacion.puntuaciones) {
-        alumnos.forEach((alumno, alumnoIndex) => {
-          tareasSeleccionadas.forEach(tarea => {
-            const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
-            const input = inputs[alumnoIndex];
-            if (input && datosEvaluacion.puntuaciones[alumno] && datosEvaluacion.puntuaciones[alumno][tarea]) {
-              input.value = datosEvaluacion.puntuaciones[alumno][tarea];
-            }
-          });
-        });
-      }
-      
-      // Si hay resultados calculados, restaurarlos
-      if (datosEvaluacion.resultados && Object.keys(datosEvaluacion.resultados).length > 0) {
-        resultados = datosEvaluacion.resultados;
-        mostrarResultados();
-      }
-    }
-
-    // =========================================================================
-    // === FUNCIONES PRINCIPALES DE LA APLICACIÓN ===
-    // =========================================================================
-
-    // Función para ajustar posición de tooltips
-    function ajustarTooltips() {
-      document.querySelectorAll('[data-tooltip]').forEach(element => {
-        const rect = element.getBoundingClientRect();
-        const tooltipWidth = 250; // Ancho estimado del tooltip
-        
-        // Si el elemento está cerca del borde izquierdo
-        if (rect.left < tooltipWidth / 2) {
-          element.classList.add('tooltip-left');
-          element.classList.remove('tooltip-right');
-        } 
-        // Si el elemento está cerca del borde derecho
-        else if (window.innerWidth - rect.right < tooltipWidth / 2) {
-          element.classList.add('tooltip-right');
-          element.classList.remove('tooltip-left');
-        } 
-        // En el centro
-        else {
-          element.classList.remove('tooltip-left', 'tooltip-right');
-        }
-      });
-    }
-
-    function validarNumeroPositivo(input, min = 0, max = null) {
-      let value = parseFloat(input.value);
-      
-      if (isNaN(value)) {
-        input.value = min;
-        input.classList.add('invalid');
-        setTimeout(() => input.classList.remove('invalid'), 1000);
-        return min;
-      }
-      
-      if (value < min) {
-        input.value = min;
-        input.classList.add('invalid');
-        setTimeout(() => input.classList.remove('invalid'), 1000);
-        return min;
-      }
-      
-      if (max !== null && value > max) {
-        input.value = max;
-        input.classList.add('invalid');
-        setTimeout(() => input.classList.remove('invalid'), 1000);
-        return max;
-      }
-      
-      return value;
-    }
-
-    function inicializarTareas() {
-      const selectorDiv = document.getElementById("selector-tareas");
-      selectorDiv.innerHTML = '';
-      
-      Object.keys(tareasCriterios).forEach(tarea => {
-        criteriosPorTarea[tarea] = [...tareasCriterios[tarea]];
-      });
-      
-      Object.keys(tareasCriterios).forEach(tarea => {
-        const item = document.createElement("div");
-        item.className = "tarea-item";
-        
-        item.innerHTML = `
-          <div class="tarea-header">
-            <label>
-              <input type="checkbox" class="tarea-checkbox" value="${tarea}"> 
-              ${tarea}
-            </label>
-            <input type="number" min="1" value="10" class="valor-input" 
-                   data-tarea="${tarea}" placeholder="Valor">
-          </div>
-          <div class="tarea-criteria">
-            <h4>
-              Criterios de evaluación 
-              <i class="fas fa-chevron-down"></i>
-            </h4>
-            <div class="criterios-list" id="criterios-${normalizarId(tarea)}"></div>
-          </div>
-        `;
-        selectorDiv.appendChild(item);
-        
-        const valorInput = item.querySelector('.valor-input');
-        valorInput.addEventListener('input', function() {
-          validarNumeroPositivo(this, 1);
-        });
-        
-        const criteriosContainer = document.getElementById(`criterios-${normalizarId(tarea)}`);
-        criterios.forEach(criterio => {
-          const isChecked = criteriosPorTarea[tarea].includes(criterio);
-          const criterioItem = document.createElement("div");
-          criterioItem.className = "criterio-item";
-          
-          // Usar IDs normalizados
-          const idNormalizado = `criterio-${normalizarId(tarea)}-${normalizarId(criterio)}`;
-          
-          criterioItem.innerHTML = `
-            <input type="checkbox" id="${idNormalizado}" 
-                   value="${criterio}" ${isChecked ? 'checked' : ''}
-                   data-tarea="${tarea}">
-            <label for="${idNormalizado}" 
-                   data-tooltip="${tooltipTextos[criterio] || 'Descripción no disponible'}">${criterio}</label>
-          `;
-          criteriosContainer.appendChild(criterioItem);
-        });
-        
-        const toggleIcon = item.querySelector('.tarea-criteria h4 i');
-        const criteriosList = item.querySelector('.criterios-list');
-        item.querySelector('.tarea-criteria h4').addEventListener('click', () => {
-          if (criteriosList.style.display === 'none' || !criteriosList.style.display) {
-            criteriosList.style.display = 'grid';
-            toggleIcon.classList.add('rotated');
-          } else {
-            criteriosList.style.display = 'none';
-            toggleIcon.classList.remove('rotated');
-          }
-          setTimeout(ajustarTooltips, 50);
-        });
-      });
-      
-      document.querySelectorAll('.criterio-item input').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          const tarea = this.getAttribute('data-tarea');
-          const criterio = this.value;
-          
-          if (this.checked) {
-            if (!criteriosPorTarea[tarea].includes(criterio)) {
-              criteriosPorTarea[tarea].push(criterio);
-            }
-          } else {
-            criteriosPorTarea[tarea] = criteriosPorTarea[tarea].filter(c => c !== criterio);
-          }
-        });
-      });
-      
-      setTimeout(ajustarTooltips, 100);
-    }
-
-    function generarFormularioAlumnos() {
-      const numAlumnosInput = document.getElementById('num-alumnos');
-      let numAlumnos = parseInt(numAlumnosInput.value);
-      
-      if (isNaN(numAlumnos)) {
-        numAlumnos = 5;
-        numAlumnosInput.value = 5;
-      } else if (numAlumnos < 1) {
-        numAlumnos = 1;
-        numAlumnosInput.value = 1;
-      } else if (numAlumnos > 50) {
-        numAlumnos = 50;
-        numAlumnosInput.value = 50;
-      }
-      
-      const alumnosContainer = document.getElementById('alumnos-container');
-      alumnosContainer.innerHTML = '';
-      
-      for (let i = 0; i < numAlumnos; i++) {
-        const alumnoItem = document.createElement('div');
-        alumnoItem.className = 'alumno-item';
-        
-        const nombreGuardado = alumnos[i] || '';
-        
-        alumnoItem.innerHTML = `
-          <div class="alumno-header">
-            <label>Alumno ${i + 1}</label>
-          </div>
-          <input type="text" class="alumno-input" value="${nombreGuardado}" placeholder="Nombre completo">
-        `;
-        alumnosContainer.appendChild(alumnoItem);
-      }
-      
-      document.getElementById('nombres-alumnos-section').style.display = 'block';
-      document.getElementById('nombres-alumnos-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function guardarAlumnos() {
-      const inputsAlumnos = document.querySelectorAll('.alumno-input');
-      alumnos = [];
-      let todosLlenos = true;
-      let nombresVacios = [];
-      
-      inputsAlumnos.forEach((input, index) => {
-        const nombre = input.value.trim();
-        
-        if (nombre === '') {
-          nombresVacios.push(index + 1);
-          todosLlenos = false;
-        } else {
-          alumnos.push(nombre);
-        }
-      });
-      
-      if (!todosLlenos) {
-        if (nombresVacios.length > 0) {
-          alert(`Por favor, ingrese el nombre para los siguientes alumnos: ${nombresVacios.join(', ')}`);
-        }
-        return;
-      }
-      
-      alert(`Nombres de ${alumnos.length} alumnos guardados correctamente`);
-    }
-
-    function generarEvaluacion() {
-      tareasSeleccionadas = [];
-      valoresTareas = {};
-      
-      document.querySelectorAll('.tarea-checkbox:checked').forEach(cb => {
-        const tarea = cb.value;
-        tareasSeleccionadas.push(tarea);
-        const valorInput = document.querySelector(`.valor-input[data-tarea="${tarea}"]`);
-        valoresTareas[tarea] = validarNumeroPositivo(valorInput, 1);
-      });
-      
-      if (tareasSeleccionadas.length === 0) {
-        alert("Por favor, seleccione al menos una tarea.");
-        return;
-      }
-      
-      if (alumnos.length === 0) {
-        alert("Por favor, configure primero los alumnos.");
-        return;
-      }
-      
-      document.getElementById('evaluacion-section').style.display = 'block';
-      document.getElementById('resultados-section').style.display = 'none';
-      
-      const tablaHeader = document.getElementById('tabla-header');
-      tablaHeader.innerHTML = '<th>Tarea</th><th class="max-value-cell">Valor Máx</th>';
-      
-      alumnos.forEach(alumno => {
-        tablaHeader.innerHTML += `<th class="student-header-cell">${alumno}</th>`;
-      });
-      
-      const cuerpoTabla = document.getElementById('cuerpo-tabla');
-      cuerpoTabla.innerHTML = '';
-      
-      tareasSeleccionadas.forEach(tarea => {
-        const fila = document.createElement('tr');
-        const maxValor = valoresTareas[tarea];
-        
-        const criteriosDesc = criteriosPorTarea[tarea].map(c => {
-          return `${c}: ${tooltipTextos[c] || 'Sin descripción'}`;
-        }).join('\n');
-        
-        fila.innerHTML = `
-          <td class="criteria-cell" data-tooltip="${criteriosDesc}">
-            ${tarea}
-          </td>
-          <td class="max-value-cell">${maxValor}</td>
-        `;
-        
-        alumnos.forEach(() => {
-          fila.innerHTML += `
-            <td>
-              <input type="number" min="0" max="${maxValor}" value="0" class="student-score" 
-                     data-tarea="${tarea}" placeholder="Punt">
-            </td>
-          `;
-        });
-        
-        cuerpoTabla.appendChild(fila);
-      });
-      
-      const scoreInputs = document.querySelectorAll('.student-score');
-      scoreInputs.forEach(input => {
-        input.addEventListener('input', function() {
-          const max = parseFloat(this.getAttribute('max'));
-          validarNumeroPositivo(this, 0, max);
-        });
-      });
-      
-      setTimeout(ajustarTooltips, 100);
-      document.getElementById('evaluacion-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function calcularResultados() {
-      resultados = {};
-      
-      const criteriosEvaluados = new Set();
-      tareasSeleccionadas.forEach(tarea => {
-        criteriosPorTarea[tarea].forEach(criterio => {
-          criteriosEvaluados.add(criterio);
-        });
-      });
-      
-      alumnos.forEach((alumno, alumnoIndex) => {
-        resultados[alumno] = {
-          tareas: {},
-          criterios: {},
-          promedio: 0
+        const datos = {
+          clase: nombreClase,
+          actividad: actividad,
+          fechaExportacion: new Date().toISOString(),
+          alumnos: AppState.alumnos
         };
         
-        tareasSeleccionadas.forEach(tarea => {
-          const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
-          const input = inputs[alumnoIndex];
-          const maxValor = valoresTareas[tarea];
-          const value = validarNumeroPositivo(input, 0, maxValor);
-          
-          resultados[alumno].tareas[tarea] = value;
+        const datosStr = JSON.stringify(datos, null, 2);
+        const blob = new Blob([datosStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Actividades_${nombreClase}_Alumnado.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
+      },
+      
+      importar(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const datos = JSON.parse(e.target.result);
+            
+            if (!datos.clase || !Array.isArray(datos.alumnos)) {
+              throw new Error('El archivo no tiene el formato correcto.');
+            }
+            
+            document.getElementById('nombre-clase').value = datos.clase;
+            
+            if (datos.actividad) {
+              document.getElementById('actividad').value = datos.actividad;
+            }
+            
+            document.getElementById('num-alumnos').value = datos.alumnos.length;
+            
+            AppState.alumnos = datos.alumnos;
+            
+            AlumnosManager.actualizarInterfaz();
+            
+            alert(`Alumnado de la clase ${datos.clase} importado correctamente. Se han cargado ${datos.alumnos.length} alumnos.`);
+            
+            event.target.value = '';
+            
+          } catch (error) {
+            alert('Error al importar el archivo: ' + error.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+
+    // =========================================================================
+    // === EVALUACIÓN Y RESULTADOS ===
+    // =========================================================================
+    
+    const EvaluationManager = {
+      generar() {
+        AppState.tareasSeleccionadas = [];
+        AppState.valoresTareas = {};
+        
+        document.querySelectorAll('.tarea-checkbox:checked').forEach(cb => {
+          const tarea = cb.value;
+          AppState.tareasSeleccionadas.push(tarea);
+          const valorInput = document.querySelector(`.valor-input[data-tarea="${tarea}"]`);
+          AppState.valoresTareas[tarea] = Utils.validarNumeroPositivo(valorInput, 1);
         });
         
-        Array.from(criteriosEvaluados).forEach(criterio => {
-          let sumaPuntuacion = 0;
-          let sumaMaximo = 0;
+        if (AppState.tareasSeleccionadas.length === 0) {
+          alert("Por favor, seleccione al menos una tarea.");
+          return;
+        }
+        
+        if (AppState.alumnos.length === 0) {
+          alert("Por favor, configure primero los alumnos.");
+          return;
+        }
+        
+        document.getElementById('evaluacion-section').style.display = 'block';
+        document.getElementById('resultados-section').style.display = 'none';
+        
+        this.generarTablaEvaluacion();
+        Utils.scrollToElement('evaluacion-section');
+      },
+      
+      generarTablaEvaluacion() {
+        const tablaHeader = document.getElementById('tabla-header');
+        tablaHeader.innerHTML = '<th>Tarea</th><th class="max-value-cell">Valor Máx</th>';
+        
+        AppState.alumnos.forEach(alumno => {
+          tablaHeader.innerHTML += `<th class="student-header-cell">${alumno}</th>`;
+        });
+        
+        const cuerpoTabla = document.getElementById('cuerpo-tabla');
+        cuerpoTabla.innerHTML = '';
+        
+        AppState.tareasSeleccionadas.forEach(tarea => {
+          const fila = document.createElement('tr');
+          const maxValor = AppState.valoresTareas[tarea];
           
-          tareasSeleccionadas.forEach(tarea => {
-            if (criteriosPorTarea[tarea].includes(criterio)) {
-              sumaPuntuacion += resultados[alumno].tareas[tarea];
-              sumaMaximo += valoresTareas[tarea];
+          const criteriosDesc = AppState.criteriosPorTarea[tarea].map(c => {
+            return `${c}: ${CONFIG.tooltipTextos[c] || 'Sin descripción'}`;
+          }).join('\n');
+          
+          fila.innerHTML = `
+            <td class="criteria-cell" data-tooltip="${criteriosDesc}">
+              ${tarea}
+            </td>
+            <td class="max-value-cell">${maxValor}</td>
+          `;
+          
+          AppState.alumnos.forEach(() => {
+            fila.innerHTML += `
+              <td>
+                <input type="number" min="0" max="${maxValor}" value="0" class="student-score" 
+                       data-tarea="${tarea}" placeholder="Punt">
+              </td>
+            `;
+          });
+          
+          cuerpoTabla.appendChild(fila);
+        });
+        
+        this.configurarEventosEvaluacion();
+      },
+      
+      configurarEventosEvaluacion() {
+        const scoreInputs = document.querySelectorAll('.student-score');
+        scoreInputs.forEach(input => {
+          input.addEventListener('input', function() {
+            const max = parseFloat(this.getAttribute('max'));
+            Utils.validarNumeroPositivo(this, 0, max);
+          });
+        });
+        
+        setTimeout(Utils.ajustarTooltips, 100);
+      },
+      
+      calcularResultados() {
+        AppState.resultados = {};
+        
+        const criteriosEvaluados = new Set();
+        AppState.tareasSeleccionadas.forEach(tarea => {
+          AppState.criteriosPorTarea[tarea].forEach(criterio => {
+            criteriosEvaluados.add(criterio);
+          });
+        });
+        
+        AppState.alumnos.forEach((alumno, alumnoIndex) => {
+          AppState.resultados[alumno] = {
+            tareas: {},
+            criterios: {},
+            promedio: 0
+          };
+          
+          AppState.tareasSeleccionadas.forEach(tarea => {
+            const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
+            const input = inputs[alumnoIndex];
+            const maxValor = AppState.valoresTareas[tarea];
+            const value = Utils.validarNumeroPositivo(input, 0, maxValor);
+            
+            AppState.resultados[alumno].tareas[tarea] = value;
+          });
+          
+          Array.from(criteriosEvaluados).forEach(criterio => {
+            let sumaPuntuacion = 0;
+            let sumaMaximo = 0;
+            
+            AppState.tareasSeleccionadas.forEach(tarea => {
+              if (AppState.criteriosPorTarea[tarea].includes(criterio)) {
+                sumaPuntuacion += AppState.resultados[alumno].tareas[tarea];
+                sumaMaximo += AppState.valoresTareas[tarea];
+              }
+            });
+            
+            AppState.resultados[alumno].criterios[criterio] = sumaMaximo > 0 ? 
+              (sumaPuntuacion / sumaMaximo) * 10 : 0;
+          });
+          
+          const valores = Object.values(AppState.resultados[alumno].criterios);
+          const suma = valores.reduce((acc, val) => acc + val, 0);
+          AppState.resultados[alumno].promedio = valores.length > 0 ? suma / valores.length : 0;
+        });
+        
+        this.mostrarResultados();
+      },
+      
+      mostrarResultados() {
+        const resumenDiv = document.getElementById('resumen-alumnos');
+        resumenDiv.innerHTML = '';
+        
+        AppState.alumnos.forEach(alumno => {
+          const card = document.createElement('div');
+          card.className = 'student-card';
+          
+          const promedio = AppState.resultados[alumno].promedio;
+          let colorClass = '';
+          if (promedio < 5) colorClass = 'text-danger';
+          else if (promedio < 7) colorClass = 'text-warning';
+          else colorClass = 'text-success';
+          
+          const series = {};
+          Object.keys(AppState.resultados[alumno].criterios).forEach(criterio => {
+            const serie = criterio.substring(0, 6);
+            if (!series[serie]) series[serie] = [];
+            series[serie].push(criterio);
+          });
+          
+          let criteriosHTML = '';
+          
+          const familiasOrden = [
+            "TEC4.1", "TEC4.2", "TEC4.3", 
+            "TEC4.4", "TEC4.5", "TEC4.6"
+          ];
+          
+          familiasOrden.forEach(familia => {
+            if (series[familia]) {
+              criteriosHTML += `<div class="criteria-group">${familia} - ${this.getDescripcionSerie(familia)}</div>`;
+              
+              series[familia].sort().forEach(criterio => {
+                const descripcion = CONFIG.tooltipTextos[criterio] || 'Sin descripción disponible';
+                criteriosHTML += `
+                  <div class="criteria-row">
+                    <div class="criteria-name" data-tooltip="${descripcion}">${criterio}</div>
+                    <div class="criteria-score">${AppState.resultados[alumno].criterios[criterio].toFixed(2)}</div>
+                  </div>
+                `;
+              });
             }
           });
           
-          resultados[alumno].criterios[criterio] = sumaMaximo > 0 ? 
-            (sumaPuntuacion / sumaMaximo) * 10 : 0;
-        });
-        
-        const valores = Object.values(resultados[alumno].criterios);
-        const suma = valores.reduce((acc, val) => acc + val, 0);
-        resultados[alumno].promedio = valores.length > 0 ? suma / valores.length : 0;
-      });
-      
-      mostrarResultados();
-    }
-
-    function mostrarResultados() {
-      const resumenDiv = document.getElementById('resumen-alumnos');
-      resumenDiv.innerHTML = '';
-      
-      alumnos.forEach(alumno => {
-        const card = document.createElement('div');
-        card.className = 'student-card';
-        
-        const promedio = resultados[alumno].promedio;
-        let colorClass = '';
-        if (promedio < 5) colorClass = 'text-danger';
-        else if (promedio < 7) colorClass = 'text-warning';
-        else colorClass = 'text-success';
-        
-        const series = {};
-        Object.keys(resultados[alumno].criterios).forEach(criterio => {
-          const serie = criterio.substring(0, 6);
-          if (!series[serie]) series[serie] = [];
-          series[serie].push(criterio);
-        });
-        
-        let criteriosHTML = '';
-        
-        const familiasOrden = [
-          "TEC4.1", "TEC4.2", "TEC4.3", 
-          "TEC4.4", "TEC4.5", "TEC4.6"
-        ];
-        
-        familiasOrden.forEach(familia => {
-          if (series[familia]) {
-            criteriosHTML += `<div class="criteria-group">${familia} - ${getSerieDescription(familia)}</div>`;
+          card.innerHTML = `
+            <div class="student-header">
+              <div class="student-name">${alumno}</div>
+              <div class="student-avg ${colorClass}">${promedio.toFixed(2)}</div>
+            </div>
             
-            series[familia].sort().forEach(criterio => {
-              const descripcion = tooltipTextos[criterio] || 'Sin descripción disponible';
-              criteriosHTML += `
-                <div class="criteria-row">
-                  <div class="criteria-name" data-tooltip="${descripcion}">${criterio}</div>
-                  <div class="criteria-score">${resultados[alumno].criterios[criterio].toFixed(2)}</div>
-                </div>
-              `;
-            });
-          }
+            <div class="criteria-container">
+              ${criteriosHTML}
+            </div>
+          `;
+          
+          resumenDiv.appendChild(card);
         });
         
-        card.innerHTML = `
-          <div class="student-header">
-            <div class="student-name">${alumno}</div>
-            <div class="student-avg ${colorClass}">${promedio.toFixed(2)}</div>
-          </div>
-          
-          <div class="criteria-container">
-            ${criteriosHTML}
-          </div>
-        `;
+        setTimeout(Utils.ajustarTooltips, 100);
+        document.getElementById('resultados-section').style.display = 'block';
+        Utils.scrollToElement('resultados-section');
+      },
+      
+      getDescripcionSerie(serie) {
+        const descriptions = {
+          "TEC4.1": "Gestión de Proyectos",
+          "TEC4.2": "Diseño y Fabricación",
+          "TEC4.3": "Comunicación",
+          "TEC4.4": "Sistemas Automáticos",
+          "TEC4.5": "Resolución Digital",
+          "TEC4.6": "Sostenibilidad"
+        };
+        return descriptions[serie] || "Área Tecnológica";
+      },
+      
+      exportarPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
         
-        resumenDiv.appendChild(card);
-      });
-      
-      setTimeout(ajustarTooltips, 100);
-      document.getElementById('resultados-section').style.display = 'block';
-      document.getElementById('resultados-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function getSerieDescription(serie) {
-      const descriptions = {
-        "TEC4.1": "Gestión de Proyectos",
-        "TEC4.2": "Diseño y Fabricación",
-        "TEC4.3": "Comunicación",
-        "TEC4.4": "Sistemas Automáticos",
-        "TEC4.5": "Resolución Digital",
-        "TEC4.6": "Sostenibilidad"
-      };
-      return descriptions[serie] || "Área Tecnológica";
-    }
-    
-    function exportarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      const actividad = document.getElementById('actividad').value || "Evaluación";
-      const fecha = new Date().toLocaleDateString();
-      
-      let firstStudent = true;
-      let yPos = 20;
-      
-      doc.setFontSize(20);
-      doc.text(`Resultados de Evaluación: ${actividad}`, 15, yPos);
-      yPos += 10;
-      
-      doc.setFontSize(12);
-      doc.setTextColor(100);
-      doc.text(`Fecha: ${fecha}`, 15, yPos);
-      yPos += 20;
-      
-      alumnos.forEach((alumno, index) => {
-        if (!firstStudent) {
-          doc.addPage();
-          yPos = 20;
-        } else {
-          firstStudent = false;
-        }
+        const actividad = document.getElementById('actividad').value || "Evaluación";
+        const fecha = new Date().toLocaleDateString();
         
-        doc.setFontSize(16);
-        doc.setTextColor(0);
-        doc.text(`Alumno: ${alumno}`, 15, yPos);
+        let firstStudent = true;
+        let yPos = 20;
         
-        doc.setFontSize(14);
-        doc.text(`Promedio: ${resultados[alumno].promedio.toFixed(2)}`, 15, yPos + 10);
-        yPos += 25;
+        doc.setFontSize(20);
+        doc.text(`Resultados de Evaluación: ${actividad}`, 15, yPos);
+        yPos += 10;
         
         doc.setFontSize(12);
         doc.setTextColor(100);
-        doc.text("Criterio", 15, yPos);
-        doc.text("Nota", 180, yPos, { align: 'right' });
-        yPos += 8;
-        doc.line(15, yPos, 195, yPos);
-        yPos += 10;
+        doc.text(`Fecha: ${fecha}`, 15, yPos);
+        yPos += 20;
         
-        doc.setFontSize(11);
-        doc.setTextColor(0);
-        
-        const series = {};
-        Object.keys(resultados[alumno].criterios).forEach(criterio => {
-          const serie = criterio.substring(0, 6);
-          if (!series[serie]) series[serie] = [];
-          series[serie].push(criterio);
-        });
-        
-        const familiasOrden = ["TEC4.1", "TEC4.2", "TEC4.3", "TEC4.4", "TEC4.5", "TEC4.6"];
-        
-        familiasOrden.forEach(familia => {
-          if (series[familia]) {
-            if (yPos > 280) {
-              doc.addPage();
-              yPos = 20;
-            }
-            
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'bold');
-            doc.text(`${familia} - ${getSerieDescription(familia)}`, 15, yPos);
-            doc.setFont(undefined, 'normal');
-            yPos += 8;
-            
-            series[familia].sort().forEach(criterio => {
+        AppState.alumnos.forEach((alumno, index) => {
+          if (!firstStudent) {
+            doc.addPage();
+            yPos = 20;
+          } else {
+            firstStudent = false;
+          }
+          
+          doc.setFontSize(16);
+          doc.setTextColor(0);
+          doc.text(`Alumno: ${alumno}`, 15, yPos);
+          
+          doc.setFontSize(14);
+          doc.text(`Promedio: ${AppState.resultados[alumno].promedio.toFixed(2)}`, 15, yPos + 10);
+          yPos += 25;
+          
+          doc.setFontSize(12);
+          doc.setTextColor(100);
+          doc.text("Criterio", 15, yPos);
+          doc.text("Nota", 180, yPos, { align: 'right' });
+          yPos += 8;
+          doc.line(15, yPos, 195, yPos);
+          yPos += 10;
+          
+          doc.setFontSize(11);
+          doc.setTextColor(0);
+          
+          const series = {};
+          Object.keys(AppState.resultados[alumno].criterios).forEach(criterio => {
+            const serie = criterio.substring(0, 6);
+            if (!series[serie]) series[serie] = [];
+            series[serie].push(criterio);
+          });
+          
+          const familiasOrden = ["TEC4.1", "TEC4.2", "TEC4.3", "TEC4.4", "TEC4.5", "TEC4.6"];
+          
+          familiasOrden.forEach(familia => {
+            if (series[familia]) {
               if (yPos > 280) {
                 doc.addPage();
                 yPos = 20;
               }
               
-              doc.text(criterio, 20, yPos);
-              doc.text(resultados[alumno].criterios[criterio].toFixed(2), 180, yPos, { align: 'right' });
-              yPos += 10;
-            });
-            
-            yPos += 5;
-          }
-        });
-        
-        yPos += 10;
-      });
-      
-      doc.save(`evaluacion-${actividad.replace(/ /g, '_')}.pdf`);
-    }
-
-    function inicializarSeccionesColapsables() {
-      const secciones = [
-        { id: 'nombres-alumnos', defaultState: 'collapsed' },
-        { id: 'tareas', defaultState: 'expanded' },
-        { id: 'evaluacion', defaultState: 'collapsed' },
-        { id: 'resultados', defaultState: 'collapsed' }
-      ];
-      
-      secciones.forEach(seccion => {
-        const title = document.getElementById(`${seccion.id}-title`);
-        const content = document.getElementById(`${seccion.id}-content`);
-        
-        if (title && content) {
-          if (seccion.defaultState === 'collapsed') {
-            title.classList.add('collapsed');
-            content.classList.remove('expanded');
-            content.classList.add('collapsed');
-          } else {
-            title.classList.remove('collapsed');
-            content.classList.remove('collapsed');
-            content.classList.add('expanded');
-          }
-          
-          title.addEventListener('click', () => {
-            title.classList.toggle('collapsed');
-            content.classList.toggle('collapsed');
-            content.classList.toggle('expanded');
+              doc.setFontSize(11);
+              doc.setFont(undefined, 'bold');
+              doc.text(`${familia} - ${this.getDescripcionSerie(familia)}`, 15, yPos);
+              doc.setFont(undefined, 'normal');
+              yPos += 8;
+              
+              series[familia].sort().forEach(criterio => {
+                if (yPos > 280) {
+                  doc.addPage();
+                  yPos = 20;
+                }
+                
+                doc.text(criterio, 20, yPos);
+                doc.text(AppState.resultados[alumno].criterios[criterio].toFixed(2), 180, yPos, { align: 'right' });
+                yPos += 10;
+              });
+              
+              yPos += 5;
+            }
           });
-        }
-      });
-    }
-
-    function mostrarAyuda() {
-      document.getElementById('help-modal').style.display = 'flex';
-    }
-
-    function ocultarAyuda() {
-      document.getElementById('help-modal').style.display = 'none';
-    }
-
-    // =========================================================================
-    // === INICIALIZACIÓN ===
-    // =========================================================================
-
-    document.addEventListener('DOMContentLoaded', () => {
-      inicializarTareas();
-      inicializarSeccionesColapsables();
-      
-      window.addEventListener('resize', ajustarTooltips);
-      
-      document.getElementById('help-button').addEventListener('click', mostrarAyuda);
-      document.getElementById('close-modal').addEventListener('click', ocultarAyuda);
-      document.getElementById('help-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-          ocultarAyuda();
-        }
-      });
-      
-      document.getElementById('seleccionar-todas').addEventListener('click', () => {
-        document.querySelectorAll('.tarea-checkbox').forEach(cb => cb.checked = true);
-      });
-      
-      document.getElementById('deseleccionar-todas').addEventListener('click', () => {
-        document.querySelectorAll('.tarea-checkbox').forEach(cb => cb.checked = false);
-      });
-      
-      document.getElementById('configurar-alumnos').addEventListener('click', generarFormularioAlumnos);
-      document.getElementById('guardar-alumnos').addEventListener('click', guardarAlumnos);
-      document.getElementById('generar-evaluacion').addEventListener('click', generarEvaluacion);
-      document.getElementById('calcular-resultados').addEventListener('click', calcularResultados);
-      
-      document.getElementById('exportar-alumnos').addEventListener('click', exportarAlumnado);
-      document.getElementById('importar-alumnos').addEventListener('click', () => {
-        document.getElementById('importar-alumnos-file').click();
-      });
-      document.getElementById('importar-alumnos-file').addEventListener('change', importarAlumnado);
-      
-      document.getElementById('nueva-evaluacion').addEventListener('click', () => {
-        document.getElementById('evaluacion-section').style.display = 'none';
-        document.getElementById('resultados-section').style.display = 'none';
-        document.querySelector('.config-section').scrollIntoView({ behavior: 'smooth' });
-      });
-      
-      document.getElementById('volver-evaluacion').addEventListener('click', () => {
-        document.getElementById('resultados-section').style.display = 'none';
-        document.getElementById('evaluacion-section').style.display = 'block';
-        document.getElementById('evaluacion-section').scrollIntoView({ behavior: 'smooth' });
-      });
-      
-      document.getElementById('exportar-pdf').addEventListener('click', exportarPDF);
-      
-      document.getElementById('exportar-rubricas-csv').addEventListener('click', exportarRubricasCSV);
-      document.getElementById('exportar-rubricas-csv-tareas').addEventListener('click', exportarRubricasCSV);
-      
-      document.getElementById('valor-total').addEventListener('input', function() {
-        validarNumeroPositivo(this, 1);
-      });
-      
-      document.getElementById('num-alumnos').addEventListener('input', function() {
-        validarNumeroPositivo(this, 1, 50);
-      });
-      
-      // Configuración de GitHub Gists
-      document.getElementById('mostrar-github').addEventListener('click', () => {
-        const githubPanel = document.getElementById('github-panel');
-        githubPanel.style.display = githubPanel.style.display === 'none' ? 'block' : 'none';
-        
-        if (githubPanel.style.display === 'block') {
-          verificarTokenGitHub();
-        }
-      });
-      
-      document.getElementById('guardar-token').addEventListener('click', guardarTokenGitHub);
-      document.getElementById('guardar-gist').addEventListener('click', guardarEnGist);
-      document.getElementById('listar-gists').addEventListener('click', mostrarEvaluacionesGuardadas);
-      document.getElementById('eliminar-token').addEventListener('click', eliminarTokenGitHub);
-      
-      // Configuración del modal de evaluaciones guardadas
-      document.getElementById('close-gists-modal').addEventListener('click', () => {
-        document.getElementById('gists-modal').style.display = 'none';
-      });
-      
-      document.getElementById('close-gists').addEventListener('click', () => {
-        document.getElementById('gists-modal').style.display = 'none';
-      });
-      
-      document.getElementById('refresh-gists').addEventListener('click', mostrarEvaluacionesGuardadas);
-      
-      document.getElementById('gists-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-          this.style.display = 'none';
-        }
-      });
-      
-      if (githubToken) {
-        document.getElementById('github-token').value = '••••••••••••••••';
-        verificarTokenGitHub();
-      }
-    });
-
-    // =========================================================================
-    // === FUNCIONES DE EXPORTACIÓN DE RÚBRICAS ===
-    // =========================================================================
-
-    const rubricasData = [
-      {
-        id: "c1",
-        titulo: "TEC.4.1.1. Idear y planificar",
-        descripcion: "Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
-        competencia: 1,
-        niveles: [
-          { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, no realiza ninguna observación documentada ni análisis de las necesidades del entorno.</li><li class='pl-2'>No presenta ninguna propuesta de solución tecnológica.</li><li class='pl-2'>No incluye un plan de acción ni lista de recursos necesarios.</li></ul>" },
-          { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis del entorno, pero no están enfocadas en necesidades o requisitos relevantes.</li><li class='pl-2'>Sus propuestas de solución son poco viables.</li><li class='pl-2'>Sus propuestas de solución son básicas y necesitan más desarrollo.</li><li class='pl-2'>Su plan de acción es limitado, falta detalle y no identifica recursos necesarios.</li></ul>" },
-          { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis adecuados del entorno.</li><li class='pl-2'>Propone soluciones tecnológicas viables, aunque pueden necesitar más refinamiento.</li><li class='pl-2'>Presenta un plan de acción básico, pero puede mejorar en detalle y organización.</li><li class='pl-2'>Identifica algunos recursos necesarios.</li></ul>" },
-          { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos del entorno.</li><li class='pl-2'>Sus propuestas de solución son creativas y bien desarrolladas.</li><li class='pl-2'>Su plan de acción es detallado y organizado, considerando la mayoría de los factores importantes.</li><li class='pl-2'>Identifica la mayoría de los recursos necesarios.</li></ul>" },
-          { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos, precisos y relevantes del entorno.</li><li class='pl-2'>Sus propuestas de solución son innovadoras, originales y muy bien desarrolladas.</li><li class='pl-2'>Su plan de acción es muy detallado, bien organizado, y considera todos los factores importantes y posibles contratiempos.</li><li class='pl-2'>Identifica todos los recursos necesarios.</li></ul>" }
-        ]
-      }
-    ];
-
-    function cleanDescriptor(htmlString) {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlString;
-      const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
-      const textoLimpio = textoPlano.replace(/\s+/g, ' ').trim();
-      return `"${textoLimpio.replace(/"/g, '""')}"`;
-    }
-
-    function getExportData(format, nivelesInvertidos) {
-      let puntosLinea = "\t";
-      let descriptoresLinea = "\t";
-
-      const desc_10 = cleanDescriptor(nivelesInvertidos[0].descriptor);
-      const desc_8_9 = cleanDescriptor(nivelesInvertidos[1].descriptor);
-      const desc_5_6 = cleanDescriptor(nivelesInvertidos[2].descriptor);
-      const desc_3_4 = cleanDescriptor(nivelesInvertidos[3].descriptor);
-      const desc_1_2 = cleanDescriptor(nivelesInvertidos[4].descriptor);
-      const desc_0 = `"No entregado"`;
-
-      switch(String(format)) {
-        case '1':
-          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
-          break;
-        case '2':
-          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0\t0.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}\t${desc_0}`;
-          break;
-        case '3':
-          puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}`;
-          break;
-        case '4':
-          puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5\t0.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}\t${desc_0}`;
-          break;
-        default:
-          puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
-          descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
-      }
-      
-      return { puntosLinea, descriptoresLinea };
-    }
-
-    function getTituloAbreviado(tituloCompleto) {
-      const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
-      if (!codigoMatch) return tituloCompleto;
-      
-      const codigo = codigoMatch[1] + ".";
-      
-      let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
-      
-      const abreviaciones = {
-        'Intercambiar información': 'Intercambio información',
-        'Presentar y difundir': 'Presentación en público',
-        'Idear y planificar': 'Ideación y planificación',
-        'Estrategias colaborativas': 'Trabajo colaborativo',
-        'Gestión creativa de proyectos': 'Gestión de proyectos',
-        'Analizar diseño y ciclo de vida': 'Análisis de diseño',
-        'Fabricar productos': 'Fabricación de productos',
-        'Diseñar sistemas automáticos': 'Sistemas automáticos',
-        'Integrar tecnologías emergentes': 'Tecnologías emergentes',
-        'Resolver tareas': 'Resolución de tareas',
-        'Uso responsable': 'Sostenibilidad',
-        'Analizar arquitectura bioclimática': 'Arquitectura bioclimática',
-        'Valorar proyectos sociales': 'Proyectos sociales'
-      };
-      
-      for (const [completo, abreviado] of Object.entries(abreviaciones)) {
-        if (descripcionAbreviada.includes(completo)) {
-          descripcionAbreviada = abreviado;
-          break;
-        }
-      }
-      
-      descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
-      
-      return `${codigo} ${descripcionAbreviada}`;
-    }
-
-    function exportarRubricasCSV() {
-      const criteriosUtilizados = new Set();
-      tareasSeleccionadas.forEach(tarea => {
-        criteriosPorTarea[tarea].forEach(criterio => {
-          criteriosUtilizados.add(criterio);
+          
+          yPos += 10;
         });
-      });
-
-      const rubricasParaExportar = rubricasData.filter(rubrica => {
-        const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
-        return criteriosUtilizados.has(codigoRubrica);
-      });
-
-      if (rubricasParaExportar.length === 0) {
-        alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
-        return;
-      }
-
-      const format = '1';
-      
-      let csvRows = [
-        "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
-        "v1.0-s"
-      ];
-
-      rubricasParaExportar.forEach(criterio => {
-        const tituloAbreviado = getTituloAbreviado(criterio.titulo);
-        csvRows.push(tituloAbreviado);
-        csvRows.push(criterio.descripcion);
         
-        const nivelesInvertidos = [...criterio.niveles].reverse();
-        const { puntosLinea, descriptoresLinea } = getExportData(format, nivelesInvertidos);
-        
-        csvRows.push(puntosLinea);
-        csvRows.push(descriptoresLinea);
-        csvRows.push("");
-      });
-
-      const csvString = csvRows.join('\n');
-      const BOM = '\uFEFF';
-      const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      
-      const actividad = document.getElementById('actividad').value || "Evaluacion";
-      link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      setTimeout(() => {
-        alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
-      }, 500);
-    }
-
-    function exportarAlumnado() {
-      const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
-      const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
-      
-      if (alumnos.length === 0) {
-        alert("No hay alumnos guardados para exportar.");
-        return;
+        doc.save(`evaluacion-${actividad.replace(/ /g, '_')}.pdf`);
       }
-      
-      const datos = {
-        clase: nombreClase,
-        actividad: actividad,
-        fechaExportacion: new Date().toISOString(),
-        alumnos: alumnos
-      };
-      
-      const datosStr = JSON.stringify(datos, null, 2);
-      const blob = new Blob([datosStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Actividades_${nombreClase}_Alumnado.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
-    }
+    };
 
-    function importarAlumnado(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    // =========================================================================
+    // === GESTIÓN DE GITHUB GISTS ===
+    // =========================================================================
+    
+    const GitHubManager = {
+      verificarToken() {
+        const githubStatus = document.getElementById('github-status');
+        
+        if (!AppState.githubToken) {
+          githubStatus.innerHTML = '<i class="fas fa-info-circle"></i> No configurado. Introduce tu token de GitHub.';
+          githubStatus.className = 'github-status disconnected';
+          return false;
+        }
+        
+        fetch('https://api.github.com/user', {
+          headers: {
+            'Authorization': `token ${AppState.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            githubStatus.innerHTML = '<i class="fas fa-check-circle"></i> Conectado a GitHub. Token válido.';
+            githubStatus.className = 'github-status connected';
+            return true;
+          } else {
+            githubStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Token inválido. Verifica tu token de GitHub.';
+            githubStatus.className = 'github-status disconnected';
+            return false;
+          }
+        })
+        .catch(error => {
+          githubStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión. Verifica tu conexión a Internet.';
+          githubStatus.className = 'github-status disconnected';
+          return false;
+        });
+        
+        return true;
+      },
       
-      const reader = new FileReader();
-      reader.onload = function(e) {
+      guardarToken() {
+        const tokenInput = document.getElementById('github-token');
+        AppState.githubToken = tokenInput.value.trim();
+        
+        if (!AppState.githubToken) {
+          alert('Por favor, introduce un token de GitHub válido.');
+          return;
+        }
+        
+        localStorage.setItem('githubToken', AppState.githubToken);
+        tokenInput.value = '';
+        
+        this.verificarToken();
+        alert('Token guardado correctamente.');
+      },
+      
+      eliminarToken() {
+        if (confirm('¿Estás seguro de que quieres eliminar el token de GitHub?')) {
+          AppState.githubToken = '';
+          localStorage.removeItem('githubToken');
+          document.getElementById('github-status').innerHTML = '<i class="fas fa-info-circle"></i> Token eliminado.';
+          document.getElementById('github-status').className = 'github-status disconnected';
+          alert('Token eliminado correctamente.');
+        }
+      },
+      
+      prepararDatosParaGist() {
+        const puntuaciones = {};
+        
+        AppState.alumnos.forEach((alumno, index) => {
+          puntuaciones[alumno] = {};
+          
+          AppState.tareasSeleccionadas.forEach(tarea => {
+            const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
+            const input = inputs[index];
+            const maxValor = AppState.valoresTareas[tarea];
+            const value = Utils.validarNumeroPositivo(input, 0, maxValor);
+            
+            puntuaciones[alumno][tarea] = value;
+          });
+        });
+        
+        const datosEvaluacion = {
+          clase: document.getElementById('nombre-clase').value,
+          actividad: document.getElementById('actividad').value,
+          fecha: new Date().toISOString(),
+          alumnos: AppState.alumnos,
+          tareasSeleccionadas: AppState.tareasSeleccionadas,
+          criteriosPorTarea: AppState.criteriosPorTarea,
+          valoresTareas: AppState.valoresTareas,
+          puntuaciones: puntuaciones,
+          resultados: AppState.resultados
+        };
+        
+        return datosEvaluacion;
+      },
+      
+      async guardarEnGist() {
+        if (!AppState.githubToken) {
+          alert('Primero debes configurar tu token de GitHub.');
+          return;
+        }
+        
+        if (AppState.alumnos.length === 0 || AppState.tareasSeleccionadas.length === 0) {
+          alert('No hay datos de evaluación para guardar. Configura los alumnos y selecciona tareas primero.');
+          return;
+        }
+        
+        const datosEvaluacion = this.prepararDatosParaGist();
+        const descripcion = document.getElementById('gist-description').value || 
+                           `Evaluación: ${datosEvaluacion.actividad} - ${datosEvaluacion.clase}`;
+        
+        const nombreArchivo = `evaluacion_${datosEvaluacion.clase}_${datosEvaluacion.actividad}_${new Date().toISOString().slice(0, 10)}.json`;
+        
+        const gistData = {
+          description: descripcion,
+          public: false,
+          files: {
+            [nombreArchivo]: {
+              content: JSON.stringify(datosEvaluacion, null, 2)
+            }
+          }
+        };
+        
         try {
-          const datos = JSON.parse(e.target.result);
+          const response = await fetch('https://api.github.com/gists', {
+            method: 'POST',
+            headers: {
+              'Authorization': `token ${AppState.githubToken}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify(gistData)
+          });
           
-          if (!datos.clase || !Array.isArray(datos.alumnos)) {
-            throw new Error('El archivo no tiene el formato correcto.');
+          if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
           }
           
-          document.getElementById('nombre-clase').value = datos.clase;
+          const data = await response.json();
           
-          if (datos.actividad) {
-            document.getElementById('actividad').value = datos.actividad;
-          }
-          
-          document.getElementById('num-alumnos').value = datos.alumnos.length;
-          
-          alumnos = datos.alumnos;
-          
-          actualizarInterfazAlumnos();
-          
-          alert(`Alumnado de la clase ${datos.clase} importado correctamente. Se han cargado ${datos.alumnos.length} alumnos.`);
-          
-          event.target.value = '';
+          alert(`Evaluación guardada correctamente en GitHub Gists.\n\nID del Gist: ${data.id}\nURL: ${data.html_url}`);
           
         } catch (error) {
-          alert('Error al importar el archivo: ' + error.message);
+          console.error('Error al guardar en Gist:', error);
+          alert(`Error al guardar en GitHub Gists: ${error.message}`);
         }
-      };
-      reader.readAsText(file);
+      },
+      
+      async mostrarEvaluacionesGuardadas() {
+        if (!AppState.githubToken) {
+          alert('Primero debes configurar tu token de GitHub.');
+          return;
+        }
+        
+        const modal = document.getElementById('gists-modal');
+        const loading = document.getElementById('gists-loading');
+        const list = document.getElementById('gists-list');
+        const empty = document.getElementById('gists-empty');
+        
+        modal.style.display = 'flex';
+        loading.style.display = 'block';
+        list.style.display = 'none';
+        empty.style.display = 'none';
+        
+        try {
+          const response = await fetch('https://api.github.com/gists', {
+            headers: {
+              'Authorization': `token ${AppState.githubToken}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+          }
+          
+          const gists = await response.json();
+          
+          const evaluaciones = gists.filter(gist => {
+            return Object.keys(gist.files).some(filename => 
+              filename.startsWith('evaluacion_') && filename.endsWith('.json')
+            );
+          });
+          
+          loading.style.display = 'none';
+          
+          if (evaluaciones.length === 0) {
+            empty.style.display = 'block';
+            return;
+          }
+          
+          list.style.display = 'block';
+          list.innerHTML = '';
+          
+          evaluaciones.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          
+          evaluaciones.forEach(gist => {
+            const evaluacionFile = Object.keys(gist.files).find(filename => 
+              filename.startsWith('evaluacion_') && filename.endsWith('.json')
+            );
+            
+            if (!evaluacionFile) return;
+            
+            const item = document.createElement('div');
+            item.className = 'gist-item';
+            item.dataset.gistId = gist.id;
+            
+            const fecha = new Date(gist.created_at).toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            
+            item.innerHTML = `
+              <div class="gist-header">
+                <div class="gist-title">${gist.description || 'Evaluación sin descripción'}</div>
+                <div class="gist-date">${fecha}</div>
+              </div>
+              <div class="gist-description">${evaluacionFile}</div>
+            `;
+            
+            item.addEventListener('click', () => {
+              this.cargarEvaluacionDesdeGist(gist.id);
+            });
+            
+            list.appendChild(item);
+          });
+          
+        } catch (error) {
+          console.error('Error al cargar evaluaciones:', error);
+          loading.style.display = 'none';
+          alert(`Error al cargar las evaluaciones guardadas: ${error.message}`);
+        }
+      },
+      
+      async cargarEvaluacionDesdeGist(gistId) {
+        try {
+          const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+            headers: {
+              'Authorization': `token ${AppState.githubToken}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+          }
+          
+          const gist = await response.json();
+          
+          const evaluacionFile = Object.keys(gist.files).find(filename => 
+            filename.startsWith('evaluacion_') && filename.endsWith('.json')
+          );
+          
+          if (!evaluacionFile) {
+            throw new Error('No se encontró un archivo de evaluación en este Gist.');
+          }
+          
+          const contenido = gist.files[evaluacionFile].content;
+          const datosEvaluacion = JSON.parse(contenido);
+          
+          this.restaurarDatosDesdeGist(datosEvaluacion);
+          
+          document.getElementById('gists-modal').style.display = 'none';
+          
+          alert(`Evaluación cargada correctamente:\n\nClase: ${datosEvaluacion.clase}\nActividad: ${datosEvaluacion.actividad}\nFecha: ${new Date(datosEvaluacion.fecha).toLocaleDateString()}`);
+          
+        } catch (error) {
+          console.error('Error al cargar desde Gist:', error);
+          alert(`Error al cargar la evaluación: ${error.message}`);
+        }
+      },
+      
+      restaurarDatosDesdeGist(datosEvaluacion) {
+        document.getElementById('nombre-clase').value = datosEvaluacion.clase;
+        document.getElementById('actividad').value = datosEvaluacion.actividad;
+        
+        AppState.alumnos = datosEvaluacion.alumnos;
+        AlumnosManager.actualizarInterfaz();
+        
+        AppState.tareasSeleccionadas = datosEvaluacion.tareasSeleccionadas;
+        AppState.criteriosPorTarea = datosEvaluacion.criteriosPorTarea;
+        AppState.valoresTareas = datosEvaluacion.valoresTareas;
+        
+        document.querySelectorAll('.tarea-checkbox').forEach(cb => {
+          cb.checked = AppState.tareasSeleccionadas.includes(cb.value);
+        });
+        
+        Object.keys(AppState.valoresTareas).forEach(tarea => {
+          const valorInput = document.querySelector(`.valor-input[data-tarea="${tarea}"]`);
+          if (valorInput) {
+            valorInput.value = AppState.valoresTareas[tarea];
+          }
+        });
+        
+        Object.keys(AppState.criteriosPorTarea).forEach(tarea => {
+          AppState.criteriosPorTarea[tarea].forEach(criterio => {
+            const idNormalizado = `criterio-${Utils.normalizarId(tarea)}-${Utils.normalizarId(criterio)}`;
+            const checkbox = document.getElementById(idNormalizado);
+            if (checkbox) {
+              checkbox.checked = true;
+            }
+          });
+        });
+        
+        EvaluationManager.generar();
+        
+        if (datosEvaluacion.puntuaciones) {
+          AppState.alumnos.forEach((alumno, alumnoIndex) => {
+            AppState.tareasSeleccionadas.forEach(tarea => {
+              const inputs = document.querySelectorAll(`.student-score[data-tarea="${tarea}"]`);
+              const input = inputs[alumnoIndex];
+              if (input && datosEvaluacion.puntuaciones[alumno] && datosEvaluacion.puntuaciones[alumno][tarea]) {
+                input.value = datosEvaluacion.puntuaciones[alumno][tarea];
+              }
+            });
+          });
+        }
+        
+        if (datosEvaluacion.resultados && Object.keys(datosEvaluacion.resultados).length > 0) {
+          AppState.resultados = datosEvaluacion.resultados;
+          EvaluationManager.mostrarResultados();
+        }
+      }
+    };
+
+    // =========================================================================
+    // === EXPORTACIÓN DE RÚBRICAS ===
+    // =========================================================================
+    
+ const RubricasManager = {
+  rubricasData: [
+    {
+      id: "c1",
+      titulo: "TEC.4.1.1. Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
+      descripcion: "Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
+      competencia: 1,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, no realiza ninguna observación documentada ni análisis de las necesidades del entorno.</li><li class='pl-2'>No presenta ninguna propuesta de solución tecnológica.</li><li class='pl-2'>No incluye un plan de acción ni lista de recursos necesarios.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis del entorno, pero no están enfocadas en necesidades o requisitos relevantes.</li><li class='pl-2'>Sus propuestas de solución son poco viables.</li><li class='pl-2'>Sus propuestas de solución son básicas y necesitan más desarrollo.</li><li class='pl-2'>Su plan de acción es limitado, falta detalle y no identifica recursos necesarios.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis adecuados del entorno.</li><li class='pl-2'>Propone soluciones tecnológicas viables, aunque pueden necesitar más refinamiento.</li><li class='pl-2'>Presenta un plan de acción básico, pero puede mejorar en detalle y organización.</li><li class='pl-2'>Identifica algunos recursos necesarios.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos del entorno.</li><li class='pl-2'>Sus propuestas de solución son creativas y bien desarrolladas.</li><li class='pl-2'>Su plan de acción es detallado y organizado, considerando la mayoría de los factores importantes.</li><li class='pl-2'>Identifica la mayoría de los recursos necesarios.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos, precisos y relevantes del entorno.</li><li class='pl-2'>Sus propuestas de solución son innovadoras, originales y muy bien desarrolladas.</li><li class='pl-2'>Su plan de acción es muy detallado, bien organizado, y considera todos los factores importantes y posibles contratiempos.</li><li class='pl-2'>Identifica todos los recursos necesarios.</li></ul>" }
+      ]
+    },
+    {
+      id: "c2",
+      titulo: "TEC.4.1.2. Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
+      descripcion: "Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
+      competencia: 1,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No participa activamente en el proyecto ni aporta ideas o soluciones.</li><li class='pl-2'>No se comunica ni coopera con el resto del equipo.</li><li class='pl-2'>No respeta las normas ni los plazos establecidos.</li><li class='pl-2'>No tiene en cuenta las aportaciones de otras disciplinas ni las necesidades del cliente o usuario.</li><li class='pl-2'>No revisa ni mejora su trabajo ni el del equipo.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa poco en el proyecto y aporta ideas o soluciones poco originales o adecuadas.</li><li class='pl-2'>Se comunica y coopera poco con el resto del equipo.</li><li class='pl-2'>Respeta poco las normas y los plazos establecidos.</li><li class='pl-2'>Tiene poco en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora poco su trabajo y el del equipo.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa en el proyecto y aporta ideas o soluciones originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera con el resto del equipo.</li><li class='pl-2'>Respeta las normas y los plazos establecidos.</li><li class='pl-2'>Tiene en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora su trabajo y el del equipo.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa mucho en el proyecto y aporta ideas o soluciones muy originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera mucho con el resto del equipo.</li><li class='pl-2'>Respeta mucho las normas y los plazos establecidos.</li><li class='pl-2'>Tiene muy en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora mucho su trabajo y el del equipo.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa excelentemente en el proyecto y aporta ideas o soluciones excelentes y adecuadas.</li><li class='pl-2'>Se comunica y coopera excelentemente con el resto del equipo.</li><li class='pl-2'>Respeta excelentemente las normas y los plazos establecidos.</li><li class='pl-2'>Tiene excelentemente en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora excelentemente su trabajo y el del equipo.</li></ul>" }
+      ]
+    },
+    {
+      id: "c3",
+      titulo: "TEC.4.1.3. Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
+      descripcion: "Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
+      competencia: 1,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra creatividad en la concepción o el diseño de su proyecto.</li><li class='pl-2'>Raramente participa en actividades grupales y no aporta al trabajo en equipo.</li><li class='pl-2'>No se observan esfuerzos de investigación para la mejora o la eficiencia del proyecto.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Algunas ideas del proyecto muestran cierta creatividad, pero falta originalidad.</li><li class='pl-2'>Participa en actividades grupales, pero sus contribuciones son mínimas y no siempre aportan al equipo.</li><li class='pl-2'>Se observa una investigación superficial o poco detallada para su proyecto.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto muestra un pensamiento creativo básico y presenta algunas soluciones innovadoras.</li><li class='pl-2'>Colabora regularmente en actividades de grupo y contribuye de manera básica al trabajo en equipo.</li><li class='pl-2'>Realiza una investigación básica que ha permitido leves mejoras en su proyecto.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es notablemente creativo e incluye varias soluciones innovadoras.</li><li class='pl-2'>A menudo toma la iniciativa en actividades de grupo y su contribución mejora significativamente el rendimiento del equipo.</li><li class='pl-2'>Realiza investigaciones detalladas que conducen a soluciones más eficientes y accesibles en su proyecto.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es excepcionalmente creativo, presenta soluciones muy innovadoras que destacan de las demás.</li><li class='pl-2'>Constantemente impulsa y mejora el rendimiento del equipo con su fuerte liderazgo y habilidades colaborativas.</li><li class='pl-2'>Realiza investigaciones exhaustivas y profundas que han llevado a soluciones extremadamente eficientes, accesibles e innovadoras para su proyecto.</li></ul>" }
+      ]
+    },
+    {
+      id: "c4",
+      titulo: "TEC.4.2.1. Analizar el diseño y el ciclo de vida de productos y soluciones tecnológicas, evaluando su demanda, evolución y previsión de fin de ciclo de vida, aplicando un criterio ético, responsable e inclusivo.",
+      descripcion: "Analizar el diseño y el ciclo de vida de productos y soluciones tecnológicas, evaluando su demanda, evolución y previsión de fin de ciclo de vida, aplicando un criterio ético, responsable e inclusivo.",
+      competencia: 2,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No analiza el diseño del producto ni identifica la necesidad que resuelve.</li><li class='pl-2'>No evalúa su demanda, evolución ni previsión de fin de ciclo de vida.</li><li class='pl-2'>No aplica un criterio ético, responsable e inclusivo.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza superficialmente el diseño del producto y reconoce parcialmente la necesidad que resuelve.</li><li class='pl-2'>Evalúa de forma incompleta o inexacta su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma deficiente o inconsistente.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza correctamente el diseño del producto y identifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa adecuadamente su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma coherente y razonada.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza detalladamente el diseño del producto y explica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con precisión su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma rigurosa y argumentada.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza exhaustivamente el diseño del producto y justifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con profundidad su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma excelente y crítica.</li></ul>" }
+      ]
+    },
+    {
+      id: "c5",
+      titulo: "TEC.4.2.2. Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos mecánicos, eléctricos, electrónicos y digitales adecuados.",
+      descripcion: "Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos mecánicos, eléctricos, electrónicos y digitales adecuados.",
+      competencia: 2,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No logra producir un producto o solución tecnológica, o el resultado es inadecuado o inapropiado.</li><li class='pl-2'>No utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>No utiliza adecuadamente técnicas manuales, mecánicas o digitales, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son inadecuados.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica, pero presenta fallos o es inadecuado para la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido, pero de manera muy limitada o ineficaz.</li><li class='pl-2'>Utiliza algunas técnicas manuales, mecánicas o digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales utilizados son insuficientes y se podrían mejorar.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que cumple con la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son apropiados, pero admiten mejora.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que no solo cumple con la necesidad prevista, sino que muestra elementos de innovación o creatividad.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera muy efectiva, y su uso mejora la calidad del producto final.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales con gran habilidad, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son óptimos y aumentan la calidad del producto final.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que es excepcional en términos de diseño, funcionalidad e innovación.</li><li class='pl-2'>Demuestra un uso maestro de las herramientas de diseño asistido, lo que mejora significativamente la calidad del producto final.</li><li class='pl-2'>Demuestra una gran maestría en el uso de técnicas manuales, mecánicas y digitales, y la selección y uso de materiales y recursos mecánicos, eléctricos, electrónicos y digitales son excepcionales, aportando a la funcionalidad y la innovación del producto final.</li></ul>" }
+      ]
+    },
+    {
+      id: "c6",
+      titulo: "TEC.4.3.1. Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
+      descripcion: "Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
+      competencia: 3,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No intercambia información ni fomenta el trabajo en equipo.</li><li class='pl-2'>No emplea las herramientas digitales adecuadas ni el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma escasa o inadecuada.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma deficiente o incompleta.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma adecuada y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma correcta y completa.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma eficaz y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma óptima y precisa.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma excelente y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma excelente y creativa.</li></ul>" }
+      ]
+    },
+    {
+      id: "c7",
+      titulo: "TEC.4.3.2. Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
+      descripcion: "Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
+      competencia: 3,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es confusa, desorganizada y no se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son monótonas y no transmiten interés ni seguridad.</li><li class='pl-2'>El discurso es incoherente, irrelevante o incompleto.</li><li class='pl-2'>El lenguaje es excluyente y sexista.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es poco clara, poco estructurada y se desvía del tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son poco variadas y transmiten poco interés o seguridad.</li><li class='pl-2'>El discurso es poco coherente, poco relevante o poco completo.</li><li class='pl-2'>El lenguaje es poco inclusivo y poco respetuoso con la diversidad.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es clara, estructurada y se ajusta aproximadamente al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son adecuadas y transmiten interés y seguridad.</li><li class='pl-2'>El discurso es coherente, relevante y completo.</li><li class='pl-2'>El lenguaje es inclusivo y respeta la diversidad.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es muy clara, muy estructurada y se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son variadas y transmiten mucho interés y seguridad.</li><li class='pl-2'>El discurso es muy coherente, muy relevante y muy completo.</li><li class='pl-2'>El lenguaje es muy inclusivo y muy respetuoso con la diversidad.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es excelente, creativa y se ajusta al tiempo establecido con precisión.</li><li class='pl-2'>La entonación y la expresión son dinámicas y transmiten entusiasmo y confianza.</li><li class='pl-2'>El discurso es excelente, original y exhaustivo.</li><li class='pl-2'>El lenguaje es excelente, inclusivo y respetuoso con la diversidad en todo momento.</li></ul>" }
+      ]
+    },
+    {
+      id: "c8",
+      titulo: "TEC.4.4.1. Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática y componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
+      descripcion: "Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática y componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
+      competencia: 4,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No realiza ni entrega los proyectos y/o prácticas de sistemas automáticos programables y robots o los hace con errores graves.</li><li class='pl-2'>No sabe qué son ni cómo funciona la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>No relaciona los contenidos de tecnología con otras materias.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots con retraso o con errores significativos.</li><li class='pl-2'>Sabe qué son algunos elementos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control, pero no cómo funcionan.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma superficial o incompleta.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan los elementos básicos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma adecuada y coherente.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y sin errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan varios elementos avanzados de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma amplia y profunda.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Sabe qué son y cómo funcionan diversos elementos innovadores o creativos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias crítica y reflexivamente.</li></ul>" }
+      ]
+    },
+    {
+      id: "c9",
+      titulo: "TEC.4.4.2. Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
+      descripcion: "Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
+      competencia: 4,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni utiliza las aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>No realiza ningún intento por incorporar una aplicación de IoT, Big Data o IA en un proyecto y/o práctica, ni muestra interés por entender su uso ético y seguro.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos, pero no las utiliza adecuadamente.</li><li class='pl-2'>Intenta incorporar una aplicación de IoT en un proyecto y/o práctica, pero no logra conectarla ni operar correctamente.</li><li class='pl-2'>Muestra una comprensión limitada del uso ético y seguro de estos dispositivos.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de modo muy básico una aplicación de IoT en un proyecto y/o práctica, demostrando un uso ético y seguro muy básico de la tecnología.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con autonomía varias aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra una aplicación de IoT y utiliza Big Data o IA en un proyecto o práctica más complejo/a, demostrando un uso ético y seguro avanzado de estas tecnologías.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con creatividad diversas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de manera innovadora y avanzada aplicaciones de IoT, Big Data e IA en un proyecto y/o práctica complejo/a y original, demostrando un alto nivel de uso ético y seguro de estas tecnologías.</li></ul>" }
+      ]
+    },
+    {
+      id: "c10",
+      titulo: "TEC.4.5.1. Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
+      descripcion: "Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
+      competencia: 5,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No entrega las tareas o las hace con errores graves.</li><li class='pl-2'>No realiza ningún intento de uso de herramientas digitales para completar las tareas asignadas en clase.</li><li class='pl-2'>No se observa evidencia de trabajo o esfuerzo en las actividades asignadas.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas con retraso o con errores significativos.</li><li class='pl-2'>Intenta usar una herramienta digital para completar una tarea en clase pero necesita ayuda constante y su resultado final es incompleto.</li><li class='pl-2'>Se puede ver un intento en las actividades, aunque su aplicación de conocimientos es muy limitada.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe usar y configurar las aplicaciones y herramientas digitales que se le indican, siguiendo instrucciones o ejemplos dados pero de modo básico.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma básica.</li><li class='pl-2'>Trabaja por su cuenta cuando es necesario, pero no siempre.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y sin errores.</li><li class='pl-2'>Demuestra un uso eficiente y autónomo de diferentes herramientas digitales para completar tareas en clase y su aplicación interdisciplinaria de conocimientos es clara.</li><li class='pl-2'>Trabaja por su cuenta con iniciativa y responsabilidad.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Utiliza de manera experta y creativa diversas herramientas digitales para resolver tareas de clase, aplicando conocimientos interdisciplinares de manera innovadora.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma crítica y reflexiva.</li><li class='pl-2'>Trabaja por su cuenta con proactividad e independencia.</li></ul>" }
+      ]
+    },
+    {
+      id: "c11",
+      titulo: "TEC.4.6.1. Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
+      descripcion: "Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
+      competencia: 6,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No reconoce el concepto de sostenibilidad y accesibilidad y no puede identificar estos criterios en el uso de materiales o desarrollo de procesos tecnológicos.</li><li class='pl-2'>No respeta las normas de seguridad e higiene en el taller.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e identifica algunos materiales y procesos tecnológicos sostenibles y accesibles pero tiene dificultades para aplicar estos conceptos en su trabajo.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller solo cuando se le recuerda.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona materiales sostenibles y accesibles para un proyecto o práctica simple.</li><li class='pl-2'>Además, muestra un entendimiento básico de cómo su proceso de trabajo puede minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller siempre que se le indica.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e implementa materiales sostenibles y accesibles en un proyecto o práctica de mediana complejidad.</li><li class='pl-2'>Además, muestra un entendimiento avanzado de cómo su proceso de trabajo puede minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con iniciativa y responsabilidad.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona, implementa y justifica el uso de materiales sostenibles y accesibles en un proyecto de alta complejidad o en una práctica avanzada.</li><li class='pl-2'>Demuestra constantemente cómo su proceso de trabajo minimiza el impacto negativo en la sociedad y el planeta, y hace propuestas para mejorar la sostenibilidad y accesibilidad en futuros proyectos.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con proactividad e independencia.</li></ul>" }
+      ]
+    },
+    {
+      id: "c12",
+      titulo: "TEC.4.6.2. Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
+      descripcion: "Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
+      competencia: 6,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra comprensión alguna de los conceptos de arquitectura bioclimática y ecotransporte, y no es capaz de identificar su relación con el cuidado del entorno y el desarrollo sostenible.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una mínima comprensión de los conceptos de arquitectura bioclimática y ecotransporte, y sus beneficios para el cuidado del entorno, pero tiene dificultades para conectar estos conceptos con el desarrollo sostenible.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una aceptable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir los beneficios de la arquitectura bioclimática y el ecotransporte para el cuidado del entorno.</li><li class='pl-2'>Muestra una comprensión básica de cómo estas tecnologías pueden contribuir al desarrollo sostenible.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una notable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir cómo influyen en el medio ambiente, dando ejemplos concretos o reales.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos concretos o reales.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una sobresaliente comprensión de los conceptos de arquitectura bioclimática y ecotransporte y cómo influyen en el medio ambiente, dando ejemplos originales o creativos.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos originales o creativos.</li></ul>" }
+      ]
+    },
+    {
+      id: "c13",
+      titulo: "TEC.4.6.3. Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
+      descripcion: "Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
+      competencia: 6,
+      niveles: [
+        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni valora la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, no sabe qué son ni para qué sirven estos tipos de proyectos.</li><li class='pl-2'>No muestra interés ni participación en ellos.</li></ul>" },
+        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora parcialmente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son algunos de estos tipos de proyectos, pero no para qué sirven.</li><li class='pl-2'>Muestra poco interés y participación en ellos.</li></ul>" },
+        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora correctamente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos.</li><li class='pl-2'>Muestra interés y participación en ellos cuando se le indica.</li></ul>" },
+        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora muy bien la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos concretos o reales.</li><li class='pl-2'>Muestra interés y participación en ellos con iniciativa y responsabilidad.</li></ul>" },
+        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora excelentemente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos originales o creativos.</li><li class='pl-2'>Muestra interés y participación en ellos con proactividad e independencia.</li></ul>" }
+      ]
+    }
+  ],
+
+  cleanDescriptor(htmlString) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
+    const textoLimpio = textoPlano.replace(/\s+/g, ' ').trim();
+    return `"${textoLimpio.replace(/"/g, '""')}"`;
+  },
+
+  getExportData(format, nivelesInvertidos) {
+    let puntosLinea = "\t";
+    let descriptoresLinea = "\t";
+
+    const desc_10 = this.cleanDescriptor(nivelesInvertidos[0].descriptor);
+    const desc_8_9 = this.cleanDescriptor(nivelesInvertidos[1].descriptor);
+    const desc_5_6 = this.cleanDescriptor(nivelesInvertidos[2].descriptor);
+    const desc_3_4 = this.cleanDescriptor(nivelesInvertidos[3].descriptor);
+    const desc_1_2 = this.cleanDescriptor(nivelesInvertidos[4].descriptor);
+    const desc_0 = `"No entregado"`;
+
+    switch(String(format)) {
+      case '1':
+        puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
+        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+        break;
+      case '2':
+        puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0\t0.0";
+        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}\t${desc_0}`;
+        break;
+      case '3':
+        puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5";
+        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}`;
+        break;
+      case '4':
+        puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5\t0.0";
+        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}\t${desc_0}`;
+        break;
+      default:
+        puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
+        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+    }
+    
+    return { puntosLinea, descriptoresLinea };
+  },
+
+  getTituloAbreviado(tituloCompleto) {
+    const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
+    if (!codigoMatch) return tituloCompleto;
+    
+    const codigo = codigoMatch[1] + ".";
+    
+    let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
+    
+    const abreviaciones = {
+      'Intercambiar información': 'Intercambio información',
+      'Presentar y difundir': 'Presentación en público',
+      'Idear y planificar': 'Ideación y planificación',
+      'Estrategias colaborativas': 'Trabajo colaborativo',
+      'Gestión creativa de proyectos': 'Gestión de proyectos',
+      'Analizar diseño y ciclo de vida': 'Análisis de diseño',
+      'Fabricar productos': 'Fabricación de productos',
+      'Diseñar sistemas automáticos': 'Sistemas automáticos',
+      'Integrar tecnologías emergentes': 'Tecnologías emergentes',
+      'Resolver tareas': 'Resolución de tareas',
+      'Uso responsable': 'Sostenibilidad',
+      'Analizar arquitectura bioclimática': 'Arquitectura bioclimática',
+      'Valorar proyectos sociales': 'Proyectos sociales'
+    };
+    
+    for (const [completo, abreviado] of Object.entries(abreviaciones)) {
+      if (descripcionAbreviada.includes(completo)) {
+        descripcionAbreviada = abreviado;
+        break;
+      }
+    }
+    
+    descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
+    
+    return `${codigo} ${descripcionAbreviada}`;
+  },
+
+  exportarCSV() {
+    const criteriosUtilizados = new Set();
+    AppState.tareasSeleccionadas.forEach(tarea => {
+      AppState.criteriosPorTarea[tarea].forEach(criterio => {
+        criteriosUtilizados.add(criterio);
+      });
+    });
+
+    const rubricasParaExportar = this.rubricasData.filter(rubrica => {
+      const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
+      return criteriosUtilizados.has(codigoRubrica);
+    });
+
+    if (rubricasParaExportar.length === 0) {
+      alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
+      return;
     }
 
-    function actualizarInterfazAlumnos() {
-      const alumnosContainer = document.getElementById('alumnos-container');
-      alumnosContainer.innerHTML = '';
+    const format = '1';
+    
+    let csvRows = [
+      "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
+      "v1.0-s"
+    ];
+
+    rubricasParaExportar.forEach(criterio => {
+      const tituloAbreviado = this.getTituloAbreviado(criterio.titulo);
+      csvRows.push(tituloAbreviado);
+      csvRows.push(criterio.descripcion);
       
-      alumnos.forEach((alumno, index) => {
-        const alumnoItem = document.createElement('div');
-        alumnoItem.className = 'alumno-item';
-        alumnoItem.innerHTML = `
-          <div class="alumno-header">
-            <label>Alumno ${index + 1}</label>
-          </div>
-          <input type="text" class="alumno-input" value="${alumno}" placeholder="Nombre completo">
-        `;
-        alumnosContainer.appendChild(alumnoItem);
-      });
+      const nivelesInvertidos = [...criterio.niveles].reverse();
+      const { puntosLinea, descriptoresLinea } = this.getExportData(format, nivelesInvertidos);
       
-      document.getElementById('nombres-alumnos-section').style.display = 'block';
-    }
+      csvRows.push(puntosLinea);
+      csvRows.push(descriptoresLinea);
+      csvRows.push("");
+    });
+
+    const csvString = csvRows.join('\n');
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    
+    const actividad = document.getElementById('actividad').value || "Evaluacion";
+    link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
+    }, 500);
+  }
+};
+
+    // =========================================================================
+    // === INICIALIZACIÓN DE LA APLICACIÓN ===
+    // =========================================================================
+    
+    const App = {
+      inicializar() {
+        TareasManager.inicializar();
+        this.inicializarSeccionesColapsables();
+        this.configurarEventListeners();
+        
+        window.addEventListener('resize', Utils.ajustarTooltips);
+        
+        if (AppState.githubToken) {
+          document.getElementById('github-token').value = '••••••••••••••••';
+          GitHubManager.verificarToken();
+        }
+      },
+      
+      inicializarSeccionesColapsables() {
+        const secciones = [
+          { id: 'nombres-alumnos', defaultState: 'collapsed' },
+          { id: 'tareas', defaultState: 'expanded' },
+          { id: 'evaluacion', defaultState: 'collapsed' },
+          { id: 'resultados', defaultState: 'collapsed' }
+        ];
+        
+        secciones.forEach(seccion => {
+          const title = document.getElementById(`${seccion.id}-title`);
+          const content = document.getElementById(`${seccion.id}-content`);
+          
+          if (title && content) {
+            if (seccion.defaultState === 'collapsed') {
+              title.classList.add('collapsed');
+              content.classList.remove('expanded');
+              content.classList.add('collapsed');
+            } else {
+              title.classList.remove('collapsed');
+              content.classList.remove('collapsed');
+              content.classList.add('expanded');
+            }
+            
+            title.addEventListener('click', () => {
+              title.classList.toggle('collapsed');
+              content.classList.toggle('collapsed');
+              content.classList.toggle('expanded');
+            });
+          }
+        });
+      },
+      
+      configurarEventListeners() {
+        // Ayuda
+        document.getElementById('help-button').addEventListener('click', this.mostrarAyuda);
+        document.getElementById('close-modal').addEventListener('click', this.ocultarAyuda);
+        document.getElementById('help-modal').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) this.ocultarAyuda();
+        });
+        
+        // Configuración general
+        document.getElementById('configurar-alumnos').addEventListener('click', () => AlumnosManager.generarFormulario());
+        document.getElementById('guardar-alumnos').addEventListener('click', () => {
+          if (AlumnosManager.guardar()) {
+            alert(`Nombres de ${AppState.alumnos.length} alumnos guardados correctamente`);
+          }
+        });
+        
+        // Tareas
+        document.getElementById('seleccionar-todas').addEventListener('click', () => TareasManager.seleccionarTodas());
+        document.getElementById('deseleccionar-todas').addEventListener('click', () => TareasManager.deseleccionarTodas());
+        
+        // Evaluación
+        document.getElementById('generar-evaluacion').addEventListener('click', () => EvaluationManager.generar());
+        document.getElementById('calcular-resultados').addEventListener('click', () => EvaluationManager.calcularResultados());
+        
+        // Exportación/Importación
+        document.getElementById('exportar-alumnos').addEventListener('click', () => AlumnosManager.exportar());
+        document.getElementById('importar-alumnos').addEventListener('click', () => {
+          document.getElementById('importar-alumnos-file').click();
+        });
+        document.getElementById('importar-alumnos-file').addEventListener('change', (e) => AlumnosManager.importar(e));
+        
+        // Navegación
+        document.getElementById('nueva-evaluacion').addEventListener('click', () => {
+          document.getElementById('evaluacion-section').style.display = 'none';
+          document.getElementById('resultados-section').style.display = 'none';
+          Utils.scrollToElement('config-section');
+        });
+        
+        document.getElementById('volver-evaluacion').addEventListener('click', () => {
+          document.getElementById('resultados-section').style.display = 'none';
+          document.getElementById('evaluacion-section').style.display = 'block';
+          Utils.scrollToElement('evaluacion-section');
+        });
+        
+        // Exportación de resultados
+        document.getElementById('exportar-pdf').addEventListener('click', () => EvaluationManager.exportarPDF());
+        document.getElementById('exportar-rubricas-csv').addEventListener('click', () => RubricasManager.exportarCSV());
+        document.getElementById('exportar-rubricas-csv-tareas').addEventListener('click', () => RubricasManager.exportarCSV());
+        
+        // Validación de inputs
+        document.getElementById('valor-total').addEventListener('input', function() {
+          Utils.validarNumeroPositivo(this, 1);
+        });
+        
+        document.getElementById('num-alumnos').addEventListener('input', function() {
+          Utils.validarNumeroPositivo(this, 1, CONFIG.maxAlumnos);
+        });
+        
+        // GitHub Gists
+        document.getElementById('mostrar-github').addEventListener('click', () => {
+          const githubPanel = document.getElementById('github-panel');
+          githubPanel.style.display = githubPanel.style.display === 'none' ? 'block' : 'none';
+          
+          if (githubPanel.style.display === 'block') {
+            GitHubManager.verificarToken();
+          }
+        });
+        
+        document.getElementById('guardar-token').addEventListener('click', () => GitHubManager.guardarToken());
+        document.getElementById('guardar-gist').addEventListener('click', () => GitHubManager.guardarEnGist());
+        document.getElementById('listar-gists').addEventListener('click', () => GitHubManager.mostrarEvaluacionesGuardadas());
+        document.getElementById('eliminar-token').addEventListener('click', () => GitHubManager.eliminarToken());
+        
+        // Modal de evaluaciones guardadas
+        document.getElementById('close-gists-modal').addEventListener('click', () => {
+          document.getElementById('gists-modal').style.display = 'none';
+        });
+        
+        document.getElementById('close-gists').addEventListener('click', () => {
+          document.getElementById('gists-modal').style.display = 'none';
+        });
+        
+        document.getElementById('refresh-gists').addEventListener('click', () => GitHubManager.mostrarEvaluacionesGuardadas());
+        
+        document.getElementById('gists-modal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            this.style.display = 'none';
+          }
+        });
+      },
+      
+      mostrarAyuda() {
+        document.getElementById('help-modal').style.display = 'flex';
+      },
+      
+      ocultarAyuda() {
+        document.getElementById('help-modal').style.display = 'none';
+      }
+    };
+
+    // Inicializar la aplicación cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+      App.inicializar();
+    });
   </script>
 </body>
 </html>
