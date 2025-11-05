@@ -384,6 +384,25 @@
     </div>
   </div>
 
+  <!-- Modal para seleccionar formato de rúbrica -->
+  <div class="modal-overlay" id="rubric-format-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-file-export"></i> Seleccionar Formato de Rúbrica</h2>
+        <button class="close-modal" id="close-rubric-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Selecciona el formato de niveles para la rúbrica:</p>
+        <div class="controls" style="flex-direction: column; align-items: center; gap: 10px; margin-top: 20px;">
+          <button class="btn" data-format="1"><i class="fas fa-list-ol"></i> 5 niveles (10, 8, 6, 4, 2)</button>
+          <button class="btn" data-format="2"><i class="fas fa-list-ol"></i> 6 niveles (10, 8, 6, 4, 2, 0)</button>
+          <button class="btn" data-format="3"><i class="fas fa-list-ol"></i> 9 niveles (10, 8.5, 7.5, 6.5, 5.5, 4.5, 3.5, 2.5, 1.5)</button>
+          <button class="btn" data-format="4"><i class="fas fa-list-ol"></i> 10 niveles (9 niveles + 0)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <header class="fade-in">
       <h1><i class="fas fa-user-graduate"></i> Sistema de Evaluación Multi-Alumno</h1>
@@ -489,7 +508,7 @@
       <h2 class="panel-title collapsible" id="tareas-title"><i class="fas fa-clipboard-list"></i> Selección de Tareas<i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div class="section-content expanded" id="tareas-content">
         <div class="controls">
-          <button class="btn btn-success" id="exportar-rubricas-csv-tareas"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
+          <button class="btn btn-success export-rubric-btn" id="exportar-rubricas-csv-tareas"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
         </div>
         
         <div class="tareas-container" id="selector-tareas"></div>
@@ -509,7 +528,7 @@
         <div class="controls">
           <button class="btn btn-warning" id="calcular-resultados"><i class="fas fa-calculator"></i> Calcular Resultados</button>
           <button class="btn" id="nueva-evaluacion"><i class="fas fa-sync-alt"></i> Nueva Evaluación</button>
-          <button class="btn btn-success" id="exportar-rubricas-csv-evaluacion"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
+          <button class="btn btn-success export-rubric-btn" id="exportar-rubricas-csv-evaluacion"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
         </div>
       </div>
     </section>
@@ -521,7 +540,7 @@
         
         <div class="controls">
           <button class="btn btn-danger" id="exportar-pdf"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
-          <button class="btn btn-success" id="exportar-rubricas-csv"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
+          <button class="btn btn-success export-rubric-btn" id="exportar-rubricas-csv"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
           <button class="btn" id="volver-evaluacion"><i class="fas fa-arrow-left"></i> Volver a Evaluación</button>
         </div>
       </div>
@@ -1602,7 +1621,7 @@
     };
 
     // =========================================================================
-    // === EXPORTACIÓN DE RÚBRICAS ===
+    // === EXPORTACIÓN DE RÚBRICAS MEJORADA ===
     // =========================================================================
     
     const RubricasManager = {
@@ -1718,10 +1737,10 @@
           competencia: 4,
           niveles: [
             { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni utiliza las aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>No realiza ningún intento por incorporar una aplicación de IoT, Big Data o IA en un proyecto y/o práctica, ni muestra interés por entender su uso ético y seguro.</li></ul>" },
-            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos, pero no las utiliza adecuadamente.</li><li class='pl-2'>Intenta incorporar una aplicación de IoT en un proyecto y/o práctica, pero no logra conectarla ni operar correctamente.</li><li class='pl-2'>Muestra una comprensión limitada del uso ético y seguro de estos dispositivos.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos, pero no las utiliza adecuadamente.</li><li class='pl-2'>Intenta incorporar una aplicación de IoT en un proyecto и/o práctica, pero no logra conectarla ni operar correctamente.</li><li class='pl-2'>Muestra una comprensión limitada del uso ético y seguro de estos dispositivos.</li></ul>" },
             { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de modo muy básico una aplicación de IoT en un proyecto y/o práctica, demostrando un uso ético y seguro muy básico de la tecnología.</li></ul>" },
             { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con autonomía varias aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra una aplicación de IoT y utiliza Big Data o IA en un proyecto o práctica más complejo/a, demostrando un uso ético y seguro avanzado de estas tecnologías.</li></ul>" },
-            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con creatividad diversas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de manera innovadora y avanzada aplicaciones de IoT, Big Data e IA en un proyecto y/o práctica complejo/a y original, demostrando un alto nivel de uso ético y seguro de estas tecnologías.</li></ul>" }
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con creatividad diversas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de manera innovadora y avanzada aplicaciones de IoT, Big Data e IA en un proyecto и/o práctica complejo/a y original, demostrando un alto nivel de uso ético y seguro de estas tecnologías.</li></ul>" }
           ]
         },
         {
@@ -1740,7 +1759,7 @@
         {
           id: "c11",
           titulo: "TEC.4.6.1. Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
-          descripcion: "Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
+          descripcion: "Hacer un uso responsable de la tecnología, mediante el análisis y application de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
           competencia: 6,
           niveles: [
             { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No reconoce el concepto de sostenibilidad y accesibilidad y no puede identificar estos criterios en el uso de materiales o desarrollo de procesos tecnológicos.</li><li class='pl-2'>No respeta las normas de seguridad e higiene en el taller.</li></ul>" },
@@ -1831,6 +1850,20 @@
         let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
         
         const abreviaciones = {
+          'Intercambiar información y fomentar el trabajo en equipo': 'Intercambio información',
+          'Presentar y difundir las propuestas o soluciones tecnológicas': 'Presentación en público',
+          'Idear y planificar soluciones tecnológicas emprendedoras': 'Ideación y planificación',
+          'Aplicar con iniciativa estrategias colaborativas de gestión': 'Trabajo colaborativo',
+          'Abordar la gestión del proyecto de forma creativa': 'Gestión de proyectos',
+          'Analizar el diseño y el ciclo de vida de productos': 'Análisis de diseño',
+          'Fabricar productos y soluciones tecnológicas': 'Fabricación de productos',
+          'Diseñar, construir, controlar y simular sistemas automáticos': 'Sistemas automáticos',
+          'Integrar en las máquinas y sistemas tecnológicos aplicaciones': 'Tecnologías emergentes',
+          'Resolver tareas propuestas de manera eficiente': 'Resolución de tareas',
+          'Hacer un uso responsable de la tecnología': 'Sostenibilidad',
+          'Analizar los beneficios que, en el cuidado del entorno': 'Arquitectura bioclimática',
+          'Identificar y valorar la repercusión y los beneficios': 'Proyectos sociales',
+          // Nuevas abreviaciones para cubrir todos los criterios
           'Intercambiar información': 'Intercambio información',
           'Presentar y difundir': 'Presentación en público',
           'Idear y planificar': 'Ideación y planificación',
@@ -1846,11 +1879,23 @@
           'Valorar proyectos sociales': 'Proyectos sociales'
         };
         
+        // Buscar la abreviatura más larga que coincida
+        let abreviaturaEncontrada = null;
         for (const [completo, abreviado] of Object.entries(abreviaciones)) {
           if (descripcionAbreviada.includes(completo)) {
-            descripcionAbreviada = abreviado;
-            break;
+            // Preferir la coincidencia más larga
+            if (!abreviaturaEncontrada || completo.length > abreviaturaEncontrada.length) {
+              abreviaturaEncontrada = { completo, abreviado };
+            }
           }
+        }
+        
+        if (abreviaturaEncontrada) {
+          descripcionAbreviada = abreviaturaEncontrada.abreviado;
+        } else {
+          // Si no se encuentra abreviatura, usar las primeras palabras como fallback
+          const palabras = descripcionAbreviada.split(' ');
+          descripcionAbreviada = palabras.slice(0, 3).join(' ');
         }
         
         descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
@@ -1858,7 +1903,17 @@
         return `${codigo} ${descripcionAbreviada}`;
       },
 
-      exportarCSV() {
+      getFormatoNombre(format) {
+        const formatos = {
+          '1': '5 niveles (10,8,6,4,2)',
+          '2': '6 niveles (10,8,6,4,2,0)',
+          '3': '9 niveles (10,8.5,7.5,6.5,5.5,4.5,3.5,2.5,1.5)',
+          '4': '10 niveles (9 niveles + 0)'
+        };
+        return formatos[format] || 'Desconocido';
+      },
+
+      exportarCSV(format) {
         const criteriosUtilizados = new Set();
         AppState.tareasSeleccionadas.forEach(tarea => {
           AppState.criteriosPorTarea[tarea].forEach(criterio => {
@@ -1875,8 +1930,6 @@
           alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
           return;
         }
-
-        const format = '1';
         
         let csvRows = [
           "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
@@ -1896,17 +1949,17 @@
           csvRows.push("");
         });
 
-        const csvString = csvRows.join('\r\n'); // Usar \r\n para compatibilidad Windows
-        const BOM = '\uFEFF'; // BOM para UTF-8
+        const csvString = csvRows.join('\r\n');
+        const BOM = '\uFEFF';
         const blob = new Blob([BOM + csvString], { 
-          type: 'text/csv; charset=utf-8' // Especificar charset explícitamente
+          type: 'text/csv; charset=utf-8'
         });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
         
         const actividad = document.getElementById('actividad').value || "Evaluacion";
-        link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
+        link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}_formato_${format}.csv`);
         
         document.body.appendChild(link);
         link.click();
@@ -1914,7 +1967,7 @@
         URL.revokeObjectURL(url);
 
         setTimeout(() => {
-          alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
+          alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato ${this.getFormatoNombre(format)}.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
         }, 500);
       }
     };
@@ -2022,9 +2075,32 @@
         
         // Exportación de resultados
         document.getElementById('exportar-pdf').addEventListener('click', () => EvaluationManager.exportarPDF());
-        document.getElementById('exportar-rubricas-csv').addEventListener('click', () => RubricasManager.exportarCSV());
-        document.getElementById('exportar-rubricas-csv-tareas').addEventListener('click', () => RubricasManager.exportarCSV());
-        document.getElementById('exportar-rubricas-csv-evaluacion').addEventListener('click', () => RubricasManager.exportarCSV());
+        
+        // Exportación de rúbricas (nueva funcionalidad)
+        document.querySelectorAll('.export-rubric-btn').forEach(button => {
+          button.addEventListener('click', () => {
+            document.getElementById('rubric-format-modal').style.display = 'flex';
+          });
+        });
+        
+        // Modal de formato de rúbricas
+        document.getElementById('close-rubric-modal').addEventListener('click', () => {
+          document.getElementById('rubric-format-modal').style.display = 'none';
+        });
+        
+        document.querySelectorAll('#rubric-format-modal .btn[data-format]').forEach(button => {
+          button.addEventListener('click', (e) => {
+            const format = e.target.getAttribute('data-format');
+            RubricasManager.exportarCSV(format);
+            document.getElementById('rubric-format-modal').style.display = 'none';
+          });
+        });
+        
+        document.getElementById('rubric-format-modal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            this.style.display = 'none';
+          }
+        });
         
         // Validación de inputs
         document.getElementById('valor-total').addEventListener('input', function() {
