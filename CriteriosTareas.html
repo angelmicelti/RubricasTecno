@@ -838,36 +838,40 @@
         document.getElementById('nombres-alumnos-section').style.display = 'block';
       },
       
-      exportar() {
-        const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
-        const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
-        
-        if (AppState.alumnos.length === 0) {
-          alert("No hay alumnos guardados para exportar.");
-          return;
-        }
-        
-        const datos = {
-          clase: nombreClase,
-          actividad: actividad,
-          fechaExportacion: new Date().toISOString(),
-          alumnos: AppState.alumnos
-        };
-        
-        const datosStr = JSON.stringify(datos, null, 2);
-        const blob = new Blob([datosStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Actividades_${nombreClase}_Alumnado.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
-      },
+exportar() {
+            const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
+            const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
+            
+            if (AppState.alumnos.length === 0) {
+                alert("No hay alumnos guardados para exportar.");
+                return;
+            }
+            
+            const datos = {
+                clase: nombreClase,
+                actividad: actividad,
+                fechaExportacion: new Date().toISOString(),
+                alumnos: AppState.alumnos
+            };
+            
+            const datosStr = JSON.stringify(datos, null, 2);
+            const BOM = '\uFEFF'; // BOM para UTF-8
+            const blob = new Blob([BOM + datosStr], { 
+                type: 'application/json; charset=utf-8' // Especificar charset
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Actividades_${nombreClase}_Alumnado.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
+        },
       
+	  
       importar(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -1791,64 +1795,66 @@
     return `${codigo} ${descripcionAbreviada}`;
   },
 
-  exportarCSV() {
-    const criteriosUtilizados = new Set();
-    AppState.tareasSeleccionadas.forEach(tarea => {
-      AppState.criteriosPorTarea[tarea].forEach(criterio => {
-        criteriosUtilizados.add(criterio);
-      });
-    });
+exportarCSV() {
+            const criteriosUtilizados = new Set();
+            AppState.tareasSeleccionadas.forEach(tarea => {
+                AppState.criteriosPorTarea[tarea].forEach(criterio => {
+                    criteriosUtilizados.add(criterio);
+                });
+            });
 
-    const rubricasParaExportar = this.rubricasData.filter(rubrica => {
-      const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
-      return criteriosUtilizados.has(codigoRubrica);
-    });
+            const rubricasParaExportar = this.rubricasData.filter(rubrica => {
+                const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
+                return criteriosUtilizados.has(codigoRubrica);
+            });
 
-    if (rubricasParaExportar.length === 0) {
-      alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
-      return;
-    }
+            if (rubricasParaExportar.length === 0) {
+                alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
+                return;
+            }
 
-    const format = '1';
-    
-    let csvRows = [
-      "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
-      "v1.0-s"
-    ];
+            const format = '1';
+            
+            let csvRows = [
+                "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
+                "v1.0-s"
+            ];
 
-    rubricasParaExportar.forEach(criterio => {
-      const tituloAbreviado = this.getTituloAbreviado(criterio.titulo);
-      csvRows.push(tituloAbreviado);
-      csvRows.push(criterio.descripcion);
-      
-      const nivelesInvertidos = [...criterio.niveles].reverse();
-      const { puntosLinea, descriptoresLinea } = this.getExportData(format, nivelesInvertidos);
-      
-      csvRows.push(puntosLinea);
-      csvRows.push(descriptoresLinea);
-      csvRows.push("");
-    });
+            rubricasParaExportar.forEach(criterio => {
+                const tituloAbreviado = this.getTituloAbreviado(criterio.titulo);
+                csvRows.push(tituloAbreviado);
+                csvRows.push(criterio.descripcion);
+                
+                const nivelesInvertidos = [...criterio.niveles].reverse();
+                const { puntosLinea, descriptoresLinea } = this.getExportData(format, nivelesInvertidos);
+                
+                csvRows.push(puntosLinea);
+                csvRows.push(descriptoresLinea);
+                csvRows.push("");
+            });
 
-    const csvString = csvRows.join('\n');
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    
-    const actividad = document.getElementById('actividad').value || "Evaluacion";
-    link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+            const csvString = csvRows.join('\r\n'); // Usar \r\n para compatibilidad Windows
+            const BOM = '\uFEFF'; // BOM para UTF-8
+            const blob = new Blob([BOM + csvString], { 
+                type: 'text/csv; charset=utf-8' // Especificar charset explícitamente
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            
+            const actividad = document.getElementById('actividad').value || "Evaluacion";
+            link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
 
-    setTimeout(() => {
-      alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
-    }, 500);
-  }
-};
+            setTimeout(() => {
+                alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
+            }, 500);
+        }
+    };
 
     // =========================================================================
     // === INICIALIZACIÓN DE LA APLICACIÓN ===
