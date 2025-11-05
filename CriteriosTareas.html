@@ -1,3 +1,5 @@
+[file name]: deepseek_html_20251105_ecfd55.html
+[file content begin]
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -509,6 +511,7 @@
         <div class="controls">
           <button class="btn btn-warning" id="calcular-resultados"><i class="fas fa-calculator"></i> Calcular Resultados</button>
           <button class="btn" id="nueva-evaluacion"><i class="fas fa-sync-alt"></i> Nueva Evaluación</button>
+          <button class="btn btn-success" id="exportar-rubricas-csv-evaluacion"><i class="fas fa-file-csv"></i> Exportar Rúbricas a CSV</button>
         </div>
       </div>
     </section>
@@ -646,6 +649,61 @@
       
       scrollToElement(id) {
         document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    // =========================================================================
+    // === GESTIÓN DE SECCIONES MEJORADA ===
+    // =========================================================================
+    
+    const SectionManager = {
+      // Colapsar todas las secciones principales
+      colapsarTodas() {
+        this.colapsarSeccion('nombres-alumnos');
+        this.colapsarSeccion('tareas');
+        this.colapsarSeccion('evaluacion');
+        this.colapsarSeccion('resultados');
+      },
+      
+      // Expandir una sección específica
+      expandirSeccion(id) {
+        const title = document.getElementById(`${id}-title`);
+        const content = document.getElementById(`${id}-content`);
+        
+        if (title && content) {
+          title.classList.remove('collapsed');
+          content.classList.remove('collapsed');
+          content.classList.add('expanded');
+        }
+      },
+      
+      // Colapsar una sección específica
+      colapsarSeccion(id) {
+        const title = document.getElementById(`${id}-title`);
+        const content = document.getElementById(`${id}-content`);
+        
+        if (title && content) {
+          title.classList.add('collapsed');
+          content.classList.add('collapsed');
+          content.classList.remove('expanded');
+        }
+      },
+      
+      // Mostrar y expandir una sección (para secciones que estaban ocultas)
+      mostrarYExpandirSeccion(id) {
+        const section = document.getElementById(`${id}-section`);
+        if (section) {
+          section.style.display = 'block';
+          this.expandirSeccion(id);
+        }
+      },
+      
+      // Ocultar una sección completa
+      ocultarSeccion(id) {
+        const section = document.getElementById(`${id}-section`);
+        if (section) {
+          section.style.display = 'none';
+        }
       }
     };
 
@@ -788,7 +846,8 @@
           alumnosContainer.appendChild(alumnoItem);
         }
         
-        document.getElementById('nombres-alumnos-section').style.display = 'block';
+        SectionManager.mostrarYExpandirSeccion('nombres-alumnos');
+        SectionManager.colapsarSeccion('tareas'); // Colapsar tareas mientras configuramos alumnos
         Utils.scrollToElement('nombres-alumnos-section');
       },
       
@@ -816,6 +875,10 @@
           return false;
         }
         
+        // Agregar después del guardado exitoso:
+        SectionManager.colapsarSeccion('nombres-alumnos');
+        SectionManager.expandirSeccion('tareas');
+        
         return true;
       },
       
@@ -835,43 +898,42 @@
           alumnosContainer.appendChild(alumnoItem);
         });
         
-        document.getElementById('nombres-alumnos-section').style.display = 'block';
+        SectionManager.mostrarYExpandirSeccion('nombres-alumnos');
       },
       
-exportar() {
-            const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
-            const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
-            
-            if (AppState.alumnos.length === 0) {
-                alert("No hay alumnos guardados para exportar.");
-                return;
-            }
-            
-            const datos = {
-                clase: nombreClase,
-                actividad: actividad,
-                fechaExportacion: new Date().toISOString(),
-                alumnos: AppState.alumnos
-            };
-            
-            const datosStr = JSON.stringify(datos, null, 2);
-            const BOM = '\uFEFF'; // BOM para UTF-8
-            const blob = new Blob([BOM + datosStr], { 
-                type: 'application/json; charset=utf-8' // Especificar charset
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `Actividades_${nombreClase}_Alumnado.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
-        },
+      exportar() {
+        const nombreClase = document.getElementById('nombre-clase').value.trim() || 'Clase';
+        const actividad = document.getElementById('actividad').value.trim() || 'Actividad';
+        
+        if (AppState.alumnos.length === 0) {
+          alert("No hay alumnos guardados para exportar.");
+          return;
+        }
+        
+        const datos = {
+          clase: nombreClase,
+          actividad: actividad,
+          fechaExportacion: new Date().toISOString(),
+          alumnos: AppState.alumnos
+        };
+        
+        const datosStr = JSON.stringify(datos, null, 2);
+        const BOM = '\uFEFF'; // BOM para UTF-8
+        const blob = new Blob([BOM + datosStr], { 
+          type: 'application/json; charset=utf-8' // Especificar charset
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Actividades_${nombreClase}_Alumnado.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert(`Alumnado de la clase ${nombreClase} exportado correctamente.`);
+      },
       
-	  
       importar(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -935,8 +997,9 @@ exportar() {
           return;
         }
         
-        document.getElementById('evaluacion-section').style.display = 'block';
-        document.getElementById('resultados-section').style.display = 'none';
+        SectionManager.mostrarYExpandirSeccion('evaluacion');
+        SectionManager.ocultarSeccion('resultados');
+        SectionManager.colapsarSeccion('tareas'); // Colapsar tareas mientras evaluamos
         
         this.generarTablaEvaluacion();
         Utils.scrollToElement('evaluacion-section');
@@ -996,6 +1059,8 @@ exportar() {
       },
       
       calcularResultados() {
+        SectionManager.colapsarSeccion('evaluacion');
+        
         AppState.resultados = {};
         
         const criteriosEvaluados = new Set();
@@ -1103,7 +1168,7 @@ exportar() {
         });
         
         setTimeout(Utils.ajustarTooltips, 100);
-        document.getElementById('resultados-section').style.display = 'block';
+        SectionManager.mostrarYExpandirSeccion('resultados');
         Utils.scrollToElement('resultados-section');
       },
       
@@ -1542,318 +1607,318 @@ exportar() {
     // === EXPORTACIÓN DE RÚBRICAS ===
     // =========================================================================
     
- const RubricasManager = {
-  rubricasData: [
-    {
-      id: "c1",
-      titulo: "TEC.4.1.1. Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
-      descripcion: "Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
-      competencia: 1,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, no realiza ninguna observación documentada ni análisis de las necesidades del entorno.</li><li class='pl-2'>No presenta ninguna propuesta de solución tecnológica.</li><li class='pl-2'>No incluye un plan de acción ni lista de recursos necesarios.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis del entorno, pero no están enfocadas en necesidades o requisitos relevantes.</li><li class='pl-2'>Sus propuestas de solución son poco viables.</li><li class='pl-2'>Sus propuestas de solución son básicas y necesitan más desarrollo.</li><li class='pl-2'>Su plan de acción es limitado, falta detalle y no identifica recursos necesarios.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis adecuados del entorno.</li><li class='pl-2'>Propone soluciones tecnológicas viables, aunque pueden necesitar más refinamiento.</li><li class='pl-2'>Presenta un plan de acción básico, pero puede mejorar en detalle y organización.</li><li class='pl-2'>Identifica algunos recursos necesarios.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos del entorno.</li><li class='pl-2'>Sus propuestas de solución son creativas y bien desarrolladas.</li><li class='pl-2'>Su plan de acción es detallado y organizado, considerando la mayoría de los factores importantes.</li><li class='pl-2'>Identifica la mayoría de los recursos necesarios.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos, precisos y relevantes del entorno.</li><li class='pl-2'>Sus propuestas de solución son innovadoras, originales y muy bien desarrolladas.</li><li class='pl-2'>Su plan de acción es muy detallado, bien organizado, y considera todos los factores importantes y posibles contratiempos.</li><li class='pl-2'>Identifica todos los recursos necesarios.</li></ul>" }
-      ]
-    },
-    {
-      id: "c2",
-      titulo: "TEC.4.1.2. Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
-      descripcion: "Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
-      competencia: 1,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No participa activamente en el proyecto ni aporta ideas o soluciones.</li><li class='pl-2'>No se comunica ni coopera con el resto del equipo.</li><li class='pl-2'>No respeta las normas ni los plazos establecidos.</li><li class='pl-2'>No tiene en cuenta las aportaciones de otras disciplinas ni las necesidades del cliente o usuario.</li><li class='pl-2'>No revisa ni mejora su trabajo ni el del equipo.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa poco en el proyecto y aporta ideas o soluciones poco originales o adecuadas.</li><li class='pl-2'>Se comunica y coopera poco con el resto del equipo.</li><li class='pl-2'>Respeta poco las normas y los plazos establecidos.</li><li class='pl-2'>Tiene poco en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora poco su trabajo y el del equipo.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa en el proyecto y aporta ideas o soluciones originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera con el resto del equipo.</li><li class='pl-2'>Respeta las normas y los plazos establecidos.</li><li class='pl-2'>Tiene en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora su trabajo y el del equipo.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa mucho en el proyecto y aporta ideas o soluciones muy originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera mucho con el resto del equipo.</li><li class='pl-2'>Respeta mucho las normas y los plazos establecidos.</li><li class='pl-2'>Tiene muy en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora mucho su trabajo y el del equipo.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa excelentemente en el proyecto y aporta ideas o soluciones excelentes y adecuadas.</li><li class='pl-2'>Se comunica y coopera excelentemente con el resto del equipo.</li><li class='pl-2'>Respeta excelentemente las normas y los plazos establecidos.</li><li class='pl-2'>Tiene excelentemente en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora excelentemente su trabajo y el del equipo.</li></ul>" }
-      ]
-    },
-    {
-      id: "c3",
-      titulo: "TEC.4.1.3. Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
-      descripcion: "Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
-      competencia: 1,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra creatividad en la concepción o el diseño de su proyecto.</li><li class='pl-2'>Raramente participa en actividades grupales y no aporta al trabajo en equipo.</li><li class='pl-2'>No se observan esfuerzos de investigación para la mejora o la eficiencia del proyecto.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Algunas ideas del proyecto muestran cierta creatividad, pero falta originalidad.</li><li class='pl-2'>Participa en actividades grupales, pero sus contribuciones son mínimas y no siempre aportan al equipo.</li><li class='pl-2'>Se observa una investigación superficial o poco detallada para su proyecto.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto muestra un pensamiento creativo básico y presenta algunas soluciones innovadoras.</li><li class='pl-2'>Colabora regularmente en actividades de grupo y contribuye de manera básica al trabajo en equipo.</li><li class='pl-2'>Realiza una investigación básica que ha permitido leves mejoras en su proyecto.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es notablemente creativo e incluye varias soluciones innovadoras.</li><li class='pl-2'>A menudo toma la iniciativa en actividades de grupo y su contribución mejora significativamente el rendimiento del equipo.</li><li class='pl-2'>Realiza investigaciones detalladas que conducen a soluciones más eficientes y accesibles en su proyecto.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es excepcionalmente creativo, presenta soluciones muy innovadoras que destacan de las demás.</li><li class='pl-2'>Constantemente impulsa y mejora el rendimiento del equipo con su fuerte liderazgo y habilidades colaborativas.</li><li class='pl-2'>Realiza investigaciones exhaustivas y profundas que han llevado a soluciones extremadamente eficientes, accesibles e innovadoras para su proyecto.</li></ul>" }
-      ]
-    },
-    {
-      id: "c4",
-      titulo: "TEC.4.2.1. Analizar el diseño y el ciclo de vida de productos y soluciones tecnológicas, evaluando su demanda, evolución y previsión de fin de ciclo de vida, aplicando un criterio ético, responsable e inclusivo.",
-      descripcion: "Analizar el diseño y el ciclo de vida de productos y soluciones tecnológicas, evaluando su demanda, evolución y previsión de fin de ciclo de vida, aplicando un criterio ético, responsable e inclusivo.",
-      competencia: 2,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No analiza el diseño del producto ni identifica la necesidad que resuelve.</li><li class='pl-2'>No evalúa su demanda, evolución ni previsión de fin de ciclo de vida.</li><li class='pl-2'>No aplica un criterio ético, responsable e inclusivo.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza superficialmente el diseño del producto y reconoce parcialmente la necesidad que resuelve.</li><li class='pl-2'>Evalúa de forma incompleta o inexacta su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma deficiente o inconsistente.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza correctamente el diseño del producto y identifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa adecuadamente su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma coherente y razonada.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza detalladamente el diseño del producto y explica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con precisión su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma rigurosa y argumentada.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza exhaustivamente el diseño del producto y justifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con profundidad su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma excelente y crítica.</li></ul>" }
-      ]
-    },
-    {
-      id: "c5",
-      titulo: "TEC.4.2.2. Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos mecánicos, eléctricos, electrónicos y digitales adecuados.",
-      descripcion: "Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos mecánicos, eléctricos, electrónicos y digitales adecuados.",
-      competencia: 2,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No logra producir un producto o solución tecnológica, o el resultado es inadecuado o inapropiado.</li><li class='pl-2'>No utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>No utiliza adecuadamente técnicas manuales, mecánicas o digitales, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son inadecuados.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica, pero presenta fallos o es inadecuado para la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido, pero de manera muy limitada o ineficaz.</li><li class='pl-2'>Utiliza algunas técnicas manuales, mecánicas o digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales utilizados son insuficientes y se podrían mejorar.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que cumple con la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son apropiados, pero admiten mejora.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que no solo cumple con la necesidad prevista, sino que muestra elementos de innovación o creatividad.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera muy efectiva, y su uso mejora la calidad del producto final.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales con gran habilidad, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son óptimos y aumentan la calidad del producto final.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que es excepcional en términos de diseño, funcionalidad e innovación.</li><li class='pl-2'>Demuestra un uso maestro de las herramientas de diseño asistido, lo que mejora significativamente la calidad del producto final.</li><li class='pl-2'>Demuestra una gran maestría en el uso de técnicas manuales, mecánicas y digitales, y la selección y uso de materiales y recursos mecánicos, eléctricos, electrónicos y digitales son excepcionales, aportando a la funcionalidad y la innovación del producto final.</li></ul>" }
-      ]
-    },
-    {
-      id: "c6",
-      titulo: "TEC.4.3.1. Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
-      descripcion: "Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
-      competencia: 3,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No intercambia información ni fomenta el trabajo en equipo.</li><li class='pl-2'>No emplea las herramientas digitales adecuadas ni el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma escasa o inadecuada.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma deficiente o incompleta.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma adecuada y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma correcta y completa.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma eficaz y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma óptima y precisa.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma excelente y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma excelente y creativa.</li></ul>" }
-      ]
-    },
-    {
-      id: "c7",
-      titulo: "TEC.4.3.2. Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
-      descripcion: "Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
-      competencia: 3,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es confusa, desorganizada y no se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son monótonas y no transmiten interés ni seguridad.</li><li class='pl-2'>El discurso es incoherente, irrelevante o incompleto.</li><li class='pl-2'>El lenguaje es excluyente y sexista.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es poco clara, poco estructurada y se desvía del tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son poco variadas y transmiten poco interés o seguridad.</li><li class='pl-2'>El discurso es poco coherente, poco relevante o poco completo.</li><li class='pl-2'>El lenguaje es poco inclusivo y poco respetuoso con la diversidad.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es clara, estructurada y se ajusta aproximadamente al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son adecuadas y transmiten interés y seguridad.</li><li class='pl-2'>El discurso es coherente, relevante y completo.</li><li class='pl-2'>El lenguaje es inclusivo y respeta la diversidad.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es muy clara, muy estructurada y se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son variadas y transmiten mucho interés y seguridad.</li><li class='pl-2'>El discurso es muy coherente, muy relevante y muy completo.</li><li class='pl-2'>El lenguaje es muy inclusivo y muy respetuoso con la diversidad.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es excelente, creativa y se ajusta al tiempo establecido con precisión.</li><li class='pl-2'>La entonación y la expresión son dinámicas y transmiten entusiasmo y confianza.</li><li class='pl-2'>El discurso es excelente, original y exhaustivo.</li><li class='pl-2'>El lenguaje es excelente, inclusivo y respetuoso con la diversidad en todo momento.</li></ul>" }
-      ]
-    },
-    {
-      id: "c8",
-      titulo: "TEC.4.4.1. Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática y componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
-      descripcion: "Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática y componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
-      competencia: 4,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No realiza ni entrega los proyectos y/o prácticas de sistemas automáticos programables y robots o los hace con errores graves.</li><li class='pl-2'>No sabe qué son ni cómo funciona la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>No relaciona los contenidos de tecnología con otras materias.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots con retraso o con errores significativos.</li><li class='pl-2'>Sabe qué son algunos elementos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control, pero no cómo funcionan.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma superficial o incompleta.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan los elementos básicos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma adecuada y coherente.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y sin errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan varios elementos avanzados de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma amplia y profunda.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Sabe qué son y cómo funcionan diversos elementos innovadores o creativos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias crítica y reflexivamente.</li></ul>" }
-      ]
-    },
-    {
-      id: "c9",
-      titulo: "TEC.4.4.2. Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
-      descripcion: "Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
-      competencia: 4,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni utiliza las aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>No realiza ningún intento por incorporar una aplicación de IoT, Big Data o IA en un proyecto y/o práctica, ni muestra interés por entender su uso ético y seguro.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos, pero no las utiliza adecuadamente.</li><li class='pl-2'>Intenta incorporar una aplicación de IoT en un proyecto y/o práctica, pero no logra conectarla ni operar correctamente.</li><li class='pl-2'>Muestra una comprensión limitada del uso ético y seguro de estos dispositivos.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de modo muy básico una aplicación de IoT en un proyecto y/o práctica, demostrando un uso ético y seguro muy básico de la tecnología.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con autonomía varias aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra una aplicación de IoT y utiliza Big Data o IA en un proyecto o práctica más complejo/a, demostrando un uso ético y seguro avanzado de estas tecnologías.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con creatividad diversas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de manera innovadora y avanzada aplicaciones de IoT, Big Data e IA en un proyecto y/o práctica complejo/a y original, demostrando un alto nivel de uso ético y seguro de estas tecnologías.</li></ul>" }
-      ]
-    },
-    {
-      id: "c10",
-      titulo: "TEC.4.5.1. Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
-      descripcion: "Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
-      competencia: 5,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No entrega las tareas o las hace con errores graves.</li><li class='pl-2'>No realiza ningún intento de uso de herramientas digitales para completar las tareas asignadas en clase.</li><li class='pl-2'>No se observa evidencia de trabajo o esfuerzo en las actividades asignadas.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas con retraso o con errores significativos.</li><li class='pl-2'>Intenta usar una herramienta digital para completar una tarea en clase pero necesita ayuda constante y su resultado final es incompleto.</li><li class='pl-2'>Se puede ver un intento en las actividades, aunque su aplicación de conocimientos es muy limitada.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe usar y configurar las aplicaciones y herramientas digitales que se le indican, siguiendo instrucciones o ejemplos dados pero de modo básico.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma básica.</li><li class='pl-2'>Trabaja por su cuenta cuando es necesario, pero no siempre.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y sin errores.</li><li class='pl-2'>Demuestra un uso eficiente y autónomo de diferentes herramientas digitales para completar tareas en clase y su aplicación interdisciplinaria de conocimientos es clara.</li><li class='pl-2'>Trabaja por su cuenta con iniciativa y responsabilidad.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Utiliza de manera experta y creativa diversas herramientas digitales para resolver tareas de clase, aplicando conocimientos interdisciplinares de manera innovadora.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma crítica y reflexiva.</li><li class='pl-2'>Trabaja por su cuenta con proactividad e independencia.</li></ul>" }
-      ]
-    },
-    {
-      id: "c11",
-      titulo: "TEC.4.6.1. Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
-      descripcion: "Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
-      competencia: 6,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No reconoce el concepto de sostenibilidad y accesibilidad y no puede identificar estos criterios en el uso de materiales o desarrollo de procesos tecnológicos.</li><li class='pl-2'>No respeta las normas de seguridad e higiene en el taller.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e identifica algunos materiales y procesos tecnológicos sostenibles y accesibles pero tiene dificultades para aplicar estos conceptos en su trabajo.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller solo cuando se le recuerda.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona materiales sostenibles y accesibles para un proyecto o práctica simple.</li><li class='pl-2'>Además, muestra un entendimiento básico de cómo su proceso de trabajo puede minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller siempre que se le indica.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e implementa materiales sostenibles y accesibles en un proyecto o práctica de mediana complejidad.</li><li class='pl-2'>Además, muestra un entendimiento avanzado de cómo su proceso de trabajo puede minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con iniciativa y responsabilidad.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona, implementa y justifica el uso de materiales sostenibles y accesibles en un proyecto de alta complejidad o en una práctica avanzada.</li><li class='pl-2'>Demuestra constantemente cómo su proceso de trabajo minimiza el impacto negativo en la sociedad y el planeta, y hace propuestas para mejorar la sostenibilidad y accesibilidad en futuros proyectos.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con proactividad e independencia.</li></ul>" }
-      ]
-    },
-    {
-      id: "c12",
-      titulo: "TEC.4.6.2. Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
-      descripcion: "Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
-      competencia: 6,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra comprensión alguna de los conceptos de arquitectura bioclimática y ecotransporte, y no es capaz de identificar su relación con el cuidado del entorno y el desarrollo sostenible.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una mínima comprensión de los conceptos de arquitectura bioclimática y ecotransporte, y sus beneficios para el cuidado del entorno, pero tiene dificultades para conectar estos conceptos con el desarrollo sostenible.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una aceptable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir los beneficios de la arquitectura bioclimática y el ecotransporte para el cuidado del entorno.</li><li class='pl-2'>Muestra una comprensión básica de cómo estas tecnologías pueden contribuir al desarrollo sostenible.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una notable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir cómo influyen en el medio ambiente, dando ejemplos concretos o reales.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos concretos o reales.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una sobresaliente comprensión de los conceptos de arquitectura bioclimática y ecotransporte y cómo influyen en el medio ambiente, dando ejemplos originales o creativos.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos originales o creativos.</li></ul>" }
-      ]
-    },
-    {
-      id: "c13",
-      titulo: "TEC.4.6.3. Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
-      descripcion: "Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
-      competencia: 6,
-      niveles: [
-        { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni valora la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, no sabe qué son ni para qué sirven estos tipos de proyectos.</li><li class='pl-2'>No muestra interés ni participación en ellos.</li></ul>" },
-        { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora parcialmente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son algunos de estos tipos de proyectos, pero no para qué sirven.</li><li class='pl-2'>Muestra poco interés y participación en ellos.</li></ul>" },
-        { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora correctamente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos.</li><li class='pl-2'>Muestra interés y participación en ellos cuando se le indica.</li></ul>" },
-        { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora muy bien la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos concretos o reales.</li><li class='pl-2'>Muestra interés y participación en ellos con iniciativa y responsabilidad.</li></ul>" },
-        { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora excelentemente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos originales o creativos.</li><li class='pl-2'>Muestra interés y participación en ellos con proactividad e independencia.</li></ul>" }
-      ]
-    }
-  ],
-
-  cleanDescriptor(htmlString) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlString;
-    const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
-    const textoLimpio = textoPlano.replace(/\s+/g, ' ').trim();
-    return `"${textoLimpio.replace(/"/g, '""')}"`;
-  },
-
-  getExportData(format, nivelesInvertidos) {
-    let puntosLinea = "\t";
-    let descriptoresLinea = "\t";
-
-    const desc_10 = this.cleanDescriptor(nivelesInvertidos[0].descriptor);
-    const desc_8_9 = this.cleanDescriptor(nivelesInvertidos[1].descriptor);
-    const desc_5_6 = this.cleanDescriptor(nivelesInvertidos[2].descriptor);
-    const desc_3_4 = this.cleanDescriptor(nivelesInvertidos[3].descriptor);
-    const desc_1_2 = this.cleanDescriptor(nivelesInvertidos[4].descriptor);
-    const desc_0 = `"No entregado"`;
-
-    switch(String(format)) {
-      case '1':
-        puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
-        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
-        break;
-      case '2':
-        puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0\t0.0";
-        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}\t${desc_0}`;
-        break;
-      case '3':
-        puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5";
-        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}`;
-        break;
-      case '4':
-        puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5\t0.0";
-        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}\t${desc_0}`;
-        break;
-      default:
-        puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
-        descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
-    }
-    
-    return { puntosLinea, descriptoresLinea };
-  },
-
-  getTituloAbreviado(tituloCompleto) {
-    const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
-    if (!codigoMatch) return tituloCompleto;
-    
-    const codigo = codigoMatch[1] + ".";
-    
-    let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
-    
-    const abreviaciones = {
-      'Intercambiar información': 'Intercambio información',
-      'Presentar y difundir': 'Presentación en público',
-      'Idear y planificar': 'Ideación y planificación',
-      'Estrategias colaborativas': 'Trabajo colaborativo',
-      'Gestión creativa de proyectos': 'Gestión de proyectos',
-      'Analizar diseño y ciclo de vida': 'Análisis de diseño',
-      'Fabricar productos': 'Fabricación de productos',
-      'Diseñar sistemas automáticos': 'Sistemas automáticos',
-      'Integrar tecnologías emergentes': 'Tecnologías emergentes',
-      'Resolver tareas': 'Resolución de tareas',
-      'Uso responsable': 'Sostenibilidad',
-      'Analizar arquitectura bioclimática': 'Arquitectura bioclimática',
-      'Valorar proyectos sociales': 'Proyectos sociales'
-    };
-    
-    for (const [completo, abreviado] of Object.entries(abreviaciones)) {
-      if (descripcionAbreviada.includes(completo)) {
-        descripcionAbreviada = abreviado;
-        break;
-      }
-    }
-    
-    descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
-    
-    return `${codigo} ${descripcionAbreviada}`;
-  },
-
-exportarCSV() {
-            const criteriosUtilizados = new Set();
-            AppState.tareasSeleccionadas.forEach(tarea => {
-                AppState.criteriosPorTarea[tarea].forEach(criterio => {
-                    criteriosUtilizados.add(criterio);
-                });
-            });
-
-            const rubricasParaExportar = this.rubricasData.filter(rubrica => {
-                const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
-                return criteriosUtilizados.has(codigoRubrica);
-            });
-
-            if (rubricasParaExportar.length === 0) {
-                alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
-                return;
-            }
-
-            const format = '1';
-            
-            let csvRows = [
-                "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
-                "v1.0-s"
-            ];
-
-            rubricasParaExportar.forEach(criterio => {
-                const tituloAbreviado = this.getTituloAbreviado(criterio.titulo);
-                csvRows.push(tituloAbreviado);
-                csvRows.push(criterio.descripcion);
-                
-                const nivelesInvertidos = [...criterio.niveles].reverse();
-                const { puntosLinea, descriptoresLinea } = this.getExportData(format, nivelesInvertidos);
-                
-                csvRows.push(puntosLinea);
-                csvRows.push(descriptoresLinea);
-                csvRows.push("");
-            });
-
-            const csvString = csvRows.join('\r\n'); // Usar \r\n para compatibilidad Windows
-            const BOM = '\uFEFF'; // BOM para UTF-8
-            const blob = new Blob([BOM + csvString], { 
-                type: 'text/csv; charset=utf-8' // Especificar charset explícitamente
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            
-            const actividad = document.getElementById('actividad').value || "Evaluacion";
-            link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-
-            setTimeout(() => {
-                alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
-            }, 500);
+    const RubricasManager = {
+      rubricasData: [
+        {
+          id: "c1",
+          titulo: "TEC.4.1.1. Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
+          descripcion: "Idear y planificar soluciones tecnológicas emprendedoras que generen un valor para la comunidad, a partir de la observación y el análisis del entorno más cercano, estudiando sus necesidades, requisitos y posibilidades de mejora.",
+          competencia: 1,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, no realiza ninguna observación documentada ni análisis de las necesidades del entorno.</li><li class='pl-2'>No presenta ninguna propuesta de solución tecnológica.</li><li class='pl-2'>No incluye un plan de acción ni lista de recursos necesarios.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis del entorno, pero no están enfocadas en necesidades o requisitos relevantes.</li><li class='pl-2'>Sus propuestas de solución son poco viables.</li><li class='pl-2'>Sus propuestas de solución son básicas y necesitan más desarrollo.</li><li class='pl-2'>Su plan de acción es limitado, falta detalle y no identifica recursos necesarios.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis adecuados del entorno.</li><li class='pl-2'>Propone soluciones tecnológicas viables, aunque pueden necesitar más refinamiento.</li><li class='pl-2'>Presenta un plan de acción básico, pero puede mejorar en detalle y organización.</li><li class='pl-2'>Identifica algunos recursos necesarios.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos del entorno.</li><li class='pl-2'>Sus propuestas de solución son creativas y bien desarrolladas.</li><li class='pl-2'>Su plan de acción es detallado y organizado, considerando la mayoría de los factores importantes.</li><li class='pl-2'>Identifica la mayoría de los recursos necesarios.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>En su proyecto, realiza observaciones y análisis exhaustivos, precisos y relevantes del entorno.</li><li class='pl-2'>Sus propuestas de solución son innovadoras, originales y muy bien desarrolladas.</li><li class='pl-2'>Su plan de acción es muy detallado, bien organizado, y considera todos los factores importantes y posibles contratiempos.</li><li class='pl-2'>Identifica todos los recursos necesarios.</li></ul>" }
+          ]
+        },
+        {
+          id: "c2",
+          titulo: "TEC.4.1.2. Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
+          descripcion: "Aplicar con iniciativa estrategias colaborativas de gestión de proyectos con una perspectiva interdisciplinar y siguiendo un proceso iterativo de validación, desde la fase de ideación hasta la difusión de la solución.",
+          competencia: 1,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No participa activamente en el proyecto ni aporta ideas o soluciones.</li><li class='pl-2'>No se comunica ni coopera con el resto del equipo.</li><li class='pl-2'>No respeta las normas ni los plazos establecidos.</li><li class='pl-2'>No tiene en cuenta las aportaciones de otras disciplinas ni las necesidades del cliente o usuario.</li><li class='pl-2'>No revisa ni mejora su trabajo ni el del equipo.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa poco en el proyecto y aporta ideas o soluciones poco originales o adecuadas.</li><li class='pl-2'>Se comunica y coopera poco con el resto del equipo.</li><li class='pl-2'>Respeta poco las normas y los plazos establecidos.</li><li class='pl-2'>Tiene poco en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora poco su trabajo y el del equipo.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa en el proyecto y aporta ideas o soluciones originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera con el resto del equipo.</li><li class='pl-2'>Respeta las normas y los plazos establecidos.</li><li class='pl-2'>Tiene en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora su trabajo y el del equipo.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa mucho en el proyecto y aporta ideas o soluciones muy originales y adecuadas.</li><li class='pl-2'>Se comunica y coopera mucho con el resto del equipo.</li><li class='pl-2'>Respeta mucho las normas y los plazos establecidos.</li><li class='pl-2'>Tiene muy en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora mucho su trabajo y el del equipo.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Participa excelentemente en el proyecto y aporta ideas o soluciones excelentes y adecuadas.</li><li class='pl-2'>Se comunica y coopera excelentemente con el resto del equipo.</li><li class='pl-2'>Respeta excelentemente las normas y los plazos establecidos.</li><li class='pl-2'>Tiene excelentemente en cuenta las aportaciones de otras disciplinas y las necesidades del cliente o usuario.</li><li class='pl-2'>Revisa y mejora excelentemente su trabajo y el del equipo.</li></ul>" }
+          ]
+        },
+        {
+          id: "c3",
+          titulo: "TEC.4.1.3. Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
+          descripcion: "Abordar la gestión del proyecto de forma creativa, aplicando estrategias y técnicas colaborativas adecuadas, así como métodos de investigación en la ideación de soluciones lo más eficientes, accesibles e innovadoras posibles.",
+          competencia: 1,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra creatividad en la concepción o el diseño de su proyecto.</li><li class='pl-2'>Raramente participa en actividades grupales y no aporta al trabajo en equipo.</li><li class='pl-2'>No se observan esfuerzos de investigación para la mejora o la eficiencia del proyecto.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Algunas ideas del proyecto muestran cierta creatividad, pero falta originalidad.</li><li class='pl-2'>Participa en actividades grupales, pero sus contribuciones son mínimas y no siempre aportan al equipo.</li><li class='pl-2'>Se observa una investigación superficial o poco detallada para su proyecto.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto muestra un pensamiento creativo básico y presenta algunas soluciones innovadoras.</li><li class='pl-2'>Colabora regularmente en actividades de grupo y contribuye de manera básica al trabajo en equipo.</li><li class='pl-2'>Realiza una investigación básica que ha permitido leves mejoras en su proyecto.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es notablemente creativo e incluye varias soluciones innovadoras.</li><li class='pl-2'>A menudo toma la iniciativa en actividades de grupo y su contribución mejora significativamente el rendimiento del equipo.</li><li class='pl-2'>Realiza investigaciones detalladas que conducen a soluciones más eficientes y accesibles en su proyecto.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Su proyecto es excepcionalmente creativo, presenta soluciones muy innovadoras que destacan de las demás.</li><li class='pl-2'>Constantemente impulsa y mejora el rendimiento del equipo con su fuerte liderazgo y habilidades colaborativas.</li><li class='pl-2'>Realiza investigaciones exhaustivas y profundas que han llevado a soluciones extremadamente eficientes, accesibles e innovadoras para su proyecto.</li></ul>" }
+          ]
+        },
+        {
+          id: "c4",
+          titulo: "TEC.4.2.1. Analizar el diseño y el ciclo de vida de productos y soluciones tecnológicas, evaluando su demanda, evolución y previsión de fin de ciclo de vida, aplicando un criterio ético, responsable e inclusivo.",
+          descripcion: "Analizar el diseño y el ciclo de vida de productos y soluciones tecnológicas, evaluando su demanda, evolución y previsión de fin de ciclo de vida, aplicando un criterio ético, responsable e inclusivo.",
+          competencia: 2,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No analiza el diseño del producto ni identifica la necesidad que resuelve.</li><li class='pl-2'>No evalúa su demanda, evolución ni previsión de fin de ciclo de vida.</li><li class='pl-2'>No aplica un criterio ético, responsable e inclusivo.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza superficialmente el diseño del producto y reconoce parcialmente la necesidad que resuelve.</li><li class='pl-2'>Evalúa de forma incompleta o inexacta su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma deficiente o inconsistente.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza correctamente el diseño del producto y identifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa adecuadamente su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma coherente y razonada.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza detalladamente el diseño del producto y explica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con precisión su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma rigurosa y argumentada.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Analiza exhaustivamente el diseño del producto y justifica la necesidad que resuelve.</li><li class='pl-2'>Evalúa con profundidad su demanda, evolución y previsión de fin de ciclo de vida.</li><li class='pl-2'>Aplica un criterio ético, responsable e inclusivo de forma excelente y crítica.</li></ul>" }
+          ]
+        },
+        {
+          id: "c5",
+          titulo: "TEC.4.2.2. Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos mecánicos, eléctricos, electrónicos y digitales adecuados.",
+          descripcion: "Fabricar productos y soluciones tecnológicas, aplicando herramientas de diseño asistido, técnicas de elaboración manual, mecánica y digital y utilizando los materiales y recursos mecánicos, eléctricos, electrónicos y digitales adecuados.",
+          competencia: 2,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No logra producir un producto o solución tecnológica, o el resultado es inadecuado o inapropiado.</li><li class='pl-2'>No utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>No utiliza adecuadamente técnicas manuales, mecánicas o digitales, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son inadecuados.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica, pero presenta fallos o es inadecuado para la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido, pero de manera muy limitada o ineficaz.</li><li class='pl-2'>Utiliza algunas técnicas manuales, mecánicas o digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales utilizados son insuficientes y se podrían mejorar.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que cumple con la necesidad prevista.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera efectiva en la creación del producto.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales adecuadamente, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son apropiados, pero admiten mejora.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que no solo cumple con la necesidad prevista, sino que muestra elementos de innovación o creatividad.</li><li class='pl-2'>Utiliza herramientas de diseño asistido de manera muy efectiva, y su uso mejora la calidad del producto final.</li><li class='pl-2'>Utiliza técnicas manuales, mecánicas y digitales con gran habilidad, y los materiales y recursos mecánicos, eléctricos, electrónicos y digitales seleccionados son óptimos y aumentan la calidad del producto final.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Produce un producto o solución tecnológica que es excepcional en términos de diseño, funcionalidad e innovación.</li><li class='pl-2'>Demuestra un uso maestro de las herramientas de diseño asistido, lo que mejora significativamente la calidad del producto final.</li><li class='pl-2'>Demuestra una gran maestría en el uso de técnicas manuales, mecánicas y digitales, y la selección y uso de materiales y recursos mecánicos, eléctricos, electrónicos y digitales son excepcionales, aportando a la funcionalidad y la innovación del producto final.</li></ul>" }
+          ]
+        },
+        {
+          id: "c6",
+          titulo: "TEC.4.3.1. Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
+          descripcion: "Intercambiar información y fomentar el trabajo en equipo de manera asertiva, empleando las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.",
+          competencia: 3,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No intercambia información ni fomenta el trabajo en equipo.</li><li class='pl-2'>No emplea las herramientas digitales adecuadas ni el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma escasa o inadecuada.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma deficiente o incompleta.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma adecuada y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma correcta y completa.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma eficaz y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma óptima y precisa.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Intercambia información y fomenta el trabajo en equipo de forma excelente y asertiva.</li><li class='pl-2'>Emplea las herramientas digitales adecuadas y el vocabulario técnico, símbolos y esquemas de sistemas tecnológicos apropiados de forma excelente y creativa.</li></ul>" }
+          ]
+        },
+        {
+          id: "c7",
+          titulo: "TEC.4.3.2. Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
+          descripcion: "Presentar y difundir las propuestas o soluciones tecnológicas de manera efectiva, empleando la entonación, expresión, gestión del tiempo y adaptación adecuada del discurso, así como un lenguaje inclusivo y no sexista.",
+          competencia: 3,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es confusa, desorganizada y no se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son monótonas y no transmiten interés ni seguridad.</li><li class='pl-2'>El discurso es incoherente, irrelevante o incompleto.</li><li class='pl-2'>El lenguaje es excluyente y sexista.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es poco clara, poco estructurada y se desvía del tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son poco variadas y transmiten poco interés o seguridad.</li><li class='pl-2'>El discurso es poco coherente, poco relevante o poco completo.</li><li class='pl-2'>El lenguaje es poco inclusivo y poco respetuoso con la diversidad.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es clara, estructurada y se ajusta aproximadamente al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son adecuadas y transmiten interés y seguridad.</li><li class='pl-2'>El discurso es coherente, relevante y completo.</li><li class='pl-2'>El lenguaje es inclusivo y respeta la diversidad.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es muy clara, muy estructurada y se ajusta al tiempo establecido.</li><li class='pl-2'>La entonación y la expresión son variadas y transmiten mucho interés y seguridad.</li><li class='pl-2'>El discurso es muy coherente, muy relevante y muy completo.</li><li class='pl-2'>El lenguaje es muy inclusivo y muy respetuoso con la diversidad.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>La presentación es excelente, creativa y se ajusta al tiempo establecido con precisión.</li><li class='pl-2'>La entonación y la expresión son dinámicas y transmiten entusiasmo y confianza.</li><li class='pl-2'>El discurso es excelente, original y exhaustivo.</li><li class='pl-2'>El lenguaje es excelente, inclusivo y respetuoso con la diversidad en todo momento.</li></ul>" }
+          ]
+        },
+        {
+          id: "c8",
+          titulo: "TEC.4.4.1. Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática y componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
+          descripcion: "Diseñar, construir, controlar y simular sistemas automáticos programables y robots que sean capaces de realizar tareas de forma autónoma, aplicando conocimientos de mecánica, electrónica, neumática y componentes de los sistemas de control, así como otros conocimientos interdisciplinares.",
+          competencia: 4,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No realiza ni entrega los proyectos y/o prácticas de sistemas automáticos programables y robots o los hace con errores graves.</li><li class='pl-2'>No sabe qué son ni cómo funciona la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>No relaciona los contenidos de tecnología con otras materias.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots con retraso o con errores significativos.</li><li class='pl-2'>Sabe qué son algunos elementos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control, pero no cómo funcionan.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma superficial o incompleta.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan los elementos básicos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma adecuada y coherente.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y sin errores.</li><li class='pl-2'>Sabe qué son y cómo funcionan varios elementos avanzados de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma amplia y profunda.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Realiza y entrega los proyectos y/o prácticas de sistemas automáticos programables y robots en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Sabe qué son y cómo funcionan diversos elementos innovadores o creativos de la mecánica y/o electrónica y/o neumática y/o los componentes de los sistemas de control.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias crítica y reflexivamente.</li></ul>" }
+          ]
+        },
+        {
+          id: "c9",
+          titulo: "TEC.4.4.2. Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
+          descripcion: "Integrar en las máquinas y sistemas tecnológicos aplicaciones informáticas y tecnologías digitales emergentes de control y simulación como el internet de las cosas, el big data y la inteligencia artificial con sentido crítico y ético.",
+          competencia: 4,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni utiliza las aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>No realiza ningún intento por incorporar una aplicación de IoT, Big Data o IA en un proyecto y/o práctica, ni muestra interés por entender su uso ético y seguro.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos, pero no las utiliza adecuadamente.</li><li class='pl-2'>Intenta incorporar una aplicación de IoT en un proyecto y/o práctica, pero no logra conectarla ni operar correctamente.</li><li class='pl-2'>Muestra una comprensión limitada del uso ético y seguro de estos dispositivos.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente algunas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de modo muy básico una aplicación de IoT en un proyecto y/o práctica, demostrando un uso ético y seguro muy básico de la tecnología.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con autonomía varias aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra una aplicación de IoT y utiliza Big Data o IA en un proyecto o práctica más complejo/a, demostrando un uso ético y seguro avanzado de estas tecnologías.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y utiliza correctamente y con creatividad diversas aplicaciones informáticas y tecnologías digitales de control y simulación en las máquinas y sistemas tecnológicos.</li><li class='pl-2'>Configura e integra de manera innovadora y avanzada aplicaciones de IoT, Big Data e IA en un proyecto y/o práctica complejo/a y original, demostrando un alto nivel de uso ético y seguro de estas tecnologías.</li></ul>" }
+          ]
+        },
+        {
+          id: "c10",
+          titulo: "TEC.4.5.1. Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
+          descripcion: "Resolver tareas propuestas de manera eficiente mediante el uso y configuración de diferentes aplicaciones y herramientas digitales, aplicando conocimientos interdisciplinares con autonomía.",
+          competencia: 5,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No entrega las tareas o las hace con errores graves.</li><li class='pl-2'>No realiza ningún intento de uso de herramientas digitales para completar las tareas asignadas en clase.</li><li class='pl-2'>No se observa evidencia de trabajo o esfuerzo en las actividades asignadas.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas con retraso o con errores significativos.</li><li class='pl-2'>Intenta usar una herramienta digital para completar una tarea en clase pero necesita ayuda constante y su resultado final es incompleto.</li><li class='pl-2'>Se puede ver un intento en las actividades, aunque su aplicación de conocimientos es muy limitada.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con pocos errores.</li><li class='pl-2'>Sabe usar y configurar las aplicaciones y herramientas digitales que se le indican, siguiendo instrucciones o ejemplos dados pero de modo básico.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma básica.</li><li class='pl-2'>Trabaja por su cuenta cuando es necesario, pero no siempre.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y sin errores.</li><li class='pl-2'>Demuestra un uso eficiente y autónomo de diferentes herramientas digitales para completar tareas en clase y su aplicación interdisciplinaria de conocimientos es clara.</li><li class='pl-2'>Trabaja por su cuenta con iniciativa y responsabilidad.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Entrega las tareas en el plazo establecido y con un nivel superior al esperado.</li><li class='pl-2'>Utiliza de manera experta y creativa diversas herramientas digitales para resolver tareas de clase, aplicando conocimientos interdisciplinares de manera innovadora.</li><li class='pl-2'>Relaciona los contenidos de tecnología con otras materias de forma crítica y reflexiva.</li><li class='pl-2'>Trabaja por su cuenta con proactividad e independencia.</li></ul>" }
+          ]
+        },
+        {
+          id: "c11",
+          titulo: "TEC.4.6.1. Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
+          descripcion: "Hacer un uso responsable de la tecnología, mediante el análisis y aplicación de criterios de sostenibilidad y accesibilidad en la selección de materiales y en el diseño de estos, así como en los procesos de fabricación de productos tecnológicos, minimizando el impacto negativo en la sociedad y en el planeta.",
+          competencia: 6,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No reconoce el concepto de sostenibilidad y accesibilidad y no puede identificar estos criterios en el uso de materiales o desarrollo de procesos tecnológicos.</li><li class='pl-2'>No respeta las normas de seguridad e higiene en el taller.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e identifica algunos materiales y procesos tecnológicos sostenibles y accesibles pero tiene dificultades para aplicar estos conceptos en su trabajo.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller solo cuando se le recuerda.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona materiales sostenibles y accesibles para un proyecto o práctica simple.</li><li class='pl-2'>Además, muestra un entendimiento básico de cómo su proceso de trabajo puede minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller siempre que se le indica.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona e implementa materiales sostenibles y accesibles en un proyecto o práctica de mediana complejidad.</li><li class='pl-2'>Además, muestra un entendimiento avanzado de cómo su proceso de trabajo puede minimizar el impacto negativo en la sociedad y el planeta.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con iniciativa y responsabilidad.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Selecciona, implementa y justifica el uso de materiales sostenibles y accesibles en un proyecto de alta complejidad o en una práctica avanzada.</li><li class='pl-2'>Demuestra constantemente cómo su proceso de trabajo minimiza el impacto negativo en la sociedad y el planeta, y hace propuestas para mejorar la sostenibilidad y accesibilidad en futuros proyectos.</li><li class='pl-2'>Respeta las normas de seguridad e higiene en el taller con proactividad e independencia.</li></ul>" }
+          ]
+        },
+        {
+          id: "c12",
+          titulo: "TEC.4.6.2. Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
+          descripcion: "Analizar los beneficios que, en el cuidado del entorno, aportan la arquitectura bioclimática y el ecotransporte, valorando la contribución de las tecnologías al desarrollo sostenible.",
+          competencia: 6,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No muestra comprensión alguna de los conceptos de arquitectura bioclimática y ecotransporte, y no es capaz de identificar su relación con el cuidado del entorno y el desarrollo sostenible.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una mínima comprensión de los conceptos de arquitectura bioclimática y ecotransporte, y sus beneficios para el cuidado del entorno, pero tiene dificultades para conectar estos conceptos con el desarrollo sostenible.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una aceptable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir los beneficios de la arquitectura bioclimática y el ecotransporte para el cuidado del entorno.</li><li class='pl-2'>Muestra una comprensión básica de cómo estas tecnologías pueden contribuir al desarrollo sostenible.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una notable comprensión de los conceptos de arquitectura bioclimática y ecotransporte y es capaz de describir cómo influyen en el medio ambiente, dando ejemplos concretos o reales.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos concretos o reales.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Muestra una sobresaliente comprensión de los conceptos de arquitectura bioclimática y ecotransporte y cómo influyen en el medio ambiente, dando ejemplos originales o creativos.</li><li class='pl-2'>Reconoce el papel de diversas tecnologías para mejorar la calidad de vida de las personas y el planeta, dando ejemplos originales o creativos.</li></ul>" }
+          ]
+        },
+        {
+          id: "c13",
+          titulo: "TEC.4.6.3. Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
+          descripcion: "Identificar y valorar la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.",
+          competencia: 6,
+          niveles: [
+            { nivel: "(1-2.9)", color: "bg-red-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>No identifica ni valora la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, no sabe qué son ni para qué sirven estos tipos de proyectos.</li><li class='pl-2'>No muestra interés ni participación en ellos.</li></ul>" },
+            { nivel: "(3-4.9)", color: "bg-orange-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora parcialmente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son algunos de estos tipos de proyectos, pero no para qué sirven.</li><li class='pl-2'>Muestra poco interés y participación en ellos.</li></ul>" },
+            { nivel: "(5-6.9)", color: "bg-yellow-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora correctamente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos.</li><li class='pl-2'>Muestra interés y participación en ellos cuando se le indica.</li></ul>" },
+            { nivel: "(7-8.9)", color: "bg-green-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora muy bien la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos concretos o reales.</li><li class='pl-2'>Muestra interés y participación en ellos con iniciativa y responsabilidad.</li></ul>" },
+            { nivel: "(9-10)", color: "bg-blue-50", descriptor: "<ul class='list-disc list-inside space-y-1'><li class='pl-2'>Identifica y valora excelentemente la repercusión y los beneficios del desarrollo de proyectos tecnológicos de carácter social, por medio de comunidades abiertas, acciones de voluntariado o proyectos de servicio a la comunidad.</li><li class='pl-2'>Por ejemplo, sabe qué son y para qué sirven estos tipos de proyectos, dando ejemplos originales o creativos.</li><li class='pl-2'>Muestra interés y participación en ellos con proactividad e independencia.</li></ul>" }
+          ]
         }
+      ],
+
+      cleanDescriptor(htmlString) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlString;
+        const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
+        const textoLimpio = textoPlano.replace(/\s+/g, ' ').trim();
+        return `"${textoLimpio.replace(/"/g, '""')}"`;
+      },
+
+      getExportData(format, nivelesInvertidos) {
+        let puntosLinea = "\t";
+        let descriptoresLinea = "\t";
+
+        const desc_10 = this.cleanDescriptor(nivelesInvertidos[0].descriptor);
+        const desc_8_9 = this.cleanDescriptor(nivelesInvertidos[1].descriptor);
+        const desc_5_6 = this.cleanDescriptor(nivelesInvertidos[2].descriptor);
+        const desc_3_4 = this.cleanDescriptor(nivelesInvertidos[3].descriptor);
+        const desc_1_2 = this.cleanDescriptor(nivelesInvertidos[4].descriptor);
+        const desc_0 = `"No entregado"`;
+
+        switch(String(format)) {
+          case '1':
+            puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
+            descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+            break;
+          case '2':
+            puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0\t0.0";
+            descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}\t${desc_0}`;
+            break;
+          case '3':
+            puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5";
+            descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}`;
+            break;
+          case '4':
+            puntosLinea += "10.0\t8.5\t7.5\t6.5\t5.5\t4.5\t3.5\t2.5\t1.5\t0.0";
+            descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_8_9}\t${desc_5_6}\t${desc_5_6}\t${desc_3_4}\t${desc_3_4}\t${desc_1_2}\t${desc_1_2}\t${desc_0}`;
+            break;
+          default:
+            puntosLinea += "10.0\t8.0\t6.0\t4.0\t2.0";
+            descriptoresLinea += `${desc_10}\t${desc_8_9}\t${desc_5_6}\t${desc_3_4}\t${desc_1_2}`;
+        }
+        
+        return { puntosLinea, descriptoresLinea };
+      },
+
+      getTituloAbreviado(tituloCompleto) {
+        const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
+        if (!codigoMatch) return tituloCompleto;
+        
+        const codigo = codigoMatch[1] + ".";
+        
+        let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
+        
+        const abreviaciones = {
+          'Intercambiar información': 'Intercambio información',
+          'Presentar y difundir': 'Presentación en público',
+          'Idear y planificar': 'Ideación y planificación',
+          'Estrategias colaborativas': 'Trabajo colaborativo',
+          'Gestión creativa de proyectos': 'Gestión de proyectos',
+          'Analizar diseño y ciclo de vida': 'Análisis de diseño',
+          'Fabricar productos': 'Fabricación de productos',
+          'Diseñar sistemas automáticos': 'Sistemas automáticos',
+          'Integrar tecnologías emergentes': 'Tecnologías emergentes',
+          'Resolver tareas': 'Resolución de tareas',
+          'Uso responsable': 'Sostenibilidad',
+          'Analizar arquitectura bioclimática': 'Arquitectura bioclimática',
+          'Valorar proyectos sociales': 'Proyectos sociales'
+        };
+        
+        for (const [completo, abreviado] of Object.entries(abreviaciones)) {
+          if (descripcionAbreviada.includes(completo)) {
+            descripcionAbreviada = abreviado;
+            break;
+          }
+        }
+        
+        descripcionAbreviada = descripcionAbreviada.charAt(0).toUpperCase() + descripcionAbreviada.slice(1);
+        
+        return `${codigo} ${descripcionAbreviada}`;
+      },
+
+      exportarCSV() {
+        const criteriosUtilizados = new Set();
+        AppState.tareasSeleccionadas.forEach(tarea => {
+          AppState.criteriosPorTarea[tarea].forEach(criterio => {
+            criteriosUtilizados.add(criterio);
+          });
+        });
+
+        const rubricasParaExportar = this.rubricasData.filter(rubrica => {
+          const codigoRubrica = rubrica.titulo.split(' ')[0].replace('TEC.', 'TEC').replace(/\.$/, '');
+          return criteriosUtilizados.has(codigoRubrica);
+        });
+
+        if (rubricasParaExportar.length === 0) {
+          alert("No se encontraron rúbricas para los criterios utilizados en esta evaluación.");
+          return;
+        }
+
+        const format = '1';
+        
+        let csvRows = [
+          "Se recomienda no editar las guías de evaluación en formato de hoja de cálculo",
+          "v1.0-s"
+        ];
+
+        rubricasParaExportar.forEach(criterio => {
+          const tituloAbreviado = this.getTituloAbreviado(criterio.titulo);
+          csvRows.push(tituloAbreviado);
+          csvRows.push(criterio.descripcion);
+          
+          const nivelesInvertidos = [...criterio.niveles].reverse();
+          const { puntosLinea, descriptoresLinea } = this.getExportData(format, nivelesInvertidos);
+          
+          csvRows.push(puntosLinea);
+          csvRows.push(descriptoresLinea);
+          csvRows.push("");
+        });
+
+        const csvString = csvRows.join('\r\n'); // Usar \r\n para compatibilidad Windows
+        const BOM = '\uFEFF'; // BOM para UTF-8
+        const blob = new Blob([BOM + csvString], { 
+          type: 'text/csv; charset=utf-8' // Especificar charset explícitamente
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        
+        const actividad = document.getElementById('actividad').value || "Evaluacion";
+        link.setAttribute('download', `rubricas_${actividad.replace(/ /g, '_')}.csv`);
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        setTimeout(() => {
+          alert(`Se han exportado ${rubricasParaExportar.length} rúbrica(s) en formato CSV.\n\nPara importar a Google Classroom:\n\n1. Abre una Google Sheet en blanco\n2. Importa este archivo CSV\n3. Renombra la hoja (ej: "Rúbrica para importar")\n4. Importa desde Google Classroom`);
+        }, 500);
+      }
     };
 
     // =========================================================================
@@ -1865,6 +1930,12 @@ exportarCSV() {
         TareasManager.inicializar();
         this.inicializarSeccionesColapsables();
         this.configurarEventListeners();
+        
+        // Estado inicial: solo tareas expandidas
+        SectionManager.colapsarSeccion('nombres-alumnos');
+        SectionManager.expandirSeccion('tareas');
+        SectionManager.ocultarSeccion('evaluacion');
+        SectionManager.ocultarSeccion('resultados');
         
         window.addEventListener('resize', Utils.ajustarTooltips);
         
@@ -1939,14 +2010,15 @@ exportarCSV() {
         
         // Navegación
         document.getElementById('nueva-evaluacion').addEventListener('click', () => {
-          document.getElementById('evaluacion-section').style.display = 'none';
-          document.getElementById('resultados-section').style.display = 'none';
+          SectionManager.ocultarSeccion('evaluacion');
+          SectionManager.ocultarSeccion('resultados');
+          SectionManager.expandirSeccion('tareas'); // Volver a mostrar tareas
           Utils.scrollToElement('config-section');
         });
         
         document.getElementById('volver-evaluacion').addEventListener('click', () => {
-          document.getElementById('resultados-section').style.display = 'none';
-          document.getElementById('evaluacion-section').style.display = 'block';
+          SectionManager.ocultarSeccion('resultados');
+          SectionManager.mostrarYExpandirSeccion('evaluacion');
           Utils.scrollToElement('evaluacion-section');
         });
         
@@ -1954,6 +2026,7 @@ exportarCSV() {
         document.getElementById('exportar-pdf').addEventListener('click', () => EvaluationManager.exportarPDF());
         document.getElementById('exportar-rubricas-csv').addEventListener('click', () => RubricasManager.exportarCSV());
         document.getElementById('exportar-rubricas-csv-tareas').addEventListener('click', () => RubricasManager.exportarCSV());
+        document.getElementById('exportar-rubricas-csv-evaluacion').addEventListener('click', () => RubricasManager.exportarCSV());
         
         // Validación de inputs
         document.getElementById('valor-total').addEventListener('input', function() {
@@ -1970,7 +2043,10 @@ exportarCSV() {
           githubPanel.style.display = githubPanel.style.display === 'none' ? 'block' : 'none';
           
           if (githubPanel.style.display === 'block') {
+            SectionManager.colapsarSeccion('tareas'); // Colapsar tareas al configurar GitHub
             GitHubManager.verificarToken();
+          } else {
+            SectionManager.expandirSeccion('tareas'); // Expandir tareas al cerrar GitHub
           }
         });
         
