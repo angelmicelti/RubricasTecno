@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>Rúbricas Tecnología 4º ESO</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    /* <script src="https://cdn.tailwindcss.com"></script> */
+    <script src="https://unpkg.com/tailwindcss-cdn@3.4.10/tailwindcss.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1095,43 +1097,44 @@
          * Convierte el título completo en un formato abreviado para la exportación.
          * Ejemplo: "TEC.4.3.1. Intercambiar información" -> "TEC 4.3.1. (intercambio información)"
          */
-        function getTituloAbreviado(tituloCompleto) {
-            // Extraer el código (TEC.4.3.1.)
-            const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
-            if (!codigoMatch) return tituloCompleto;
-            
-            const codigo = codigoMatch[1].replace(/\./g, ' '); // Convertir TEC.4.3.1 a TEC 4.3.1
-            
-            // Extraer la parte descriptiva y crear un título abreviado
-            let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
-            
-            // Crear abreviaciones comunes
-            const abreviaciones = {
-                'Intercambiar información': 'intercambio información',
-                'Presentar y difundir': 'presentación en público',
-                'Idear y planificar': 'ideación y planificación',
-                'Estrategias colaborativas': 'trabajo colaborativo',
-                'Gestión creativa de proyectos': 'gestión de proyectos',
-                'Analizar diseño y ciclo de vida': 'análisis de diseño',
-                'Fabricar productos': 'fabricación de productos',
-                'Diseñar sistemas automáticos': 'sistemas automáticos',
-                'Integrar tecnologías emergentes': 'tecnologías emergentes',
-                'Resolver tareas': 'resolución de tareas',
-                'Uso responsable': 'sostenibilidad',
-                'Analizar arquitectura bioclimática': 'arquitectura bioclimática',
-                'Valorar proyectos sociales': 'proyectos sociales'
-            };
-            
-            // Aplicar abreviación si existe
-            for (const [completo, abreviado] of Object.entries(abreviaciones)) {
-                if (descripcionAbreviada.includes(completo)) {
-                    descripcionAbreviada = abreviado;
-                    break;
-                }
-            }
-            
-            return `${codigo}. (${descripcionAbreviada})`;
-        }
+				function getTituloAbreviado(tituloCompleto) {
+			// Extraer el código (TEC.4.3.1.)
+			const codigoMatch = tituloCompleto.match(/^(TEC\.\d+\.\d+\.\d+)\./);
+			if (!codigoMatch) return tituloCompleto;
+			
+			const codigo = codigoMatch[1] + '.'; // TEC.4.5.1. (mantiene los puntos)
+			
+			// Extraer la parte descriptiva y crear un título abreviado
+			let descripcionAbreviada = tituloCompleto.replace(/^TEC\.\d+\.\d+\.\d+\.\s*/, '');
+			
+			// Crear abreviaciones comunes
+			const abreviaciones = {
+				'Intercambiar información': 'Intercambiar información',
+				'Presentar y difundir': 'Presentar y difundir',
+				'Idear y planificar': 'Idear y planificar',
+				'Estrategias colaborativas': 'Estrategias colaborativas',
+				'Gestión creativa de proyectos': 'Gestión de proyectos',
+				'Analizar diseño y ciclo de vida': 'Analizar diseño y ciclo de vida',
+				'Fabricar productos': 'Fabricación de productos',
+				'Diseñar sistemas automáticos': 'Diseñar sistemas automáticos',
+				'Integrar tecnologías emergentes': 'Integrar tecnologías emergentes',
+				'Resolver tareas': 'Resolución de tareas',
+				'Uso responsable': 'Uso responsable de la tecnología',
+				'Analizar arquitectura bioclimática': 'Arquitectura bioclimática y ecotransporte',
+				'Valorar proyectos sociales': 'Proyectos tecnológicos de carácter social'
+			};
+			
+			// Aplicar abreviación si existe
+			for (const [completo, abreviado] of Object.entries(abreviaciones)) {
+				if (descripcionAbreviada.includes(completo)) {
+					descripcionAbreviada = abreviado;
+					break;
+				}
+			}
+			
+			return `${codigo} ${descripcionAbreviada}`; // Sin paréntesis
+		}
+
 
     </script>
     <script src="./regist_serviceWorker.js"></script>
