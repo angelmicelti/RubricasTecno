@@ -1,8 +1,29 @@
 ///asignar un nombre y versión al cache
-const CACHE_NAME = 'xamplepwa4',
+const CACHE_NAME = 'xamplepwa5',
     urlsToCache = [
         '.',
         './index.html',
+        './CYR1.html',
+        './CYR2.html',
+        './CYR3.html',
+        './TYD2.html',
+        './TYD3.html',
+        './TEC4.html',
+        './DIG4.html',
+        './EvaluaRubricas.html',
+        './CriteriosTareas.html',
+        './favicon.ico',
+        './favicon.png',
+        './icon-192x192.png',
+        './icon-512x512.png',
+        './manifest.json',
+        './CriteriosEvaluacionCYR1.pdf',
+        './CriteriosEvaluacionCYR2.pdf',
+        './CriteriosEvaluacionCYR3.pdf',
+        './CriteriosEvaluacionTYD2.pdf',
+        './CriteriosEvaluacionTYD3.pdf',
+        './CriteriosEvaluacionTEC4.pdf',
+        './CriteriosEvaluacionDIG4.pdf'
     ]
 //durante la fase de instalación, generalmente se almacena en caché los activos estáticos
 self.addEventListener('install', e => {
