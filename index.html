@@ -178,11 +178,24 @@
                 <a href="DIG4.html" target="_blank" class="btn">Digitalización <br> 4ºESO</a>
             </div>
 
-            <!-- Nueva fila de botones verdes -->
-            <div class="button-row">
-                <a href="EvaluaRubricas.html" target="_blank" class="btn-green">Evaluación de rúbricas</a>
-                <a href="CriteriosTareas.html" target="_blank" class="btn-green">Evaluación completa del alumnado por tareas</a>
-            </div>
+            <!-- Sección Evaluación de rúbricas -->
+<div class="panel-title" id="evaluacion-rubricas-title">
+  <i class="fas fa-clipboard-check"></i> Evaluación de rúbricas
+  <i class="fas fa-chevron-down toggle-icon"></i>
+</div>
+<div class="section-content collapsed" id="evaluacion-rubricas-content">
+  <!-- Selector de tareas predefinidas -->
+  <div class="form-group">
+    <label for="predefined-task-select"><i class="fas fa-list"></i> Selecciona una tarea predefinida</label>
+    <select id="predefined-task-select">
+      <option value="">-- Elige una tarea --</option>
+    </select>
+  </div>
+  <!-- Contenido de EvaluaRubricas.html (sin <html>, <head>, <body>) -->
+  <div id="rubrica-content">
+    <!-- Aquí se insertará dinámicamente el contenido de EvaluaRubricas -->
+  </div>
+</div>
         </div>
         
         <footer>
