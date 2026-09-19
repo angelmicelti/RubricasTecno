@@ -140,13 +140,40 @@
                 font-size: 0.875rem;
             }
         }
+        /* ===== Integración con el Módulo de Evaluación ===== */
+        .export-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+        @media (min-width: 768px) {
+            .export-actions {
+                flex-direction: row;
+                align-items: stretch;
+            }
+        }
+        .eval-send-hint {
+            margin-top: 0.625rem;
+            font-size: 0.8rem;
+            color: #6b7280;
+            line-height: 1.45;
+        }
+        .eval-send-hint strong { color: #4f46e5; }
     </style>
+    
 </head>
 <body class="bg-gray-100">
 
     <!-- PANTALLA PRINCIPAL -->
     <div id="main-screen" class="min-h-screen flex flex-col justify-center items-center p-4 sm:p-6">
         <div class="max-w-lg w-full bg-white rounded-xl shadow-lg p-6 md:p-8 lg:p-10">
+            <a href="index.html" class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors duration-200 self-start mb-2" aria-label="Volver al inicio">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Inicio
+            </a>
+
             <!-- Icono grande principal -->
             <div class="flex justify-center mb-4 md:mb-6">
                 <div class="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-blue-100 flex items-center justify-center">
@@ -239,12 +266,23 @@
                             <option value="4">10, 8.5, 7.5 ... 1.5, 0 (10 niveles, con "No entregado")</option>
                         </select>
                     </div>
+                    <div class="export-actions">
                     <button id="export-csv-button-competencias" class="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 md:px-5 md:py-3 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                         </svg>
                         Exportar a Google Classroom (CSV)
                     </button>
+                        <button id="send-eval-button-competencias" onclick="sendToEvaluation('competencias')" class="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 md:px-5 md:py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75" />
+                            </svg>
+                            Pasar al módulo de evaluación
+                        </button>
+
+                    </div>
+                    <p class="eval-send-hint">Los criterios seleccionados se cargarán en el <strong>Evaluador de Rúbricas</strong> para calificar al alumnado y calcular las notas con coevaluación.</p>
+
                     <div class="text-sm text-gray-600 mt-2">
                         <div class="tooltip-container">
                             <span class="tooltip-trigger">Archivo .csv para llevar a Google Classroom</span>
@@ -333,12 +371,23 @@
                             <option value="4">10, 8.5, 7.5 ... 1.5, 0 (10 niveles, con "No entregado")</option>
                         </select>
                     </div>
+                    <div class="export-actions">
                     <button id="export-csv-button" class="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 md:px-5 md:py-3 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                         </svg>
                         Exportar a Google Classroom (CSV)
                     </button>
+                        <button id="send-eval-button" onclick="sendToEvaluation('multiple')" class="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 md:px-5 md:py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75" />
+                            </svg>
+                            Pasar al módulo de evaluación
+                        </button>
+
+                    </div>
+                    <p class="eval-send-hint">Los criterios seleccionados se cargarán en el <strong>Evaluador de Rúbricas</strong> para calificar al alumnado y calcular las notas con coevaluación.</p>
+
                     <div class="text-sm text-gray-600 mt-2">
                         <div class="tooltip-container">
                             <span class="tooltip-trigger">Archivo .csv para llevar a Google Classroom</span>
@@ -1179,6 +1228,105 @@
             }
             
             return `${codigo} ${descripcionAbreviada}`;
+        }
+
+    
+        // =========================================================================
+        // === INTEGRACIÓN CON EL MÓDULO DE EVALUACIÓN (EvaluaRubricas.html) =======
+        // =========================================================================
+
+        const EVAL_PENDING_KEY = 'evaluador:rubrica-pendiente';
+        const EVAL_SOURCE_TITLE = 'Tecnología y Digitalización 3º ESO';
+        const EVAL_SOURCE_FILE = 'TYD3.html';
+
+        /**
+         * Devuelve los valores de puntuación (de más bajo a más alto) según el
+         * formato elegido, con etiqueta informativa del nivel de la rúbrica.
+         */
+        function getScoreValuesByFormat(format) {
+            switch (String(format)) {
+                case '2':
+                    return ['0 (No entregado)', '2 (1-2.9)', '4 (3-4.9)', '6 (5-6.9)', '8 (7-8.9)', '10 (9-10)'];
+                case '3':
+                    return ['1.5 (1-2.9)', '2.5 (1-2.9)', '3.5 (3-4.9)', '4.5 (3-4.9)', '5.5 (5-6.9)', '6.5 (5-6.9)', '7.5 (7-8.9)', '8.5 (7-8.9)', '10 (9-10)'];
+                case '4':
+                    return ['0 (No entregado)', '1.5 (1-2.9)', '2.5 (1-2.9)', '3.5 (3-4.9)', '4.5 (3-4.9)', '5.5 (5-6.9)', '6.5 (5-6.9)', '7.5 (7-8.9)', '8.5 (7-8.9)', '10 (9-10)'];
+                default:
+                    return ['2 (1-2.9)', '4 (3-4.9)', '6 (5-6.9)', '8 (7-8.9)', '10 (9-10)'];
+            }
+        }
+
+        /**
+         * Crea una etiqueta compacta para un criterio: "CÓDIGO · descripción…"
+         */
+        function buildAspectShortLabel(criterio) {
+            const match = criterio.titulo.match(/^\s*([A-Z]{2,4}(?:\.\d+){2,3})\.?\s*/);
+            const code = match ? match[1] : '';
+            let desc = criterio.titulo.replace(/^\s*[A-Z]{2,4}(?:\.\d+){2,3}\.?\s*/, '').trim();
+            if (desc.length > 60) {
+                desc = desc.slice(0, 60).replace(/\s+\S*$/, '') + '…';
+            }
+            return code ? (code + ' · ' + desc) : desc;
+        }
+
+        /**
+         * Envía los criterios seleccionados al módulo de evaluación:
+         * guarda el payload en localStorage y navega a EvaluaRubricas.html.
+         */
+        function sendToEvaluation(mode) {
+            let criteriaList = [];
+            if (mode === 'competencias') {
+                criteriaList = rubricasData.filter(c => c.competencia == selectedCompetencia);
+            } else {
+                criteriaList = rubricasData.filter(c => selectedCriterios.includes(c.id));
+            }
+
+            if (!criteriaList.length) {
+                alert('Selecciona al menos un criterio antes de pasarlo al módulo de evaluación.');
+                return;
+            }
+
+            const formatSelect = document.getElementById(mode === 'competencias' ? 'export-format-competencias' : 'export-format-multiple');
+            const format = formatSelect ? formatSelect.value : '1';
+            const values = getScoreValuesByFormat(format);
+
+            // Etiquetas cortas únicas para los aspectos
+            const used = {};
+            const labels = criteriaList.map(c => {
+                let label = buildAspectShortLabel(c);
+                if (used[label]) {
+                    used[label] += 1;
+                    label = label + ' (' + used[label] + ')';
+                } else {
+                    used[label] = 1;
+                }
+                return label;
+            });
+
+            const payload = {
+                source: EVAL_SOURCE_FILE,
+                sourceTitle: EVAL_SOURCE_TITLE,
+                sentAt: new Date().toISOString(),
+                format: String(format),
+                evaluationName: 'Rúbrica ' + EVAL_SOURCE_TITLE,
+                aspects: labels,
+                values: values,
+                rubricDetails: criteriaList.map((c, i) => ({
+                    label: labels[i],
+                    titulo: c.titulo,
+                    descripcion: c.descripcion,
+                    niveles: c.niveles.map(n => ({ nivel: n.nivel, descriptor: n.descriptor }))
+                }))
+            };
+
+            try {
+                localStorage.setItem(EVAL_PENDING_KEY, JSON.stringify(payload));
+            } catch (err) {
+                alert('No se pudo preparar la rúbrica para el evaluador: ' + err.message);
+                return;
+            }
+
+            window.location.href = 'EvaluaRubricas.html';
         }
 
     </script>
