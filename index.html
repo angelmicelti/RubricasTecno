@@ -1,188 +1,505 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<link rel="manifest" href="./manifest.json" />
+    <link rel="manifest" href="./manifest.json" />
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2563eb">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <title>Generación de Rúbrícas de Evaluación</title>
+    <title>Rúbricas de Evaluación · Depto. Tecnología</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #4f46e5;
+            --success: #16a34a;
+            --radius: 18px;
+            --shadow-1: 0 1px 2px rgba(15, 23, 42, .05), 0 1px 3px rgba(15, 23, 42, .08);
+            --shadow-2: 0 10px 28px rgba(15, 23, 42, .12), 0 2px 6px rgba(15, 23, 42, .05);
+            --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
+
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
+            min-height: 100dvh;
+            line-height: 1.55;
+        }
+
+        /* Blobs decorativos de fondo */
+        .bg-decor {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bg-decor::before, .bg-decor::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: .5;
+        }
+        .bg-decor::before {
+            width: 480px; height: 480px;
+            background: #dbeafe;
+            top: -160px; right: -120px;
+        }
+        .bg-decor::after {
+            width: 420px; height: 420px;
+            background: #e0e7ff;
+            bottom: -180px; left: -140px;
+        }
+
+        .wrap {
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: clamp(20px, 4vw, 48px) clamp(16px, 4vw, 32px) 32px;
+        }
+
+        /* ===== Cabecera ===== */
+        .hero { text-align: center; margin-bottom: clamp(24px, 4vw, 40px); }
+
+        .hero-badge {
+            display: inline-flex;
             align-items: center;
-            padding: 20px;
+            gap: 8px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: var(--primary-dark);
+            font-size: clamp(.72rem, 2.4vw, .82rem);
+            font-weight: 600;
+            letter-spacing: .02em;
+            padding: 7px 14px;
+            border-radius: 999px;
+            margin-bottom: 18px;
         }
-        
-        .container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 900px;
-            padding: 40px;
-            text-align: center;
+        .hero-badge svg { width: 15px; height: 15px; flex: none; }
+
+        .hero h1 {
+            font-size: clamp(1.65rem, 5.4vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: -.02em;
+            line-height: 1.12;
         }
-        
-        header {
-            margin-bottom: 40px;
+
+        .hero p {
+            margin: 12px auto 0;
+            max-width: 62ch;
+            color: var(--text-2);
+            font-size: clamp(.92rem, 2.6vw, 1.06rem);
         }
-        
-        h1 {
-            color: #2c3e50;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        h2 {
-            color: #3498db;
-            font-size: 1.8rem;
-            font-weight: 500;
-        }
-        
-        .buttons-container {
+
+        /* ===== Tarjeta destacada: módulo de evaluación ===== */
+        .eval-feature { margin-bottom: clamp(28px, 4.5vw, 44px); }
+
+        .eval-card {
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            margin-top: 30px;
+            gap: 18px;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: clamp(20px, 4vw, 30px);
+            text-decoration: none;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, .35);
+            transition: transform .25s ease, box-shadow .25s ease;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .button-row {
+        .eval-card::after {
+            content: "";
+            position: absolute;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .12);
+            top: -130px; right: -80px;
+            pointer-events: none;
+        }
+        .eval-card:hover, .eval-card:focus-visible {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(37, 99, 235, .45);
+            text-decoration: none;
+        }
+
+        .eval-card-head {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            align-items: center;
+            gap: 16px;
         }
-        
-        .row-top {
-            justify-content: center;
+        .eval-card-icon {
+            flex: none;
+            width: 54px; height: 54px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, .18);
+            display: grid;
+            place-items: center;
         }
-        
-        .row-middle, .row-bottom {
-            justify-content: center;
+        .eval-card-icon svg { width: 28px; height: 28px; }
+
+        .eval-card-title { flex: 1; min-width: 0; }
+        .eval-card-title h2 {
+            font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+            font-weight: 700;
+            line-height: 1.2;
         }
-        
-        .btn {
-            background: linear-gradient(135deg, #3498db, #2c3e50);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 20px 15px;
-            font-size: 1.1rem;
+        .eval-card-title span {
+            display: block;
+            margin-top: 3px;
+            font-size: clamp(.8rem, 2.4vw, .9rem);
+            font-weight: 500;
+            color: #dbeafe;
+        }
+        .eval-card-go {
+            flex: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, .16);
+            border: 1px solid rgba(255, 255, 255, .35);
+            padding: 9px 16px;
+            border-radius: 999px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: .88rem;
+            white-space: nowrap;
+        }
+        .eval-card-go svg { width: 16px; height: 16px; transition: transform .2s ease; }
+        .eval-card:hover .eval-card-go svg { transform: translateX(3px); }
+
+        .eval-steps {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .eval-steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: clamp(.82rem, 2.5vw, .92rem);
+            color: #eef2ff;
+            line-height: 1.45;
+        }
+        .eval-steps b { color: #fff; font-weight: 600; }
+        .eval-step-n {
+            flex: none;
+            width: 22px; height: 22px;
+            margin-top: 1px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .22);
+            display: grid;
+            place-items: center;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        /* ===== Sección materias ===== */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: clamp(1.05rem, 3vw, 1.3rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .section-title::after {
+            content: "";
             flex: 1;
-            max-width: 250px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            height: 1px;
+            background: var(--border);
+        }
+        .section-title span { color: var(--text-3); font-weight: 600; font-size: .85em; }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 225px), 1fr));
+            gap: 14px;
+        }
+
+        .subject-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 18px 16px;
+            text-decoration: none;
+            color: var(--text);
+            box-shadow: var(--shadow-1);
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+            overflow: hidden;
+        }
+        .subject-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--chip, var(--primary));
+            opacity: .9;
+        }
+        .subject-card:hover, .subject-card:focus-visible {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-2);
+            border-color: color-mix(in srgb, var(--chip, var(--primary)) 45%, #ffffff);
             text-decoration: none;
         }
-        
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 7px 12px rgba(0, 0, 0, 0.15);
-            background: linear-gradient(135deg, #2980b9, #1c2833);
-            text-decoration: none;
+
+        .subject-icon {
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: color-mix(in srgb, var(--chip, var(--primary)) 12%, #ffffff);
+            color: var(--chip, var(--primary));
         }
-        
-        .btn:active {
-            transform: translateY(-2px);
+        .subject-icon svg { width: 24px; height: 24px; }
+
+        .subject-name {
+            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.3;
         }
-        
-        .btn-green {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 20px 15px;
-            font-size: 1.1rem;
+        .subject-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: auto;
+        }
+        .subject-level {
+            display: inline-block;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            color: var(--text-2);
+            font-size: .76rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            max-width: 250px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
         }
-        
-        .btn-green:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 7px 12px rgba(0, 0, 0, 0.15);
-            background: linear-gradient(135deg, #229954, #1e8449);
-            text-decoration: none;
+        .subject-go {
+            color: var(--text-3);
+            transition: color .2s ease, transform .2s ease;
         }
-        
-        .btn-green:active {
-            transform: translateY(-2px);
-        }
-        
+        .subject-go svg { width: 18px; height: 18px; display: block; }
+        .subject-card:hover .subject-go { color: var(--chip, var(--primary)); transform: translateX(3px); }
+
         footer {
-            margin-top: 40px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
+            margin-top: clamp(32px, 5vw, 48px);
+            text-align: center;
+            color: var(--text-3);
+            font-size: .85rem;
         }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .button-row {
-                flex-direction: column;
-                align-items: center;
+
+        /* ===== Responsive ===== */
+        @media (min-width: 640px) {
+            .eval-steps { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        }
+        @media (min-width: 768px) {
+            .eval-card { flex-direction: row; align-items: center; }
+            .eval-card-head { flex: 1; }
+            .eval-steps {
+                flex: 1;
+                min-width: 280px;
+                max-width: 380px;
+                border-left: 1px solid rgba(255, 255, 255, .25);
+                padding-left: 22px;
+                gap: 12px;
             }
-            
-            .btn, .btn-green {
-                max-width: 100%;
-                width: 100%;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
+        }
+        @media (hover: none) {
+            .subject-card:active { transform: scale(.98); }
+            .eval-card:active { transform: scale(.99); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>GENERACIÓN DE RÚBRICAS DE EVALUACIÓN</h1>
-            <h2>Departamento de Tecnología - IES Virgen de Villadiego</h2>
+    <div class="bg-decor" aria-hidden="true"></div>
+
+    <div class="wrap">
+        <header class="hero">
+            <div class="hero-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                </svg>
+                Departamento de Tecnología · IES Virgen de Villadiego
+            </div>
+            <h1>Generación de Rúbricas<br>de Evaluación</h1>
+            <p>Elige una materia para consultar sus criterios y rúbricas, pásalas al módulo de evaluación y calcula las notas de tu grupo.</p>
         </header>
-        
-        <div class="buttons-container">
-            <div class="button-row row-top">
-                <a href="CYR1.html" target="_blank" class="btn">Computación y Robótica <br> 1º ESO</a>
-                <a href="CYR2.html" target="_blank" class="btn">Computación y Robótica <br> 2º ESO</a>
-                <a href="CYR3.html" target="_blank" class="btn">Computación y Robótica <br> 3º ESO</a>
+
+        <!-- Módulo de evaluación (destacado) -->
+        <section class="eval-feature" aria-label="Módulo de evaluación">
+            <a href="EvaluaRubricas.html" class="eval-card">
+                <div class="eval-card-head">
+                    <span class="eval-card-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75" />
+                        </svg>
+                    </span>
+                    <span class="eval-card-title">
+                        <h2>Módulo de Evaluación</h2>
+                        <span>Evalúa al alumnado con tus rúbricas y obtén las notas</span>
+                    </span>
+                    <span class="eval-card-go" aria-hidden="true">
+                        Abrir
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" />
+                        </svg>
+                    </span>
+                </div>
+                <ol class="eval-steps">
+                    <li><span class="eval-step-n">1</span><span>Elige una materia y <b>selecciona los criterios</b> que te interesan.</span></li>
+                    <li><span class="eval-step-n">2</span><span>Pulsa <b>«Pasar al módulo de evaluación»</b> desde la propia materia.</span></li>
+                    <li><span class="eval-step-n">3</span><span><b>Evalúa</b> al grupo, añade la coevaluación y calcula las notas.</span></li>
+                </ol>
+            </a>
+        </section>
+
+        <!-- Materias -->
+        <section aria-label="Materias">
+            <h2 class="section-title">Materias <span>· rúbricas por curso</span></h2>
+            <div class="subjects-grid">
+
+                <a class="subject-card" href="CYR1.html" style="--chip:#2563eb">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                            <rect x="9" y="9" width="6" height="6" />
+                            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Computación y Robótica</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">1º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
+                <a class="subject-card" href="CYR2.html" style="--chip:#2563eb">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                            <rect x="9" y="9" width="6" height="6" />
+                            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Computación y Robótica</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">2º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
+                <a class="subject-card" href="CYR3.html" style="--chip:#2563eb">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                            <rect x="9" y="9" width="6" height="6" />
+                            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Computación y Robótica</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">3º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
+                <a class="subject-card" href="TYD2.html" style="--chip:#0d9488">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17L8.705 4.536a1.5 1.5 0 00-2.874-.09L4.25 8.5m7.17 6.67l-6.67 6.67a1.414 1.414 0 01-2-2l6.67-6.67m0 0L4.25 8.5m4.67 5.17L4.25 8.5" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Tecnología y Digitalización</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">2º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
+                <a class="subject-card" href="TYD3.html" style="--chip:#0d9488">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17L8.705 4.536a1.5 1.5 0 00-2.874-.09L4.25 8.5m7.17 6.67l-6.67 6.67a1.414 1.414 0 01-2-2l6.67-6.67m0 0L4.25 8.5m4.67 5.17L4.25 8.5" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Tecnología y Digitalización</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">3º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
+                <a class="subject-card" href="TEC4.html" style="--chip:#d97706">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Tecnología</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">4º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
+                <a class="subject-card" href="DIG4.html" style="--chip:#7c3aed">
+                    <span class="subject-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                        </svg>
+                    </span>
+                    <span class="subject-name">Digitalización</span>
+                    <span class="subject-meta">
+                        <span class="subject-level">4º ESO</span>
+                        <span class="subject-go" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" /></svg>
+                        </span>
+                    </span>
+                </a>
+
             </div>
-            
-            <div class="button-row row-middle">
-                <a href="TYD2.html" target="_blank" class="btn">Tecnología y Digitalización <br> 2º ESO</a>
-                <a href="TYD3.html" target="_blank" class="btn">Tecnología y Digitalización <br> 3º ESO</a>
-            </div>
-            
-            <div class="button-row row-bottom">
-                <a href="TEC4.html" target="_blank" class="btn">Tecnología <br> 4º ESO</a>
-                <a href="DIG4.html" target="_blank" class="btn">Digitalización <br> 4ºESO</a>
-            </div>
-        </div>
-        
+        </section>
+
         <footer>
-            <p>Ángel Millán León - 2026</p>
+            <p>Ángel Millán León — 2026</p>
         </footer>
     </div>
+
     <script src="./regist_serviceWorker.js"></script>
 </body>
 </html>
